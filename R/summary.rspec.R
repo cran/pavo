@@ -1,6 +1,6 @@
-#' Tristimulus color variables
+#' Colorimetric variables
 #'
-#' Extracts all 23 tristimulus color variables described in 
+#' Calculates all 23 colorimetric variables reviewed in 
 #' Montgomerie (2006).
 #'
 #' @S3method summary rspec
@@ -9,14 +9,19 @@
 #' @param object (required) a data frame, possibly an object of class \code{rspec},
 #' with a column with wavelength data, named 'wl', and the remaining column containing
 #' spectra to process.
+#' @param subset Either \code{FALSE} (the default), \code{TRUE}, or a character vector. 
+#' If \code{FALSE}, all variables calculated are returned. If \code{TRUE}, only a subset 
+#' of the complete ouput (composed of B2, H1, H3, S8, S9; the variables described in 
+#' Andersson and Prager 2006) are returned. Finally, a user-specified string of variable 
+#' names can be used in order to filter and show only those variables.
 #' @param ... class consistency (ignored)
-#' @return A data frame containing 23 variables described in Montgomerie (2006)
-#' with spectra name as row names. 
-#' @return The tristimulus color variables calculated by this function are 
+#' @return A data frame containing either 23 or 5 (\code{subset = TRUE}) variables described 
+#' in Montgomerie (2006) with spectra name as row names. 
+#' The colorimetric variables calculated by this function are 
 #' described in Montgomerie (2006) with corrections included in the README CLR
 #' file from the May 2008 distribution of the CLR sofware. Authors should reference 
-#' both this package and Montgomerie (2006).
-#' @return Description and notes on the measures:
+#' both this package,Montgomerie (2006), and the original reference(s).
+#' Description and notes on the measures:
 #'
 #' B1 (Total brightness): Sum of the relative reflectance over the entire spectral
 #' range (area under the curve). Frequently used but should be discouraged because
@@ -92,7 +97,12 @@
 #' rely on smoothed curves to remove noise, which would otherwise result in spurious
 #' results. Make sure chosen smoothing parameters are adequate.
 #' @note Smoothing affects only B3, S2, S4, S6, S10, H2, and H5 calculation. All other 
-#' variables are extracted using non-smoothed data. 
+#' variables can be reliably extracted using non-smoothed data. 
+#' @examples \dontrun{
+#' data(sicalis)
+#' summary(sicalis)
+#' summary(sicalis, subset = TRUE)
+#' summary(sicalis, subset = c('B1', 'H4')) }
 #' @author Pierre-Paul Bitton \email{bittonp@@windsor.ca}, Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @references Montgomerie R. 2006. Analyzing colors. In Hill, G.E, and McGraw, K.J., eds. 
 #' Bird Coloration. Volume 1 Mechanisms and measuremements. Harvard University Press, Cambridge, Massachusetts.
@@ -146,7 +156,7 @@
 #summary.rspec <- function (object, ...) {
 
  
-summary.rspec <- function (object, ...) {
+summary.rspec <- function (object, subset = FALSE, ...) {
 
 wl_index <- which(names(object)=='wl')
 wl <- object[,wl_index]
@@ -283,7 +293,7 @@ if(lambdamin <= 300){
   }
   
 if(lambdamin > 300 & lambdamin < 400){
-  warning(paste('Minimum wavelength is', lambdamin,'UV-related variables may not be meaningful'), call.=FALSE)
+  warning(paste('Minimum wavelength is', lambdamin,'; UV-related variables may not be meaningful'), call.=FALSE)
   lminuv <- lambdamin
   UVchromamat <- as.matrix(object[which(wl==lminuv):which(wl==400),]) 
   UVchroma <- (apply(UVchromamat,2,sum))/B1 # S1 UV
@@ -299,6 +309,21 @@ color.var <- data.frame(output.mat, row.names=names(object))
 names(color.var) <- c("B1", "B2", "B3", "S1.UV", "S1.violet", "S1.blue", "S1.green", 
                       "S1.yellow", "S1.red", "S2", "S3", "S4", "S5", "S6", "S7", "S8", 
                       "S9", "S10", "H1", "H2", "H3", "H4", "H5")
+
+colvarnames <- names(color.var)
+
+if(is.logical(subset)){
+  if(subset){
+    color.var <- color.var[c('B2','S8', 'H1')]
+  }
+}else{
+  #check if any color variables selected don't exist
+  if(all(subset %in% colvarnames)){
+    color.var <- color.var[subset]
+  }else{
+    stop(paste('Names in', dQuote('subset'), 'do not match color variable names'))
+  }
+}
 
 color.var
 }

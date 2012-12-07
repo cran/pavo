@@ -1,3 +1,28 @@
+pavo 0.3
+------------------------------------------------------------------------------
+NEW FUNCTIONS
+
+* subset() class methods for rspec, vismodel and tcs
+* summary() method for vismodel, returns attributes used in visual model
+
+VISUAL MODEL
+
+* vismodel() output includes only Qi or fi (as selected by qcatch argument)
+* vismodel() von Kries correction is now an optional argument
+* coldist() subset argument for partial filtering
+* Updated sensitivity curves
+
+MINOR FEATURES
+
+* getspec() works with Avasoft 8 output
+* aggspec() if no "by" argument is supplied, applies function to all spectra
+
+BUG FIXES
+
+* tcs() accepts receptor names other than usml, issues warning
+* aggplot() allows control for different line types per spectra
+* voloverlap() now assigns darkgrey color for overlap if color vector is of length 1 or 2
+
 pavo 0.1-2
 ------------------------------------------------------------------------------
 NEW FUNCTIONS

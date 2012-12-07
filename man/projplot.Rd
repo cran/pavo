@@ -7,8 +7,8 @@
 \arguments{
   \item{tcsdata}{(required) color space coordinates,
   possibly a result from the \code{\link{tcs}} function,
-  containing values for the 'x', 'y' and 'z' coordinates as
-  columns (labeled as such).}
+  containing values for the 'h.theta' and 'h.phi'
+  coordinates as columns (labeled as such).}
 
   \item{...}{additonal parameters to be passed to the
   plotting of data points.}
@@ -32,8 +32,8 @@
 \dontrun{
 data(sicalis)
 vis.sicalis <- vismodel(sicalis, visual='avg.uv')
-tcs.sicalis <- tcs(vis.sicalis, by=rep(c('C','T','B'),7))
-projplot(tcs.sicalis) }
+tcs.sicalis <- tcs(vis.sicalis)
+projplot(tcs.sicalis, pch=16, col=setNames(rep(1:3, 7), rep(c('C','T','B'),7))) }
 }
 \author{
   Rafael Maia \email{rm72@zips.uakron.edu}

@@ -17,10 +17,11 @@
 #' Bmid based on the regression equations found in Hart ad Vorobyev (2005).
 #' @param beta logical. If \code{TRUE} the sensitivities will include the beta peak
 #' See Govardovskii et al.(2000) (defaults to \code{TRUE}).
-#' @param om logical. If \code{TRUE} cone senssitivity will be corrected for ocular media 
-#' transmission. Values from Hart et al. (2005)(defaults to \code{FALSE}).
+#' @param om a vector of same length as \code{range1}-\code{range2} that contains ocular media transmission data.
+#' If included, cone sensitivity will be corrected for ocular media transmission. Currently accepts "bird" using 
+#' values from Hart et al. (2005), or user-defined values.
 #' @param integrate logical. If \code{TRUE}, each curve is transformed to have a total area
-#' under the curve of 1 (best for visual models)(defaults to \code{TRUE}).
+#' under the curve of 1 (best for visual models; defaults to \code{TRUE}).
 #' @return A data frame of class \code{rspec} containing each cone model as a column.
 #' @export
 #' @examples \dontrun{
@@ -40,7 +41,7 @@
 
 
 sensmodel <- function(peaksense, range = c(300,700), lambdacut = NULL, Bmid = NULL, 
-		             oiltype = NULL, beta = TRUE, om = FALSE, integrate = TRUE) {
+		             oiltype = NULL, beta = TRUE, om = NULL, integrate = TRUE) {
 
 if (!is.null(lambdacut)){
  if (is.null(Bmid) & is.null(oiltype)) stop ("Bmid or oiltype must be included when including a lambdacut vector", call.=FALSE)
@@ -49,8 +50,7 @@ if (!is.null(lambdacut)){
 
 sensecurves <- matrix(ncol = length(peaksense)+1,nrow = (range[2]-range[1]+1))
 sensecurves[,1] <- c(range[1]:range[2])
-T.e <- log(8.928*10^-13*(range[1]:range[2])^5-2.595*10^-9*(range[1]:range[2])^4+3.006*10^-6*(range[1]:range[2])^3-.001736*(range[1]:range[2])^2+.5013*(range[1]:range[2])-55.56)
-T.e[which(T.e < 0)] <- 0
+
 
 #Sensitivities w/o oil droplets
 for (i in 1: length(peaksense)){
@@ -76,23 +76,34 @@ if (!is.null(lambdacut) & !is.null(oiltype)){
 
   if (length(lambdacut) != length(oiltype)) stop ("lambdacut and oiltype must be of same length")
 
-  if (oiltype[i] == "T") oil <- c(0.99, 24.38) #Entered as a dummy (see below)
   if (oiltype[i] == "C") oil <- c(0.99, 24.38)
   if (oiltype[i] == "Y") oil <- c(0.9, 70.03)
   if (oiltype[i] == "R") oil <- c(0.99, 28.65)
   if (oiltype[i] == "P") oil <- c(0.96, 33.57)
 
 # Oil droplet transmission from Hart and Vorobyev (2005)
-T.oil <- exp(-exp(-2.89*(.5/((oil[1]*lambdacut[i]+oil[2])-lambdacut[i]))*(range[1]:range[2]-lambdacut[i])+1.08))
-
+if (oiltype[i] != "T"){
+  T.oil <- exp(-exp(-2.89*(.5/((oil[1]*lambdacut[i]+oil[2])-lambdacut[i]))*(range[1]:range[2]-lambdacut[i])+1.08))
+}
   if(oiltype[i] == "T") T.oil <- rep(1,range[2]-range[1])
   
 peak <- peak*T.oil
 }
-# Apply ocular media trnasmission correction
-if (om == TRUE){
-  peak <- peak * T.e
+# Apply ocular media transmission correction
+
+if (!is.null(om)){
+  if (length(om) == 1){
+    if (om == "bird"){
+    T.e <- log(8.928*10^-13*(range[1]:range[2])^5-2.595*10^-9*(range[1]:range[2])^4+3.006*10^-6*(range[1]:range[2])^3-.001736*(range[1]:range[2])^2+.5013*(range[1]:range[2])-55.56)
+    T.e[which(T.e < 0)] <- 0
+    peak <- peak * T.e}
+  }
+  else {
+    T.e <- om
+    peak <- peak * T.e
+  }
 }
+
 
 sensecurves[, (i+1)] <- peak
   }

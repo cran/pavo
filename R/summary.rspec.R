@@ -9,17 +9,6 @@
 #' @param object (required) a data frame, possibly an object of class \code{rspec},
 #' with a column with wavelength data, named 'wl', and the remaining column containing
 #' spectra to process.
-#' @param smooth logical. If \code{TRUE} spectra will be smoothed 
-#' before extracting some of the values. When \code{TRUE}, uses the loess smoothing to 
-#' reduce spectral noise when extracting variables for which bmax and
-#' bmaxneg are required, and for which Rmax and Rmin are required (defaults to \code{TRUE}).
-#' See notes. 
-#' @param span the degree of smoothing if \code{smooth} is \code{TRUE}. Larger values result
-#' in greater smoothing (defaults to 0.2).
-#' @param wlrange vector of length 2 indicating the lower and upper wavelength bounds used
-#' to calculate variables that refer to a color wheel (S5 and H4) (defaults to 300nm to 700nm).
-#' @param plot logical. If \code{TRUE}, smooth spectra are plotted for verification of the
-#' smoothing parameter (defaults to \code{FALSE}).
 #' @param ... class consistency (ignored)
 #' @return A data frame containing 23 variables described in Montgomerie (2006)
 #' with spectra name as row names. 
@@ -154,15 +143,15 @@
 #' 13- Smiseth, P., J. Ornborg, S. Andersson, and T. Amundsen. 2001. Is male plumage reflectance
 #' correlated with paternal care in bluethroats? Behavioural Ecology 12:164-170.
 
-#summary.rspec <- function (object, wlrange=c(300,700), 
-#                smooth=TRUE, span=0.2, plot=FALSE) {
+#summary.rspec <- function (object, ...) {
 
  
-summary.rspec <- function (object, wlrange=c(300,700), smooth=TRUE, span=0.2, plot=FALSE, ...) {
+summary.rspec <- function (object, ...) {
 
 wl_index <- which(names(object)=='wl')
 wl <- object[,wl_index]
 lambdamin <- min(wl)
+lambdamax <- max(wl)
 object <- object[,-wl_index]
 
 output.mat <- matrix (nrow=(dim(object)[2]), ncol=23)
@@ -186,23 +175,23 @@ Bluechromamat <- as.matrix(object[which(wl==400):which(wl==510),]) # blue 400-51
   Bluechroma <- (apply(Bluechromamat,2,sum))/B1 # S1 blue
 
 
-segmts <- trunc(as.numeric(quantile(wlrange[1]:wlrange[2])))
+segmts <- trunc(as.numeric(quantile(lambdamin:lambdamax)))
 
 Q1 <- which(wl==segmts[1]):which(wl==segmts[2])
 Q2 <- which(wl==segmts[2]):which(wl==segmts[3])
 Q3 <- which(wl==segmts[3]):which(wl==segmts[4])
 Q4 <- which(wl==segmts[4]):which(wl==segmts[5])
 
-S5R <- apply(object[Q4, ],2,sum)
-S5Y <- apply(object[Q3, ],2,sum)
-S5G <- apply(object[Q2, ],2,sum)
-S5B <- apply(object[Q1, ],2,sum)
-
+S5R <- apply(object[Q4, ],2,sum)/B1
+S5Y <- apply(object[Q3, ],2,sum)/B1
+S5G <- apply(object[Q2, ],2,sum)/B1
+S5B <- apply(object[Q1, ],2,sum)/B1
 
 S5 <- sqrt((S5R-S5G)^2+(S5Y-S5B)^2)
 
 #H4 <- atan(((S5Y-S5B)/B1)/((S5R-S5G)/B1))
-H4 <- atan2((S5R-S5G)/B1, (S5Y-S5B)/B1)
+# H4 <- atan2((S5R-S5G)/B1, (S5Y-S5B)/B1)
+H4 <- atan2(S5R-S5G, S5Y-S5B)
 
 #carotchroma
 R450 <- as.numeric(object[which(wl==450), ])
@@ -227,25 +216,10 @@ pmindex <- 1:dim(object)[2]
 S3 <- sapply(pmindex, function(x) sum(object[minus50[x]:plus50[x],x]))/B1
 
 
-#Metrics that involve bmax with or without smoothing
-data <- object
-
-if(smooth){
-  smoothspecs <- data.frame(apply(object,2, function(x) loess.smooth(wl, x, 
-                                  span=span, degree=2, family = 'gaussian', 
-                                  evaluation = length(wl))$y) )
-  }else{
-    smoothspecs <- object
-    warning('Spectral curves not smoothed - 
-    variables that rely on derivatives (S4, S10, H2 and H5) are not meaningful', call.=FALSE)
-    }
-
-# PPB B3, S2, S6 are now smoothed 
-# RM H1 as well
-B3 <- sapply(smoothspecs, max)
+B3 <- sapply(object, max)
 
 # Spectral saturation
-Rmin <- sapply(smoothspecs, min)
+Rmin <- sapply(object, min)
 S2 <- B3/Rmin #S2
 
 S8  <- (B3-Rmin)/B2 # S8
@@ -253,20 +227,25 @@ S8  <- (B3-Rmin)/B2 # S8
 S6 <- B3-Rmin # S6
 
 # lambda Rmax hue
-H1 <- wl[max.col(t(smoothspecs), ties.method='first')]
+H1 <- wl[max.col(t(object), ties.method='first')]
 
 # H3 
 lambdaRmin <- wl[apply(object, 2, which.min)]  # H3
   Rmid <- round((H1+lambdaRmin)/2)
 
-
-
-diffsmooth <- apply(smoothspecs,2,diff)
+diffsmooth <- apply(object,2,diff)
 
 lambdabmaxneg <- wl[apply(diffsmooth,2,which.min)] #H2
+  lambdabmaxneg[which(apply(diffsmooth,2,min) > 0)] <- NA
+
 bmaxneg <- abs(apply(diffsmooth,2,min)) #S4
+  bmaxneg[which(apply(diffsmooth,2,min) > 0)] <- NA
+
 S10 <- S8/bmaxneg #S10
+ S10[which(apply(diffsmooth,2,min) > 0)] <- NA
+
 lambdabmax <- wl[apply(diffsmooth,2,which.max)] #H5
+  lambdabmax[which(apply(diffsmooth,2,which.max) < 0)] <- NA
 
   output.mat[, 1] <- B1
   output.mat[, 2] <- B2
@@ -320,9 +299,6 @@ color.var <- data.frame(output.mat, row.names=names(object))
 names(color.var) <- c("B1", "B2", "B3", "S1.UV", "S1.violet", "S1.blue", "S1.green", 
                       "S1.yellow", "S1.red", "S2", "S3", "S4", "S5", "S6", "S7", "S8", 
                       "S9", "S10", "H1", "H2", "H3", "H4", "H5")
-
-if(plot)
-  explorespec(cbind(data.frame(wl,smoothspecs)))
 
 color.var
 }

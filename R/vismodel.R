@@ -1,3 +1,4 @@
+
 #' Visual Models
 #' 
 #' Applies the visual models of Vorobyev et al. (1998) to calculate quantum 
@@ -8,6 +9,12 @@
 #' @param rspecdata (required) a data frame, possibly an object of class \code{rspec}
 #' that has wavelength range in the first column, named 'wl', and spectral measurements in the 
 #' remaining columns. 
+#' @param qcatch Which quantal catch metric to return. Options are:
+#' \itemize{
+#' \item \code{Qi}: Quantum catch for each photoreceptor 
+#' \item \code{fi}: Quantum catch according to Fechner law (the signal of the receptor
+#' channel is proportional to the logarithm of the quantum catch)
+#' }
 #' @param visual the visual system to be used. Options are:
 #' \itemize{
 #'	\item a data frame such as one produced containing by \code{sensmodel}, containing 
@@ -47,12 +54,9 @@
 #' are, for example, 500 (for dim light) and 10000 (for bright illumination). Note that if
 #' \code{vonkries=TRUE} this transformation has no effect.
 #'
-#' @return An object of class \code{vismodel} containing the following data frames:
-#' @return \code{descriptive}: Descriptive statistics of maximum and normalized 
-#' reflectance, and wavelength of maximum reflectance (hue)
-#' @return \code{Qi}: Quantum catch for each photoreceptor 
-#' @return \code{fi}: Quantum catch according to Fechner law (the signal of the receptor
-#' channel is proportional to the logarithm of the quantum catch)
+#' @return An object of class \code{vismodel} containing the photon catches for each of the 
+#' photoreceptors considered. Information on the parameters used in the calculation are also
+#' stored and can be called using the \code{summary.vismodel} function.
 #' @export
 #' @examples \dontrun{
 #' data(sicalis)
@@ -64,7 +68,7 @@
 #' @references Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage color in a tetrahedral color space: A phylogenetic analysis of new world buntings. The American Naturalist, 171(6), 755-776.
 #' @references Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
 
-vismodel <- function(rspecdata, 
+vismodel <- function(rspecdata, qcatch = c('Qi','fi'),
   visual = c("avg.uv", "avg.v", "bt", "star", "pfowl"), 
   achromatic = c("bt.dc","ch.dc","ml","none"),
   illum = c('ideal','bluesky','D65','forestshade'), 
@@ -93,10 +97,7 @@ if(!inherits(visual2,'try-error')){
     visual <- 'user-defined'
     }
 
-
-# if relative=F, convert to proportions
-
-# if(!relative)
+if(max(y) > 1)
   y <- y/100
 
 # check if wavelength range matches
@@ -104,7 +105,7 @@ if(!inherits(visual2,'try-error')){
     stop('wavelength in spectra table and visual system chosen do not match')
 
 
-#DEFINING illumINANT & BACKGROUND
+#DEFINING ILLUMINANT & BACKGROUND
 
 bgil<- pavo::bgandilum
 
@@ -128,18 +129,10 @@ if(!inherits(bg2,'try-error')){
 if(bg2=='ideal')
   bkg <- rep(1,dim(rspecdata)[1])
 
+# scale background
+if(max(bkg) > 1)
+  bkg <- bkg/100
 
-# brightness
-norm.B <- colSums(y)/(dim(y)[1]*100)
-max.B <- apply(y,2,max)
-
-# wavelength of maximum reflectance
-lambdamax <- wl[max.col(t(y))]
-
-descriptive <- data.frame(lambdamax,norm.B,max.B)
-
-# scale to maximum reflectance = 1
-yscale <- apply(y,2,function(x) x/max(x))
 
 # scale illuminant
 illum <- illum * scale
@@ -166,6 +159,9 @@ if(achromatic=='ml'){
   Qi <- data.frame(cbind(Qi,lum))
 }
 
+if(achromatic=='none'){
+	lum <- NULL
+}
 
 #qi 
 # von Kries correction (constant adapting background)
@@ -185,9 +181,18 @@ if(vonkries)
 fi <- log(Qi)
 
 
-if(relative){
+if(relative & !is.null(lum)){
   Qi[,-dim(Qi)[2]] <- Qi[,-dim(Qi)[2]]/rowSums(Qi[,-dim(Qi)[2]])
   fi[,-dim(fi)[2]] <- fi[,-dim(fi)[2]]/rowSums(fi[,-dim(fi)[2]])
+
+# Place dark specs in achromatic center?
+# blacks <- which(norm.B < 0.05) #find dark specs
+# Qi[blacks,] <- 0.2500 #place dark specs in achromatic center
+}
+
+if(relative & is.null(lum)){
+  Qi <- Qi/rowSums(Qi)
+  fi <- fi/rowSums(fi)
 
 # Place dark specs in achromatic center?
 # blacks <- which(norm.B < 0.05) #find dark specs
@@ -201,11 +206,17 @@ if(vonkries)
 
 #OUTPUT
 #res<-list(descriptive=descriptive,Qi=Qi, qi=qi, fi=fi)
-res<-list(Qi=Qi, fi=fi)
-class(res) <- 'vismodel'
+
+qcatch <- match.arg(qcatch)
+
+res <- switch(qcatch, Qi = Qi, fi = fi)
+
+class(res) <- c('vismodel', 'data.frame')
+attr(res, 'qcatch') <- qcatch
 attr(res,'visualsystem') <- c(visual,achromatic)
 attr(res,'illuminant') <- paste(illum2,', scale = ',scale," ",vk, sep='')
 attr(res,'background') <- bg2
 attr(res,'relative') <- relative
+
 res
 }

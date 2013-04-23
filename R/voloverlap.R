@@ -60,9 +60,9 @@
 #' the two input volumes, which may be more adequate in most cases.
 #' @examples \dontrun{
 #' data(sicalis)
-#' tcs.sicalis.C <- tcs(vismodel(sicalis[c(1,grep('\\.C',names(sicalis)))]))
-#' tcs.sicalis.T <- tcs(vismodel(sicalis[c(1,grep('\\.T',names(sicalis)))]))
-#' tcs.sicalis.B <- tcs(vismodel(sicalis[c(1,grep('\\.B',names(sicalis)))]))
+#' tcs.sicalis.C <- subset(tcs(vismodel(sicalis)), 'C')
+#' tcs.sicalis.T <- subset(tcs(vismodel(sicalis)), 'T')
+#' tcs.sicalis.B <- subset(tcs(vismodel(sicalis)), 'B')
 #' voloverlap(tcs.sicalis.T,tcs.sicalis.B)
 #' voloverlap(tcs.sicalis.T,tcs.sicalis.C, plot=T)
 #' voloverlap(tcs.sicalis.T,tcs.sicalis.C, plot=T, col=1:3) }
@@ -166,7 +166,7 @@ res <- data.frame(vol1, vol2, s_in1,s_in2,s_inboth,s_ineither,psmallest,pboth)
 ############
 if(plot==TRUE){
   if(length(col)<3)
-    col <- rep(col,3)
+    col <- c(rep(col,2)[1:2], 'darkgrey')
 
 if(new==TRUE)
   open3d(FOV=1, mouseMode=c('zAxis','xAxis','zoom'))

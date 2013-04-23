@@ -1,8 +1,8 @@
 \name{summary.rspec}
 \alias{summary.rspec}
-\title{Tristimulus color variables}
+\title{Colorimetric variables}
 \usage{
-  \method{summary}{rspec} (object, ...)
+  \method{summary}{rspec} (object, subset = FALSE, ...)
 }
 \arguments{
   \item{object}{(required) a data frame, possibly an object
@@ -10,19 +10,27 @@
   data, named 'wl', and the remaining column containing
   spectra to process.}
 
+  \item{subset}{Either \code{FALSE} (the default),
+  \code{TRUE}, or a character vector. If \code{FALSE}, all
+  variables calculated are returned. If \code{TRUE}, only a
+  subset of the complete ouput (composed of B2, H1, H3, S8,
+  S9; the variables described in Andersson and Prager 2006)
+  are returned. Finally, a user-specified string of
+  variable names can be used in order to filter and show
+  only those variables.}
+
   \item{...}{class consistency (ignored)}
 }
 \value{
-  A data frame containing 23 variables described in
-  Montgomerie (2006) with spectra name as row names.
-
-  The tristimulus color variables calculated by this
-  function are described in Montgomerie (2006) with
-  corrections included in the README CLR file from the May
-  2008 distribution of the CLR sofware. Authors should
-  reference both this package and Montgomerie (2006).
-
-  Description and notes on the measures:
+  A data frame containing either 23 or 5 (\code{subset =
+  TRUE}) variables described in Montgomerie (2006) with
+  spectra name as row names. The colorimetric variables
+  calculated by this function are described in Montgomerie
+  (2006) with corrections included in the README CLR file
+  from the May 2008 distribution of the CLR sofware.
+  Authors should reference both this package,Montgomerie
+  (2006), and the original reference(s). Description and
+  notes on the measures:
 
   B1 (Total brightness): Sum of the relative reflectance
   over the entire spectral range (area under the curve).
@@ -117,7 +125,7 @@
   REF 9
 }
 \description{
-  Extracts all 23 tristimulus color variables described in
+  Calculates all 23 colorimetric variables reviewed in
   Montgomerie (2006).
 }
 \note{
@@ -130,8 +138,15 @@
   Make sure chosen smoothing parameters are adequate.
 
   Smoothing affects only B3, S2, S4, S6, S10, H2, and H5
-  calculation. All other variables are extracted using
-  non-smoothed data.
+  calculation. All other variables can be reliably
+  extracted using non-smoothed data.
+}
+\examples{
+\dontrun{
+data(sicalis)
+summary(sicalis)
+summary(sicalis, subset = TRUE)
+summary(sicalis, subset = c('B1', 'H4')) }
 }
 \author{
   Pierre-Paul Bitton \email{bittonp@windsor.ca}, Rafael

@@ -2,10 +2,10 @@
 \alias{coldist}
 \title{Color distances}
 \usage{
-  coldist(vismodeldata, qcatch = c("fi", "Qi"),
+  coldist(vismodeldata, qcatch = c("Qi", "fi"),
     vis = c("tetra", "tri", "di"),
-    noise = c("neural", "quantum"), achro = TRUE, n1 = 1,
-    n2 = 2, n3 = 2, n4 = 4, v = 0.1)
+    noise = c("neural", "quantum"), subset = NULL,
+    achro = TRUE, n1 = 1, n2 = 2, n3 = 2, n4 = 4, v = 0.1)
 }
 \arguments{
   \item{vismodeldata}{(required) quantum catch color data.
@@ -13,17 +13,28 @@
   independently calculated data (in the form of a data
   frame with four columns, representing the avian cones).}
 
-  \item{qcatch}{quantum catch values to use in the model:
-  \itemize{ \item \code{Qi}: Quantum catch for each
-  photoreceptor (default) \item \code{fi}: Quantum catch
-  according to Fechner law (the signal of the receptor
-  channel is proportional to the logarithm of the quantum
-  catch) }}
+  \item{qcatch}{if the object is of class \code{vismodel},
+  such as one generated using \code{pavo}, this argument is
+  ignored. If the object is a data frame of quantal catches
+  from another source, this argument is used to specify
+  what type of quantum catch is being used, so that the
+  noise can be calculated accordingly: \itemize{ \item
+  \code{Qi}: Quantum catch for each photoreceptor (default)
+  \item \code{fi}: Quantum catch according to Fechner law
+  (the signal of the receptor channel is proportional to
+  the logarithm of the quantum catch) }}
 
   \item{vis}{visual system phenotype to use in the model:
   \itemize{ \item \code{tetra}: Tetrachromatic color vision
   (default) \item \code{tri}: Trichromatic color vision
   \item \code{di}: Dichromatic color vision }}
+
+  \item{subset}{If only some of the comparisons should be
+  returned, a character vector of length 1 or 2 can be
+  provided, indicating which samples are desired. The
+  subset vector must match the labels of the imput samples,
+  but partial matching (and regular expressions) are
+  supported.}
 
   \item{achro}{logical. If \code{TRUE}, last column of the
   data frame is used to calculate the achromatic contrast,
@@ -71,7 +82,7 @@
 \dontrun{
 data(sicalis)
 vis.sicalis <- vismodel(sicalis, visual='avg.uv', relative=FALSE)
-coldist.sicalis <- coldist(vis.sicalis, qcatch='fi', vis='tetra')}
+coldist.sicalis <- coldist(vis.sicalis, vis='tetra')}
 }
 \author{
   Rafael Maia \email{rm72@zips.uakron.edu}

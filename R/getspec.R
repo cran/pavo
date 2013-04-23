@@ -21,8 +21,8 @@
 #' Reflectance values are interpolated to the nearest wavelength integer.
 #' @export
 #' @examples \dontrun{
-#' getspec('/examplespec', lim=c(400,900))	
-#' getspec('/examplespec', ext='ttt')}
+#' getspec('examplespec/', lim=c(400,900))	
+#' getspec('examplespec/', ext='ttt')}
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @references Montgomerie R (2006) Analyzing colors. In: Hill G, McGraw K (eds) 
 #' Bird coloration. Harvard University Press, Cambridge, pp 90-147.
@@ -44,15 +44,12 @@ getspec <- function(where=getwd(), ext='txt', lim=c(300,700), decimal=".",
            subdir=FALSE, subdir.names=FALSE)
 {
 
-
-makenegzero<-function(x) {x[x[,2]<0,2] = 0; x}
-
-separ=ifelse(ext=='ttt',';','\t')
-
 extension <- paste('.', ext, sep='')
 
 file_names <- list.files(where, pattern=extension, recursive=subdir, include.dirs=subdir)
 files <- paste(where,'/',file_names,sep='')
+
+cat(length(files),' files found; importing spectra\n')
 
 if(subdir.names){
 	file_names <- gsub(extension,'',file_names)}else{
@@ -68,6 +65,8 @@ range <- lim[1]:lim[2]
 final <- data.frame(matrix(nrow=length(range), ncol=length(file_names)+1))
 final[,1] <- range
 
+# Setting a progress bar
+progbar <- txtProgressBar(min=0, max=length(files), style=2)
 
 for(i in 1:length(files))
 {
@@ -75,31 +74,52 @@ for(i in 1:length(files))
 raw <- scan(file=files[i], what='', quiet=T, dec=decimal, sep='\n')
 #ToDo we can actually use this raw string to import metadata if we want
 
-start <- grep(separ,raw)[1] - 1
-end <- length(grep(separ,raw))
+# find last line with text
+# correct for spectrasuite files, which have a "End Processed Spectral Data" at the end
 
-#Avantes ttt files don't use tab-delimiting, but semicolon-delimiting
-#also has two lines with semicolon that are not data
+start <- grep('[A-Da-dF-Zf-z]',raw)
+isendline <- length(grep('End.*Spectral Data', raw)) > 0
 
-if(extension=='.ttt'){
-	start <- grep(separ,raw)[3] -1
-	end <- length(grep(separ,raw)) + start -1
-}
+if(isendline)
+  start <- start[-length(start)]
 
-#jaz output file is weird. has 5 columns and an extra line in bottom
 
-if(extension=='.jaz'){
-	tempframe <- read.table(files[i], dec=decimal, sep=separ, skip=start, nrows=end-1, 
-							header=T)
-	tempframe <- tempframe[c('W','P')]
-	}else{
-tempframe <- read.table(files[i], dec=decimal, sep=separ, skip=start, nrows=(end-start-1))		
-	}
+start <- max(start)
+
+end <- length(raw) - start
+
+if( isendline >0 )
+  end <- end - 1
+
+# Avantes has an extra skipped line between header and data. Bad Avantes.
+newavaheader <- length(grep("Wave.*;Sample.*;Dark.*;Reference;Reflectance", raw)) > 0
+
+if(newavaheader)
+  start <- start+1
+
+# find if columns are separated by semicolon or tab
+issem <- length(grep(';',raw)) > 0
+istab <- length(grep('\t',raw)) > 0
+
+if(issem & istab)
+  stop('inconsistent column delimitation in source files.')
+  
+separ <- ifelse(issem,';','\t')
+
+# extract data from file
+
+tempframe <- read.table(files[i], dec=decimal, sep=separ, skip=start, nrows=end)		
+
+# Jaz and Avasoft8 have 5 columns, correct
+tempframe <- tempframe[,c(1,dim(tempframe)[2])]
+
 
 interp<-data.frame(approx(tempframe[,1], tempframe[,2], xout=range))
 names(interp) <- c("wavelength", strsplit(file_names[i], extension) )
 
 final[,i+1] <- interp[,2]
+
+setTxtProgressBar(progbar, i)
 
 }
 

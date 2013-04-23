@@ -2,7 +2,7 @@
 \alias{peakshape}
 \title{Peak shape descriptors}
 \usage{
-  peakshape(rspecdata, select = NULL, bounds = c(300, 700),
+  peakshape(rspecdata, select = NULL, lim = c(300, 700),
     plot = TRUE, ask = FALSE, ...)
 }
 \arguments{
@@ -14,7 +14,7 @@
   \item{select}{specification of which spectra to plot. Can
   be a numeric vector or factor (e.g., \code{sex=='male'})}
 
-  \item{bounds}{a vector specifying the wavelength range to
+  \item{lim}{a vector specifying the wavelength range to
   analyze}
 
   \item{plot}{logical. Should plots indicating calculated
@@ -48,7 +48,7 @@ data(teal)
 peakshape(teal, select = 3)
 peakshape(teal, select = 10)
 # Use wavelength bounds to narrow in on peak of interest
-peakshape(teal, select = 10, bounds=c(400, 550))}
+peakshape(teal, select = 10, lim=c(400, 550))}
 }
 \author{
   Chad Eliason \email{cme16@zips.uakron.edu}, Rafael Maia

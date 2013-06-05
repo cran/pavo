@@ -55,7 +55,7 @@ if (is.null(select)&haswl==TRUE)
 if (is.null(select)&haswl==FALSE)
   select <- 1:ncol(x)
 
-x <- as.data.frame(x[, select])
+x <- as.data.frame(x[select])  # CE: removed comma before select
 
 arg <- list(...)
 
@@ -63,7 +63,7 @@ arg <- list(...)
 if (is.null(arg$xlab))
   arg$xlab <- "Wavelength (nm)"
 if (is.null(arg$xlim))
-  arg$xlim <- range(wl)
+  arg$xlim <- range(wl, na.rm=TRUE)
 
 # heat plot
 if (type=='heatmap') {
@@ -77,7 +77,7 @@ if (type=='heatmap') {
     print("No varying vector supplied; using arbitrary values")
   }
   if (is.null(arg$ylim))
-    arg$ylim <- range(varying)
+    arg$ylim <- range(varying, na.rm=TRUE)
   if (is.null(arg$col)==1) {
     jc <- colorRampPalette( rev(c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", 
                                   "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", 
@@ -100,17 +100,20 @@ if (type=='heatmap') {
 }
 
 # coloring for overlay plot & others
-if (length(arg$col) < ncol(x))
+if (length(arg$col) < ncol(x)) {
   arg$col <- rep(arg$col, ncol(x))
   arg$col <- arg$col[1:ncol(x)]
-if (any(names(arg$col)%in%names(x)))
+ }
+
+if (any(names(arg$col)%in%names(x))) {
   arg$col <- arg$col[select-1]
+}
 
 # overlay different spec curves
 if (type=='overlay') {
 
   if (is.null(arg$ylim))
-    arg$ylim <- range(x)
+    arg$ylim <- range(x, na.rm=TRUE)
   if (is.null(arg$ylab))
     arg$ylab <- "Reflectance (%)"
   arg$type <- 'l'

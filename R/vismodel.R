@@ -28,7 +28,8 @@
 #' \item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system
 #' }
 #' @param achromatic the sensitivity data to be used to calculate luminance (achromatic)
-#' cone stimulation. Currently implemented options are: 
+#' cone stimulation. Either a vector containing the sensitivity for a single receptor, 
+#' or one of the options: 
 #' \itemize{
 #'	\item \code{bt.dc}: Blue tit \emph{Cyanistes caeruleus} double cone
 #'  \item \code{ch.dc}: Chicken \emph{Gallus gallus} double cone
@@ -90,7 +91,7 @@ if(is.null(dim(y))){
   }
 
 visual2 <- try(match.arg(visual), silent=T)
-sens <- pavo::vissyst
+sens <- vissyst
 
 if(!inherits(visual2,'try-error')){
   
@@ -121,7 +122,7 @@ if(max(y) > 1)
 
 #DEFINING ILLUMINANT & BACKGROUND
 
-bgil<- pavo::bgandilum
+bgil<- bgandilum
 
 illum2 <- try(match.arg(illum), silent=T)
 if(!inherits(illum2,'try-error')){
@@ -146,6 +147,25 @@ if(bg2=='ideal')
 # scale background from percentage to proportion
 if(max(bkg) > 1)
   bkg <- bkg/100
+  
+# is the illuminant a matrix, dataframe or rspec?
+
+if('rspec' %in% class(illum)){
+  whichused <- names(illum)[2]
+  illum <- illum[,2]
+  warning(paste('Illuminant is an rspec object; first spectrum (', 
+    dQuote(whichused),') has been used (remaining columns ignored)', sep='')
+    , call.=FALSE)
+}
+
+if( 'data.frame' %in% class(illum) | 'matrix' %in% class(illum) & 
+  !'rspec' %in% class(illum)){
+  whichused <- names(illum)[1]
+  illum <- illum[,1]
+  warning(paste('Illuminant is a matrix or data frame; first column (', 
+    dQuote(whichused),') has been used (remaining columns ignored)', sep='')
+    , call.=FALSE)
+  }
 
 
 # scale illuminant
@@ -169,21 +189,55 @@ names(Qi) <- names(S)
 
 # calculate achromatic contrast
 
-achromatic <- match.arg(achromatic)
+achromatic2 <- try(match.arg(achromatic), silent=T)
 
-if(achromatic=='bt.dc' | achromatic=='ch.dc' | achromatic=='st.dc'){
-   L <- sens[,grep(achromatic,names(sens))]
+# user-defined achromatic receptor
+
+if(inherits(achromatic2,'try-error')){
+
+  achromatic2 <- 'user-defined'
+
+  # is achromatic a matrix, dataframe or rspec?
+
+  if('rspec' %in% class(achromatic)){
+    whichused <- names(achromatic)[2]
+    achromatic <- achromatic[,2]
+    warning(paste('achromatic is an rspec object; first spectrum (', 
+      dQuote(whichused),') has been used (remaining columns ignored)', sep='')
+      , call.=FALSE)
+  }
+
+  if( 'data.frame' %in% class(achromatic) | 'matrix' %in% class(achromatic) & 
+    !'rspec' %in% class(achromatic)){
+    whichused <- names(achromatic)[1]
+    achromatic <- achromatic[,1]
+    warning(paste('achromatic is a matrix or data frame; first column (', 
+      dQuote(whichused),') has been used (remaining columns ignored)', sep='')
+      , call.=FALSE)
+    }
+
+  L <- achromatic
+  lum <- colSums(y*L*illum)
+  Qi <- data.frame(cbind(Qi,lum))
+
+
+  }
+  
+# using one of the predefined receptors
+
+if(achromatic2=='bt.dc' | achromatic2=='ch.dc' | achromatic2=='st.dc'){
+   L <- sens[,grep(achromatic2,names(sens))]
   lum <- colSums(y*L*illum)
   Qi <- data.frame(cbind(Qi,lum))
 }
 
-if(achromatic=='ml'){
+if(achromatic2=='ml'){
    L <- rowSums(S[,c(dim(S)[2]-1,dim(S)[2])])
   lum <- colSums(y*L*illum)
   Qi <- data.frame(cbind(Qi,lum))
 }
 
-if(achromatic=='none'){
+if(achromatic2=='none'){
 	lum <- NULL
 }
 
@@ -236,7 +290,7 @@ res <- switch(qcatch, Qi = Qi, fi = fi)
 
 class(res) <- c('vismodel', 'data.frame')
 attr(res, 'qcatch') <- qcatch
-attr(res,'visualsystem') <- c(visual,achromatic)
+attr(res,'visualsystem') <- paste('chromatic: ', visual, ', achromatic: ',achromatic2, sep='')
 attr(res,'illuminant') <- paste(illum2,', scale = ',scale," ",vk, sep='')
 attr(res,'background') <- bg2
 attr(res,'relative') <- relative

@@ -23,7 +23,7 @@
 #' cone as a column
 #' \item \code{avg.uv}: average avian UV system
 #' \item \code{avg.v}: average avian V system
-#' \item \code{bt}: Blue tit \emph{Cyanistes caeruleus} visual system
+#' \item \code{bluetit}: Blue tit \emph{Cyanistes caeruleus} visual system
 #' \item \code{star}: Starling \emph{Sturnus vulgaris} visual system  
 #' \item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system
 #' }
@@ -71,7 +71,7 @@
 #' @references Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
 
 vismodel <- function(rspecdata, qcatch = c('Qi','fi'),
-  visual = c("avg.uv", "avg.v", "bt", "star", "pfowl"), 
+  visual = c("avg.uv", "avg.v", "bluetit", "star", "pfowl"), 
   achromatic = c("bt.dc","ch.dc", 'st.dc',"ml","none"),
   illum = c('ideal','bluesky','D65','forestshade'), 
   vonkries=F, scale=1, bkg = 'ideal', relative=TRUE)
@@ -91,7 +91,7 @@ if(is.null(dim(y))){
   }
 
 visual2 <- try(match.arg(visual), silent=T)
-sens <- vissyst
+sens <- pavo::vissyst
 
 if(!inherits(visual2,'try-error')){
   
@@ -122,7 +122,7 @@ if(max(y) > 1)
 
 #DEFINING ILLUMINANT & BACKGROUND
 
-bgil<- bgandilum
+bgil<- pavo::bgandilum
 
 illum2 <- try(match.arg(illum), silent=T)
 if(!inherits(illum2,'try-error')){

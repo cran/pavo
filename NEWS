@@ -1,3 +1,13 @@
+pavo 0.5-4
+------------------------------------------------------------------------------
+MINOR FEATURES AND BUG FIXES
+* changed default values for coldist()
+
+pavo 0.5-2
+------------------------------------------------------------------------------
+MINOR FEATURES AND BUG FIXES
+* fixes to the blue tit visual system, changed vismodel() argument to "bluetit"
+
 pavo 0.5-1
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES

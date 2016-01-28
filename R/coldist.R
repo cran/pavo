@@ -33,8 +33,8 @@
 #' and \code{n2} (\code{vis='di'}) or \code{n1}, \code{n2} and \code{n3} (\code{vis='tri'})
 #' are used for chromatic contrast (NOTE: \code{n4} is still the value used for the achromatic
 #' contrast.)
-#' @param v Noise-to-signal ratio of a single cone (defaults to 0.1, so that under
-#' the default densities, the Weber fraction for the large cone will be 0.05, as
+#' @param v Noise-to-signal ratio of a single cone (defaults to 0.2, so that under
+#' the default densities, the Weber fraction for the large cone will be 0.1, as
 #' estimated from behavioral experiment with the Perkin robin, \emph{Leiothrix lutea})
 #' @param noise how the noise will be calculated:
 #' \itemize{
@@ -65,7 +65,7 @@ coldist <-function(vismodeldata, qcatch=c('Qi','fi'),
                   vis=c('tetra', 'tri', 'di'), 
                   noise=c('neural','quantum'), subset=NULL,
                   achro=TRUE,
-                  n1=1, n2=2, n3=2, n4=4, v=0.1)
+                  n1=1, n2=2, n3=2, n4=4, v=0.2)
 {
 
 if('vismodel' %in% class(vismodeldata)){

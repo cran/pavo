@@ -1,6 +1,6 @@
-b870cd47b9c5e18d883376752b058e94 *DESCRIPTION
+7e3af44afc787a8e9c3907c6cb92ddef *DESCRIPTION
 43bdaa4b88dba709b5b4a3bc9b809c27 *NAMESPACE
-b3b0c2ceb9ae75a7b4f6fdc069d2a90a *NEWS
+7bf381ffaf965454e4135663421ca164 *NEWS
 6cc927912df2aad753cd6bc0287fef22 *R/aggplot.R
 cf09202293efe8e1d7332fed59f27e9b *R/aggspec.R
 fc6bf6946836f1e04e42f122b15946ee *R/as.rspec.r
@@ -25,7 +25,7 @@ fab1391aa2c1824eed27262738735b80 *R/segclass.R
 32c886b64c4290c4ccb84eaf852ab928 *R/sensmodel.R
 b0af48fcc4e6f8551e388a7c3ea68ebe *R/spec2rgb.R
 f321868eea0fb866bf210e3cff533a98 *R/subset.rspec.R
-2b991174768effa1d2c60dd06e231b04 *R/summary.rspec.R
+26593e6747f2a73219fed87953a699f3 *R/summary.rspec.R
 67f504ace369283923c9cd7ac03be2bc *R/summary.tcs.R
 7a9e956979f5f0ce79c7f2be44374a97 *R/summary.vismodel.R
 18aa97a17b7e85278466981bbac1cb5a *R/sysdata.rda

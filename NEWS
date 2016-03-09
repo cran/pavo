@@ -1,3 +1,8 @@
+pavo 0.5-5
+------------------------------------------------------------------------------
+MINOR FEATURES AND BUG FIXES
+* fixed bug in calculaiton of H3 in summary.rspec()
+
 pavo 0.5-4
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES

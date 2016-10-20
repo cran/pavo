@@ -1,6 +1,6 @@
-7e3af44afc787a8e9c3907c6cb92ddef *DESCRIPTION
+fe1a640b2ddcce524b0f494cd302f7da *DESCRIPTION
 43bdaa4b88dba709b5b4a3bc9b809c27 *NAMESPACE
-7bf381ffaf965454e4135663421ca164 *NEWS
+40d1348dcbfd58fc8d0acd61beb54bc7 *NEWS
 6cc927912df2aad753cd6bc0287fef22 *R/aggplot.R
 cf09202293efe8e1d7332fed59f27e9b *R/aggspec.R
 fc6bf6946836f1e04e42f122b15946ee *R/as.rspec.r
@@ -12,7 +12,7 @@ fc6bf6946836f1e04e42f122b15946ee *R/as.rspec.r
 060d2a9b362713fc0251df82b8537f8b *R/data-vissyst.R
 3429dede5f5b2ee916d14038d1da1e14 *R/explorespec.R
 055c1037ff4584a71d3786a0a701dbd7 *R/getspec.R
-73cb1f17880a433b808e4300f315fe5d *R/internal.R
+bb47eb1a9138c411dbab6bf91814a9b7 *R/internal.R
 2f8327da4ae764db7d70509b9c89e74c *R/irrad2flux.R
 fb34a6bb57e86a7ee601787397d74bf8 *R/merge.rspec.R
 4a8d1c84dfade377444505d7f6bdae16 *R/pavo-package.R

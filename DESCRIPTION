@@ -3,9 +3,9 @@ Description: A cohesive framework for parsing, analyzing and organizing color
     from spectral data.
 Title: Perceptual Analysis, Visualization and Organization of Spectral
         Color Data in R
-Version: 0.5-5
+Version: 0.5-6
 License: GPL (>= 2)
-Date: 2016-03-08
+Date: 2016-10-19
 Authors@R: c(person("Rafael", "Maia", role = c("aut", "cre"),
     email = "rm72@zips.uakron.edu"),
     person("Chad", "Eliason", role = "aut",
@@ -25,11 +25,11 @@ Collate: 'aggplot.R' 'aggspec.R' 'as.rspec.r' 'coldist.R'
         'voloverlap.R' 'merge.rspec.R' 'summary.vismodel.R'
         'subset.rspec.R' 'irrad2flux.R'
 NeedsCompilation: no
-Packaged: 2016-03-08 19:40:47 UTC; rmaia
+Packaged: 2016-10-20 10:35:30 UTC; rmaia
 Author: Rafael Maia [aut, cre],
     Chad Eliason [aut],
     Pierre-Paul Bitton [aut]
 Maintainer: Rafael Maia <rm72@zips.uakron.edu>
 Repository: CRAN
-Date/Publication: 2016-03-09 01:13:54
+Date/Publication: 2016-10-20 22:16:05
 RoxygenNote: 5.0.1

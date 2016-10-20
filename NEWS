@@ -1,3 +1,8 @@
+pavo 0.5-6
+------------------------------------------------------------------------------
+BUG FIXES
+* fixed bug in calculaiton of dichromat contrast in coldist()
+
 pavo 0.5-5
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES

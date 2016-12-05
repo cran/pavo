@@ -18,30 +18,37 @@
 #' @param lcol color of plotted lines indicating central tendency.
 #' @param shadecol color of shaded areas indicating variance measure.
 #' @param alpha transparency of the shaded areas.
+#' @param legend automatically add a legend.
 #' @param ... additional graphical parameters to be passed to plot.
+#' 
 #' @return Plot containing the lines and shaded areas of the groups of spectra.
+#' 
 #' @export
+#' 
 #' @examples \dontrun{
 #' data(sicalis)
-#' bysic <- gsub("^ind[0-9].",'',names(sicalis)[-1])
-#' aggplot(sicalis,bysic)
-#' aggplot(sicalis,bysic, shade=spec2rgb(sicalis),lcol=1)
-#' aggplot(sicalis,bysic,lcol=1, FUN.error=function(x)sd(x)/sqrt(length(x))) }
+#' bysic <- gsub("^ind[0-9].",'', names(sicalis)[-1])
+#' aggplot(sicalis, bysic)
+#' aggplot(sicalis, bysic, shade = spec2rgb(sicalis), lcol = 1)
+#' aggplot(sicalis, bysic, lcol = 1, FUN.error = function(x) sd(x)/sqrt(length(x))) 
+#' }
+#' 
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}, 
 #' Chad Eliason \email{cme16@@zips.uakron.edu}
+#' 
 #' @references Montgomerie R (2006) Analyzing colors. In: Hill G, McGraw K (eds) 
 #' Bird coloration. Harvard University Press, Cambridge, pp 90-147.
 
 aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd, 
-                    lcol = NULL, shadecol = NULL, alpha = 0.2, ...) {
+                    lcol = NULL, shadecol = NULL, alpha = 0.2, legend = FALSE, ...) {
 
 if (is.numeric(by))
   if (by==1)
     stop('Cannot group single spectra (use plot instead)')
 
 #take aggregated data
-cntplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.center)
-errplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.error)
+cntplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.center, ...)
+errplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.error, ...)
 
 # make wavelength vector
 wl_index <- which(names(rspecdata)=='wl')
@@ -93,13 +100,15 @@ if (length(lty) < ncol(cntplotspecs))
 
 if (length(shadecol) < ncol(cntplotspecs))
   shadecol <- rep(shadecol, ncol(cntplotspecs))
-# if (any(class(shadecol)=='spec2rgb'))  # this messes up when you give a normal color string; need to look for # or something about hex.
+# if (any(class(shadecol)=='spec2rgb'))  
 #   shadecol <- spec2rgb(cbind(wl,cntplotspecs))
+# this messes up when you give a normal color string; need to look for # or something about hex.
 
 if (length(lcol) < ncol(cntplotspecs))
   lcol <- rep(lcol, ncol(cntplotspecs))
-# if (any(class(lcol)=='spec2rgb'))  # this messes up when you give a normal color string; need to look for # or something about hex.
+# if (any(class(lcol)=='spec2rgb'))  
 #   lcol <- spec2rgb(cbind(wl,cntplotspecs))
+# this messes up when you give a normal color string; need to look for # or something about hex.
    
 col_list <- c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
               "#FF7F00", "#FFFF33", "#A65628", "#F781BF")
@@ -121,7 +130,8 @@ arg$x <- wl
 arg$y <- cntplotspecs[, 1]
 arg$type <- 'n'
 
-  do.call(plot, arg)
+arg0 <- arg[names(arg) %in% c(names(formals(plot.default)), names(par()))]
+do.call(plot, arg0)
 
 arg$type <- NULL
 arg$x <- polygon_wl
@@ -129,33 +139,41 @@ arg$y <- polygon_data[, 1]
 arg$col <- shadecol[1]  
 arg$border <- NA
 
-do.call(polygon, arg)
+arg0 <- arg[names(arg)%in%names(formals(polygon))]
+do.call(polygon, arg0)
   
   if (ncol(cntplotspecs)>1) {
     for (i in 2:ncol(cntplotspecs)){
       arg$col <- shadecol[i]
       arg$y <- polygon_data[, i]
-      do.call(polygon, arg)
+      arg0 <- arg[names(arg) %in% c(names(formals(polygon)), names(par()))]
+      do.call(polygon, arg0)
     }
   }
   
-# ...then lines (so they are on top)
+  # ...then lines (so they are on top)
   arg$border <- NULL
   arg$col <- lcol[1]
   arg$x <- wl
   arg$y <- cntplotspecs[, 1]
   arg$type <- 'l'
   arg$lty <- lty[1]
-
-  do.call(lines, arg)
-
+  
+  arg0 <- arg[names(arg) %in% c(names(formals(plot.default)), names(par()))]
+  do.call(lines, arg0)
+  
   if (ncol(cntplotspecs)>1) {
     for (i in 2:ncol(cntplotspecs)){
       arg$y <- cntplotspecs[, i]
       arg$col <- lcol[i]
       arg$lty <- lty[i]
-      do.call(lines, arg)
+      arg0 <- arg[names(arg) %in% c(names(formals(plot.default)), names(par()))]
+      do.call(lines, arg0)
     }
   }
-
+  if (legend) {
+    legend("topleft", bty="n", legend=names(cntplotspecs), 
+      lty=lty, col=lcol)
+  }
+ 
 }

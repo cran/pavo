@@ -4,8 +4,8 @@
 \alias{peakshape}
 \title{Peak shape descriptors}
 \usage{
-peakshape(rspecdata, select = NULL, lim = c(300, 700), plot = TRUE,
-  ask = FALSE, ...)
+peakshape(rspecdata, select = NULL, lim = NULL, plot = TRUE,
+  ask = FALSE, absolute.min = FALSE, ...)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly an object of class \code{rspec},
@@ -13,17 +13,21 @@ with a column with wavelength data, named 'wl', and the remaining column contain
 spectra to process.}
 
 \item{select}{specification of which spectra to plot. Can be a numeric vector or 
-factor (e.g., \code{sex=='male'})}
+factor (e.g., \code{sex == 'male'}).}
 
-\item{lim}{a vector specifying the wavelength range to analyze}
+\item{lim}{a vector specifying the wavelength range to analyze.}
 
 \item{plot}{logical. Should plots indicating calculated parameters be returned? 
-(Defaults to \code{TRUE})}
+(Defaults to \code{TRUE}).}
 
 \item{ask}{logical, specifies whether user input needed to plot multiple plots
-when number of spectra to analyze is greater than 1 (defaults to \code{FALSE})}
+when number of spectra to analyze is greater than 1 (defaults to \code{FALSE}).}
 
-\item{...}{additional arguments to be passed to plot}
+\item{absolute.min}{logical. If \code{TRUE}, full width at half maximum will be
+calculated using the absolute minimum reflectance of the spectrum, even if
+that value falls outside the range specified by \code{lim}. (defaults to \code{FALSE})}
+
+\item{...}{additional arguments to be passed to plot.}
 }
 \value{
 a data frame containing column names (id); peak height (max value, B3), location (hue, H1) and full width
@@ -41,8 +45,10 @@ spectra using \code{\link{procspec}} is also recommended.
 data(teal)
 peakshape(teal, select = 3)
 peakshape(teal, select = 10)
+
 # Use wavelength bounds to narrow in on peak of interest
-peakshape(teal, select = 10, lim=c(400, 550))}
+peakshape(teal, select = 10, lim=c(400, 550))
+}
 }
 \author{
 Chad Eliason \email{cme16@zips.uakron.edu}, Rafael Maia \email{rm72@zips.uakron.edu}

@@ -1,22 +1,29 @@
 #' Segment classification
 #'
-#' Calculates segment classification measures as defined in Endler (1990)
+#' Calculates segment classification measures as defined in Endler (1990).
+#' 
 #' @param rspecdata (required) a data frame, such as objects of class 
 #' \code{rspec}, with a column containing wavelength range, named 'wl'
 #' and spectra data in remaining columns. 
 #' @param range vector of length 2 indicating the lower and upper wavelength bounds used
-#' to calculate segments (defaults to 300nm to 700nm).
-#' @return A data frame with LM and MS segment classification scores.
+#' to calculate segments (defaults to 300 nm to 700 nm).
+#' @return A data frame with the reflectance proportion at each of the four segments, as
+#' well as the LM and MS segment classification scores.
+#' 
 #' @export
+#' 
 #' @examples \dontrun{
 #' data(sicalis)
-#' segclass(sicalis) }
+#' segclass(sicalis) 
+#' }
+#' 
 #' @author Pierre-Paul Bitton \email{bittonp@@uwindsor.ca}
+#' 
 #' @references Endler, J. A. (1990) On the measurement and classification of 
 #' color in studies of animal color patterns. Biological Journal of the Linnean 
 #' Society, 41, 315-352.
 
-segclass <- function (rspecdata, range=c(300,700)) {
+segclass <- function (rspecdata, range = c(300, 700)) {
 
 wl_index <- which(names(rspecdata)=='wl')
 wl <- rspecdata[,wl_index]
@@ -44,7 +51,10 @@ Q4score <- apply(Q4mat,2,sum)/B1
 LM <- Q4score-Q2score
 MS <- Q3score-Q1score
 
-segclassdata <- data.frame(LM,MS, row.names = names(rspecdata))
+segclassdata <- data.frame(S1=Q1score, S2=Q2score, S3=Q3score, S4=Q4score,
+                LM,MS, row.names = names(rspecdata))
+
+class(segclassdata) <- c('segclass', 'data.frame')
 
 segclassdata
 

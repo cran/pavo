@@ -5,7 +5,7 @@
 \title{Import spectra files}
 \usage{
 getspec(where = getwd(), ext = "txt", lim = c(300, 700), decimal = ".",
-  subdir = FALSE, subdir.names = FALSE)
+  subdir = FALSE, subdir.names = FALSE, fast = TRUE)
 }
 \arguments{
 \item{where}{(required) folder in which files are located.}
@@ -17,13 +17,16 @@ getspec(where = getwd(), ext = "txt", lim = c(300, 700), decimal = ".",
 considered (defaults to 300 and 700).}
 
 \item{decimal}{character to be used to identify decimal plates 
-(defaults to ".")}
+(defaults to ".").}
 
 \item{subdir}{should subdirectories within the \code{where} folder be
-included in the search? (defaults to \code{FALSE})}
+included in the search? (defaults to \code{FALSE}).}
 
 \item{subdir.names}{should subdirectory path be included in the name of the
-spectra? (defaults to \code{FALSE})}
+spectra? (defaults to \code{FALSE})/}
+
+\item{fast}{logical. if \code{TRUE} (default), will try a fast algorithm that 
+assumes all spectra were produced using the same software configuration.}
 }
 \value{
 A data frame, of class \code{rspec}, containing individual imported
@@ -38,8 +41,9 @@ Avantes (after exporting).
 }
 \examples{
 \dontrun{
-getspec('examplespec/', lim=c(400,900))	
-getspec('examplespec/', ext='ttt')}
+getspec('examplespec/', lim = c(400, 900))	
+getspec('examplespec/', ext = 'ttt')}
+
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

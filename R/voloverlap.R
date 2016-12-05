@@ -1,23 +1,31 @@
 #' Color volume overlap
 #'
 #' Calculates the overlap between the volumes defined by two sets of points in cartesian
-#' space
+#' space.
 #'
 #' @import rcdd
+#' 
 #' @export
-#' @param tcsres1,tcsres2 (required) data frame, possibly a result from the \code{tcs} 
+#' 
+#' @param tcsres1,tcsres2 (required) data frame, possibly a result from the \code{colspace} 
 #' function, containing
 #' values for the 'x', 'y' and 'z' coordinates as columns (labeled as such)
 #' @param plot logical. Should the volumes and points be plotted? (defaults to \code{FALSE})
+#' @param interactive logical. If \code{TRUE}, uses the rgl engine for interactive plotting;
+#' if \code{FALSE} then a static plot is generated.
 #' @param col a vector of length 3 with the colors for (in order) the first volume, 
 #' the second volume, and the overlap.
 #' @param new logical. Should a new plot window be called? If \code{FALSE}, volumes and their
 #' overlap are plotted over the current plot (defaults to \code{TRUE}).
 #' @param montecarlo logical. If \code{TRUE}, Monte Carlo simulation is used instead of exact
 #' solution (not recommended; defaults to \code{FALSE})
-#' @param nsamp if \code{montecarlo=TRUE}, determines the number of points to be sampled.
-#' @param psize if \code{montecarlo=TRUE} and \code{plot=TRUE}, sets the size to plot the points
+#' @param nsamp if \code{montecarlo = TRUE}, determines the number of points to be sampled.
+#' @param psize if \code{montecarlo = TRUE} and \code{plot = TRUE}, sets the size to plot the points
 #' used in the Monte Carlo simulation.
+#' @param lwd if \code{plot = TRUE}, sets the line width for volume grids.
+#' @param view,scale.y additional arguments used when using a static plot
+#' (see \code{\link{vol}}).
+#'
 #' @return Calculates the overlap between the volumes defined by two set of points in
 #' colorspace. The volume from the overlap is then given relative to:
 #' \itemize{
@@ -33,18 +41,18 @@
 
 #' \itemize{
 #' 	\item \code{s_in1, s_in2} the number of sampled points that fall within each of the volumes 
-#' individually
-#' 	\item \code{s_inboth} the number of sampled points that fall within both volumes
-#' 	\item \code{s_ineither} the number of points that fall within either of the volumes
+#' individually.
+#' 	\item \code{s_inboth} the number of sampled points that fall within both volumes.
+#' 	\item \code{s_ineither} the number of points that fall within either of the volumes.
 #' 	\item \code{psmallest} the proportion of points that fall within both volumes divided by the 
-#'  number of points that fall within the smallest volume
+#'  number of points that fall within the smallest volume.
 #'	\item \code{pboth} the proportion of points that fall within both volumes divided by the total 
-#'  number of points that fall within both volumes
+#'  number of points that fall within both volumes.
 #'	}
 #'	
 #' If the Monte Carlo solution is used, a number of points much greater than the default should be
 #' considered (Stoddard & Stevens(2011) use around 750,000 points, but more or fewer might be required
-#' depending on the degree of overlap.)
+#' depending on the degree of overlap).
 #'
 #' @note Stoddard & Stevens (2011) originally obtained the volume overlap through Monte Carlo
 #' simulations of points within the range of the volumes, and obtaining the frequency of 
@@ -59,23 +67,32 @@
 #' volumes differ considerably in size, or (2) one of the volumes is entirely contained
 #' within the other. For this reason, we also report the volume relative to the union of
 #' the two input volumes, which may be more adequate in most cases.
+#' 
 #' @examples \dontrun{
 #' data(sicalis)
-#' tcs.sicalis.C <- subset(tcs(vismodel(sicalis)), 'C')
-#' tcs.sicalis.T <- subset(tcs(vismodel(sicalis)), 'T')
-#' tcs.sicalis.B <- subset(tcs(vismodel(sicalis)), 'B')
-#' voloverlap(tcs.sicalis.T,tcs.sicalis.B)
-#' voloverlap(tcs.sicalis.T,tcs.sicalis.C, plot=T)
-#' voloverlap(tcs.sicalis.T,tcs.sicalis.C, plot=T, col=1:3) }
+#' tcs.sicalis.C <- subset(colspace(vismodel(sicalis)), 'C')
+#' tcs.sicalis.T <- subset(colspace(vismodel(sicalis)), 'T')
+#' tcs.sicalis.B <- subset(colspace(vismodel(sicalis)), 'B')
+#' voloverlap(tcs.sicalis.T, tcs.sicalis.B)
+#' voloverlap(tcs.sicalis.T, tcs.sicalis.C, plot = T)
+#' voloverlap(tcs.sicalis.T, tcs.sicalis.C, plot = T, col = 1:3) }
+#' 
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}, with code from Sebastien Villeger
-#' @references Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage color in a tetrahedral color space: A phylogenetic analysis of new world buntings. The American Naturalist, 171(6), 755-776.
-#' @references Stoddard, M. C., & Stevens, M. (2011). Avian vision and the evolution of egg color mimicry in the common cuckoo. Evolution, 65(7), 2004-2013.
-#' @references Villeger, S., Novack-Gottshall, P. M., & Mouillot, D. (2011). The multidimensionality of the niche reveals functional diversity changes in benthic marine biotas across geological time. Ecology Letters, 14(6), 561-568.
+#' 
+#' @references Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage color 
+#' in a tetrahedral color space: A phylogenetic analysis of new world buntings. The 
+#' American Naturalist, 171(6), 755-776.
+#' @references Stoddard, M. C., & Stevens, M. (2011). Avian vision and the evolution of 
+#' egg color mimicry in the common cuckoo. Evolution, 65(7), 2004-2013.
+#' @references Villeger, S., Novack-Gottshall, P. M., & Mouillot, D. (2011). The 
+#' multidimensionality of the niche reveals functional diversity changes in benthic 
+#' marine biotas across geological time. Ecology Letters, 14(6), 561-568.
 
 
-voloverlap <- function(tcsres1,tcsres2, plot=FALSE, 
-              col=c('blue','red','darkgrey'), new=TRUE,
-              montecarlo=FALSE, nsamp=1000, psize=0.001){
+voloverlap <- function(tcsres1, tcsres2, plot = FALSE, interactive = FALSE,
+              col = c('blue', 'red', 'darkgrey'), new = TRUE,
+              montecarlo = FALSE, nsamp = 1000, psize = 0.001, 
+              lwd = 1, view = 70, scale.y = 1){
 
 dat1 <- tcsres1[, c('x', 'y', 'z')]
 
@@ -165,36 +182,67 @@ res <- data.frame(vol1, vol2, s_in1,s_in2,s_inboth,s_ineither,psmallest,pboth)
 ############
 #PLOT BEGIN#
 ############
-if(plot==TRUE){
-  if(length(col)<3)
-    col <- c(rep(col,2)[1:2], 'darkgrey')
+if(plot){
+    if(length(col)<3)
+      col <- c(rep(col,2)[1:2], 'darkgrey')
+      
+      
+	if(interactive){
+	    # check if rgl is installed and loaded
+        if (!requireNamespace("rgl", quietly = TRUE))
+          stop(dQuote('rgl'),' package needed for interactive plots. Please install it, or use interactive=FALSE.',
+            call. = FALSE)  
 
-if(new==TRUE)
-  open3d(FOV=1, mouseMode=c('zAxis','xAxis','zoom'))
+	  if(!isNamespaceLoaded("rgl"))
+	    requireNamespace("rgl")
+	    
+	  if(new)
+        rgl::open3d(FOV=1, mouseMode=c('zAxis','xAxis','zoom'))
 
-  tcsvol(dat1, col=col[1], fill=F)
-  tcsvol(dat2, col=col[2], fill=F)
+      tcsvol(dat1, col=col[1], fill=F)
+      tcsvol(dat2, col=col[2], fill=F)
+      
+      if(!montecarlo){
+        if(dim(Voverlap)[1]>3)
+          tcsvol(Voverlap, col=col[3])
+        }
+      
+      if(montecarlo==TRUE){
+        rgl::spheres3d(samples[which(invol1 & !invol2),], type='s', 
+          lit=F, radius=psize, col=col[1])
+        rgl::spheres3d(samples[which(invol2 & !invol1),], type='s', 
+          lit=F, radius=psize, col=col[2])  
 
-  if(montecarlo==FALSE){
-    if(dim(Voverlap)[1]>3)
-      tcsvol(Voverlap, col=col[3])
-  }
-  
-  if(montecarlo==TRUE){
-    spheres3d(samples[which(invol1 & !invol2),], type='s', lit=F, radius=psize, col=col[1])
-    spheres3d(samples[which(invol2 & !invol1),], type='s', lit=F, radius=psize, col=col[2])  
-
-    if(s_inboth > 0){  
-      spheres3d(samples[which(invol1 & invol2),], type='s', lit=F, radius=psize, col=col[3])
+        if(s_inboth > 0){  
+          rgl::spheres3d(samples[which(invol1 & invol2),], type='s', 
+          lit=F, radius=psize, col=col[3])
+        }
       }
-    }
-    
-  }
+	}
+	
+	if(!interactive){
+      plotrange <- apply(rbind(tcsres1,tcsres2),2,range)
 
+      if(dim(Voverlap)[1]>3){
+        attr(Voverlap, 'clrsp') <- "tcs"
+        vol(Voverlap, col=col[3], new=new,
+          xlim=plotrange[,'x'], ylim=plotrange[,'y'], 
+          zlim=plotrange[,'z'], view=view)
+        vol(tcsres1, col=col[1], fill=FALSE, lwd=lwd, new=FALSE)
+        vol(tcsres2, col=col[2], fill=FALSE, lwd=lwd, new=FALSE)
+      }else{
+        vol(tcsres1, col=col[1], fill=FALSE, lwd=lwd, new=new,
+          xlim=plotrange[,'x'], ylim=plotrange[,'y'], 
+          zlim=plotrange[,'z'], view=view)
+        vol(tcsres2, col=col[2], fill=FALSE, lwd=lwd, new=FALSE)
+      }
+	}
+	
+    
 ##########
 #PLOT END#
-##########
+##########    
+}
 
 res
-
 }

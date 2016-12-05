@@ -4,26 +4,30 @@
 \alias{spec2rgb}
 \title{Spectrum to rgb color conversion}
 \usage{
-spec2rgb(rspecdata)
+spec2rgb(rspecdata, alpha = 1)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly an object of class \code{rspec},
 with a column with wavelength data, named 'wl', and the remaining column containing
 spectra to process.}
+
+\item{alpha}{alpha value to use for colors (defaults to 1, opaque).}
 }
 \value{
 A character vector of class \code{spec2rgb} consisting of hexadecimal color values
 for passing to further plotting functions.
 }
 \description{
-Calculates rgb values from spectra based on human color matching functions
+Calculates rgb values from spectra based on human color matching functions.
 }
 \examples{
 \dontrun{
 data(teal)
 spec2rgb(teal)
+
 # Plot data using estimated perceived color
 plot(teal, col = spec2rgb(teal), type = 'o')}
+
 }
 \author{
 Chad Eliason \email{cme16@zips.uakron.edu}

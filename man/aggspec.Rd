@@ -4,12 +4,12 @@
 \alias{aggspec}
 \title{Aggregate reflectance spectra}
 \usage{
-aggspec(rspecdata, by = NULL, FUN = mean, trim = TRUE)
+aggspec(rspecdata, by = NULL, FUN = mean, trim = TRUE, na.rm = FALSE)
 }
 \arguments{
 \item{rspecdata}{(required) data frame, possibly of class \code{rspec}
-containing the spectra to be manipulated. If
-it contains a wavelength column containing "wl", that column will be ignored.}
+containing the spectra to be manipulated. If it contains a wavelength column 
+named "wl", that column will be ignored.}
 
 \item{by}{(required) either a single value specifying the range of spectra within
 the data frame to be combined (for example, \code{by} = 3 indicates the function
@@ -22,6 +22,8 @@ same identification); or a list of vectors, e.g., \code{by = list(sex, species)}
 
 \item{trim}{logical. if \code{TRUE} (default), the function will try to identify and 
 remove numbers at the end of the names of the columns in the new rspec object.}
+
+\item{na.rm}{should NAs be reomved? Defaults to \code{FALSE}.}
 }
 \value{
 A data frame of class \code{rspec} containing the spectra after applying the aggregating function.
@@ -33,13 +35,18 @@ an index or a vector of identities.
 \examples{
 \dontrun{
 data(teal)
+
 # Average every two spectra
 teal.sset1 <- aggspec(teal, by = 2)
 plot(teal.sset1)
+
 # Create factor and average spectra by levels 'a' and 'b'
-ind <- rep(c('a','b'), times=6)
-teal.sset2 <- aggspec(teal, by=ind)
-plot(teal.sset2) }
+ind <- rep(c('a', 'b'), times = 6)
+teal.sset2 <- aggspec(teal, by = ind)
+
+plot(teal.sset2) 
+}
+
 }
 \author{
 Chad Eliason \email{cme16@zips.uakron.edu}

@@ -1,73 +1,92 @@
-#' Subset rspec, tcs and vismodel objects
+#' Subset rspec, vismodel, and colspace objects
 #'
-#' Subsets various object types based on a given vector or grep partial matching of data names
+#' Subsets various object types based on a given vector or grep partial matching of data names.
 #'
-#' @export 
-#'
-#' @param x (required) an object of class \code{rspec}, \code{tcs} or \code{vismodel}
-#' containing spectra, visual model output or colourspace data to subset
+#' @param x (required) an object of class \code{rspec}, \code{vismodel}, or \code{colspace},
+#' containing spectra, visual model output or colorspace data to subset.
 #' @param ... class consistency (ignored).
-#' @param subset a string used for partial matching of observations
-#' @return a subsetted object of the same class as the input object
+#' @param subset a string used for partial matching of observations.
+#' @return a subsetted object of the same class as the input object.
+#'
+#' @export
 #'
 #' @examples \dontrun{
-#'
-#' # Load the 'sicalis' dataset 
 #' data(sicalis)
-#' # Generate a visual model
-#' vm1 <- vismodel(sicalis)
-#' # Make a tetracolorspace
-#' tcs1 <- tcs(vm1)
+#' vis.sicalis <- vismodel(sicalis)
+#' tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
+#' 
 #' # Subset all 'crown' patches (C in file names)
-#' head(subset(sicalis, "B"))
-#' subset(vm1, "B")
-#' subset(tcs1, "B")[, 1:5]}
+#' head(subset(sicalis, "C"))
+#' subset(vis.sicalis, "C")
+#' subset(tcs.sicalis, "C")[, 1:5]
+#' }
 #'
 #' @author Chad Eliason \email{cme16@@zips.uakron.edu}
 
 subset.rspec <- function (x, subset, ...) {
+  
+  # remove 'wl' column if present
+  wl_index <- which(names(x)=='wl')
+  if (length(wl_index)==1) {
+    wl <- x[, wl_index]
+    x <- x[, -wl_index]
+  }
+  
   if (is.logical(subset)) {
-    subsample <- subset
-  } else {
-      subsample <- grep(subset, names(x))
+    # test whether 'wl' is in subset condition
+    # gets from function call for subset
+    subsample <- substitute(subset)
+    if ('wl' %in% eval(subsample[[2]])) {
+      subsample[[2]] <- eval(subsample[[2]])[-wl_index]
     }
+    subsample <- which(eval(subsample))
+    # check that subset same length as number of spectra
+    if (length(subsample)!=ncol(x)){
+      warning("look out, subset doesn't match length of spectral data")
+    }
+  } else {
+    subsample <- grep(subset, names(x))
+  }
   if (length(subsample)==0) {
     warning("Subset condition not found")
   }
-  res <- cbind(x["wl"], x[subsample]) # & !is.na(subset)])
+  res <- cbind(wl, x[subsample])
   class(res) <- c("rspec", "data.frame")
   res
 }
 
-#' @export 
+#' @export
 #' @rdname subset.rspec
 #'
-subset.tcs <- function (x, subset, ...) {
+subset.colspace <- function (x, subset, ...) {
   # if (!is.logical(subset)) 
   #   stop("'subset' must be logical")
   if (is.logical(subset)) {
     subsample <- subset
+    res <- x[which(subsample), ]
   } else {
       subsample <- grep(subset, row.names(x))
+      res <- x[subsample, ]
     }
   if (length(subsample)==0) {
     warning("Subset condition not found")
   }
-  res <- x[subsample, ] # & !is.na(subset)])
-  class(res) <- c("tcs", "data.frame")
+  class(res) <- c("colspace", "data.frame")
   res
 }
 
-#' @export 
+#' @export
 #' @rdname subset.rspec
 #'
 subset.vismodel <- function (x, subset, ...) {
   if (is.logical(subset)) {
     subsample <- subset
+    res <- x[which(subsample), ]
   } else {
       subsample <- grep(subset, row.names(x))
+      res <- x[subsample, ]
     }
   # attr <- attributes(x)
-  res <- x[subsample, ]
+  class(res) <- c("vismodel", "data.frame")
   res
 }

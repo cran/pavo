@@ -1,3 +1,37 @@
+pavo 1.0
+------------------------------------------------------------------------------
+* See vignette for detailed description of changes.
+
+MAJOR CHANGES
+* coldist() arguments have been changed. Now the empirically estimated value for the Weber fraction must be entered, instead of the noise-to-signal ratio. The noise-to-signal ratio is then calculated based on the empirically estimated Weber fraction for the reference cone type, and applied to the remaining cone types. This should avoid confusion between empirically estimated values for the Weber fraction and the noise-to-signal ratio, which are currently prevalent in the literature.
+* coldist() now has an additional argument, weber.achro, so that the value for the Weber fraction to be used to calculate achromatic contrast can be input independently of the cone ratios.
+* tcs() is deprecated, replaced by colspace().
+
+NEW FUNCTIONS:
+
+* colspace() replaces tcs() and introduces several new colorspaces
+* plot() methods for several colspace() outputs, including a static tetrahedral colorspace
+* projpoints() allows the plotting of points in a projplot() figure
+* vol() draws volume polygons in static tetrahedral plots
+* axistetra() draws reference x, y and z axis arrows in static tetrahedral plots
+* legendtetra() adds legends to static tetrahedral plots
+
+MINOR FEATURES AND BUG FIXES:
+
+* summary.colspace() for tcs spaces now returns relative color volume as well as absolute
+* tcsvol() and voloverlap() now allow control for line width
+* procspec() fixed error when attempting to smooth rspec object without column names
+* procspec() handles smoothing before fixing negatives to avoid re-adding negatives when smoothing
+* procspec(), aggplot() accept additional arguments to summary functions (e.g., na.rm=TRUE)
+* peakshape() default wavelength limits (lim) now taken from rspec object rather than 300-700
+* peakshape() returns warning if a spectrum contains duplicate reflectance values
+* summary.rspec() works with single spectra
+* aggplot() and aggspec() fixed bug on ordering of levels when they don't match the sequence in the rspec object
+* aggplot() added logical argument "legend" for automatically adding a legend to the plot
+* vismodel() returns error if bkg=NULL
+* getspec() patched to stop returning warnings in Yosemite
+* getspec() has a faster (~5-10X), but less flexible, algorithm used when all input files are from the same source.
+
 pavo 0.5-6
 ------------------------------------------------------------------------------
 BUG FIXES
@@ -24,6 +58,7 @@ MINOR FEATURES AND BUG FIXES
 * vismodel() accepts matrix, data.frame or rspec objects for the illuminant, updated warning messages associated with this use
 * vismodel() accepts user-defined achromatic receptors
 * tcsplot(), tcsvol() & tcspoints(): transparency control passed to user
+* getspec() works with OceanView files
 
 pavo 0.5
 ------------------------------------------------------------------------------

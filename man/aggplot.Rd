@@ -5,7 +5,7 @@
 \title{Plot aggregated reflectance spectra}
 \usage{
 aggplot(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
-  lcol = NULL, shadecol = NULL, alpha = 0.2, ...)
+  lcol = NULL, shadecol = NULL, alpha = 0.2, legend = FALSE, ...)
 }
 \arguments{
 \item{rspecdata}{(required) data frame containing the spectra to be manipulated and 
@@ -30,6 +30,8 @@ measure of variation (defaults to \code{sd}).}
 
 \item{alpha}{transparency of the shaded areas.}
 
+\item{legend}{automatically add a legend.}
+
 \item{...}{additional graphical parameters to be passed to plot.}
 }
 \value{
@@ -42,10 +44,12 @@ according to an index or a vector of identities.
 \examples{
 \dontrun{
 data(sicalis)
-bysic <- gsub("^ind[0-9].",'',names(sicalis)[-1])
-aggplot(sicalis,bysic)
-aggplot(sicalis,bysic, shade=spec2rgb(sicalis),lcol=1)
-aggplot(sicalis,bysic,lcol=1, FUN.error=function(x)sd(x)/sqrt(length(x))) }
+bysic <- gsub("^ind[0-9].",'', names(sicalis)[-1])
+aggplot(sicalis, bysic)
+aggplot(sicalis, bysic, shade = spec2rgb(sicalis), lcol = 1)
+aggplot(sicalis, bysic, lcol = 1, FUN.error = function(x) sd(x)/sqrt(length(x))) 
+}
+
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}, 

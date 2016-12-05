@@ -1,6 +1,6 @@
 #' Process spectra
 #'
-#' Applies normalization and/or smoothing to spectra for further analysis or plotting
+#' Applies normalization and/or smoothing to spectra for further analysis or plotting.
 #'
 #' @param rspecdata (required) a data frame, possibly an object of class \code{rspec},
 #' with a column with wavelength data, named 'wl', and the remaining column containing
@@ -13,7 +13,7 @@
 #'                      \code{\link{loess.smooth}}. Optimal smoothing parameter
 #'                      can be assessed by using \code{\link{plotsmooth}}.
 #' 	\item \code{"minimum"} subtracts the minimum from each individual spectra.
-#' 	\item \code{"maxmimum"} divides each spectrum by its maximum value
+#' 	\item \code{"maxmimum"} divides each spectrum by its maximum value.
 #' 	\item \code{"sum"} divides each spectrum by summed values.
 #' 	\item \code{"bin"} bins each spectrum into specified wavelength ranges. User should
 #'									 specify.
@@ -29,28 +29,42 @@
 #'                           spectra to the reflectance at all other wavelengths (setting
 #'                           the minimum value to zero, but scaling other values accordingly).
 #' }
-#' @param span sets the smoothing parameter used by \code{loess.smooth}
-#' @param bins sets the number of equally sized wavelength bins for \code{opt="bin"}
+#' @param span sets the smoothing parameter used by \code{loess.smooth}.
+#' @param bins sets the number of equally sized wavelength bins for \code{opt = "bin"}.
+#' @param ... ignored.
+#' 
 #' @return A data frame of class \code{rspec} with the processed data.
+#' 
 #' @export
+#' 
+#' @author Chad Eliason \email{cme16@@zips.uakron.edu}
+#' 
 #' @examples \dontrun{
 #' data(teal)
 #' plot(teal, select = 10)
+#' 
 #' # Smooth data to remove noise
 #' teal.sm <- procspec(teal, opt = 'smooth', span = 0.25)
 #' plot(teal.sm, select = 10)
+#' 
 #' # Normalize to max of unity
 #' teal.max <- procspec(teal, opt = c('max'), span = 0.25)
-#' plot(teal.max, select = 10)}
-#' @author Chad Eliason \email{cme16@@zips.uakron.edu}
+#' plot(teal.max, select = 10)
+#' }
+#' 
 #' @seealso \code{\link{loess.smooth}}
-#' @references Cuthill, I., Bennett, A. T. D., Partridge, J. & Maier, E. 1999. Plumage reflectance and the objective assessment of avian sexual dichromatism. The American Naturalist, 153, 183-200.
-#' @references Montgomerie R. 2006. Analyzing colors. In Hill, G.E, and McGraw, K.J., eds. Bird Coloration. Volume 1 Mechanisms and measuremements. Harvard University Press, Cambridge, Massachusetts.
+#' 
+#' @references Cuthill, I., Bennett, A. T. D., Partridge, J. & Maier, E. 1999. 
+#'  Plumage reflectance and the objective assessment of avian sexual dichromatism. 
+#'  The American Naturalist, 153, 183-200.
+#' @references Montgomerie R. 2006. Analyzing colors. In Hill, G.E, and McGraw, 
+#'  K.J., eds. Bird Coloration. Volume 1 Mechanisms and measuremements. Harvard 
+#'  University Press, Cambridge, Massachusetts.
 
 procspec <- function(rspecdata, opt = c('none', 'smooth', 'maximum', 'minimum', 
 										 'bin', 'sum', 'center'), 
 										 fixneg = c('none', 'addmin', 'zero'),
-										 span = .25, bins = 20) {
+										 span = 0.25, bins = 20, ...) {
 
 opt <- match.arg(opt, several.ok = TRUE)
 
@@ -78,6 +92,22 @@ if (length(wl_index > 0)){
 
 nam <- names(rspecdata)
 
+if (any(opt=='smooth')){
+  rspecdata <- sapply(1:ncol(rspecdata), function(z){loess.smooth(x = wl, 
+                  y = as.data.frame(rspecdata[, z]), span = span, degree = 2, 
+                  family = "gaussian", evaluation = length(wl))$y})
+  applied <- c(applied, paste('smoothing spectra with a span of',span,'\n'))
+  }
+
+# if (any(opt=='smooth')&method=='spline')
+  # rspecdata <- sapply(names(rspecdata), function(z){smooth.spline(x = wl, y = rspecdata[, z], 
+           # spar = spar)$y})
+
+# if (any(opt=='smooth')&method=='loess')
+  # rspecdata <- sapply(names(rspecdata), function(z){loess.smooth(x = wl, y = rspecdata[, z], 
+           # span = span, degree = 2, family = "gaussian", 
+           # evaluation = length(wl))$y})
+
 if (fixneg=='addmin'){
   adm = function(x){
     if (min(x) < 0){ x + abs(min(x))
@@ -96,39 +126,24 @@ if (fixneg=='zero'){
   applied <- c(applied, 'Negative value correction: converted negative values to zero\n')
 }
 
-if (any(opt=='smooth')){
-  rspecdata <- sapply(names(rspecdata), function(z){loess.smooth(x = wl, 
-                  y = as.data.frame(rspecdata[, z]), span = span, degree = 2, 
-                  family = "gaussian", evaluation = length(wl))$y})
-  applied <- c(applied, paste('smoothing spectra with a span of',span,'\n'))
-  }
-
-# if (any(opt=='smooth')&method=='spline')
-  # rspecdata <- sapply(names(rspecdata), function(z){smooth.spline(x = wl, y = rspecdata[, z], 
-           # spar = spar)$y})
-
-# if (any(opt=='smooth')&method=='loess')
-  # rspecdata <- sapply(names(rspecdata), function(z){loess.smooth(x = wl, y = rspecdata[, z], 
-           # span = span, degree = 2, family = "gaussian", 
-           # evaluation = length(wl))$y})
 
 if (any(opt=='minimum')){
-  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] - min(rspecdata[, z]))
+  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] - min(rspecdata[, z], ...))
    applied <- c(applied, 'Scaling spectra to a minimum value of zero\n')
   }
 
 if (any(opt=='maximum')){
-  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] / max(rspecdata[, z]))
+  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] / max(rspecdata[, z], ...))
    applied <- c(applied, 'Scaling spectra to a maximum value of 1\n')
   }
 
 if (any(opt=='sum')){
-  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] / sum(rspecdata[, z]))
+  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] / sum(rspecdata[, z], ...))
    applied <- c(applied, 'Scaling spectra to a total area of 1\n')
   }
 
 if (any(opt=='center')){
-  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] - mean(rspecdata[, z]))
+  rspecdata <- sapply(1:ncol(rspecdata), function(z)rspecdata[, z] - mean(rspecdata[, z], ...))
    applied <- c(applied, 'Centering spectra to a mean of zero\n')
   }
 

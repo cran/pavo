@@ -4,20 +4,20 @@
 \alias{tcsplot}
 \alias{tcspoints}
 \alias{tcsvol}
-\title{Plot a Tetrahedral Color Space}
+\title{Interactive Plot of a Tetrahedral Colorspace}
 \usage{
 tcsplot(tcsdata, size = 0.02, alpha = 1, col = "black",
-  vertexsize = 0.02, achrosize = 0.01, achrocol = "grey", lwd = 1,
-  lcol = "lightgrey", new = FALSE, hspin = FALSE, vspin = FALSE,
-  floor = TRUE, grid = TRUE, fill = TRUE)
+  vertexsize = 0.02, achro = TRUE, achrosize = 0.01, achrocol = "grey",
+  lwd = 1, lcol = "lightgrey", new = FALSE, hspin = FALSE,
+  vspin = FALSE, floor = TRUE, grid = TRUE, fill = TRUE)
 
 tcspoints(tcsdata, size = 0.02, col = "black", alpha = 1)
 
 tcsvol(tcsdata, col = "black", alpha = 0.2, grid.alpha = 1, grid = T,
-  fill = T)
+  fill = T, lwd = 1)
 }
 \arguments{
-\item{tcsdata}{(required) a data frame, possibly a result from the \code{tcs} 
+\item{tcsdata}{(required) a data frame, possibly a result from the \code{colspace} 
 function, containing values for the 'x', 'y' and 'z' coordinates as columns (labeled as such)}
 
 \item{size}{size of the points in the plot (defaults to 0.02)}
@@ -28,13 +28,13 @@ function, containing values for the 'x', 'y' and 'z' coordinates as columns (lab
 
 \item{vertexsize}{size of the points at the vertices}
 
+\item{achro}{plot a point at the origin? (defaults to \code{TRUE})}
+
 \item{achrosize}{size of the point in the achromatic center}
 
 \item{achrocol}{color of the point in the achromatic center}
 
-\item{lwd}{line width for the edges of the tetrahedron}
-
-\item{lcol}{line color for the edges of the tetrahedron}
+\item{lwd, lcol}{graphical parameters for the edges of the tetrahedron.}
 
 \item{new}{should a new 3D plot be called (defaults to \code{FALSE})?}
 
@@ -62,47 +62,52 @@ currently plotted only as spheres to maintain export capabilities.
 \code{tcspoints} creates 3D points in a tetrahedral color space plot produced by \code{tcsplot}
 using functions of the package \code{rgl}, based on openGL capabilities.
 
-\code{tcsvol} creates a 3D convex hull within a \code{tcsplot} object
+\code{tcsvol} creates a 3D convex hull within a \code{tcsplot} object.
 }
 \description{
-\code{tcsplot} produces a 3D plot of a tetrahedral color space using OpenGL capabilities
+Produces an interactive 3D plot of a tetrahedral 
+colorspace using OpenGL capabilities.
 
-\code{tcspoints} plots points in a tetrahedral color space
+Plots points in a tetrahedral color space
 
-\code{tcsvol} produces a 3D convex hull in tetrahedral color space
+Produces a 3D convex hull in tetrahedral color space
 }
 \examples{
 \dontrun{
 # For plotting
 data(sicalis)
-vis.sicalis <- vismodel(sicalis, visual='avg.uv')
-tcs.sicalis <- tcs(vis.sicalis)
-tcsplot(tcs.sicalis, size=0.005)
+vis.sicalis <- vismodel(sicalis, visual = 'avg.uv')
+tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
+plot(tcs.sicalis, size = 0.005)
 rgl.postscript('testplot.pdf',fmt='pdf') 
 rgl.snapshot('testplot.png')
 
 # For adding points
-patch <- rep(c('C','T','B'),7)
+patch <- rep(c('C', 'T', 'B'), 7)
 tcs.crown <- subset(tcs.sicalis, 'C') 
 tcs.breast <- subset(tcs.sicalis, 'B') 
-tcsplot(tcs.crown, col='blue')
-tcspoints(tcs.breast, col='red')
+plot(tcs.crown, col ='blue')
+points(tcs.breast, col ='red')
 
 # For plotting convex hull
-tcsplot(tcs.sicalis, col='blue', size=.005)
-tcsvol(tcs.sicalis)}
+plot(tcs.sicalis, col = 'blue', size = 0.005)
+vol(tcs.sicalis)
+}
 
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}
 }
 \references{
-Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage color in a tetrahedral color space: A phylogenetic analysis of new world buntings. The American Naturalist, 171(6), 755-776.
+Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage 
+ color in a tetrahedral color space: A phylogenetic analysis of new world buntings. 
+ The American Naturalist, 171(6), 755-776.
 
-Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
+Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns 
+ as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
 }
 \seealso{
-\code{\link{spheres3d}},\code{\link{rgl.postscript}}, 
-\code{\link{rgl.snapshot}},\code{\link{rgl.material}}
+\code{\link[rgl]{spheres3d}},\code{\link[rgl]{rgl.postscript}}, 
+\code{\link[rgl]{rgl.snapshot}},\code{\link[rgl]{rgl.material}}
 }
 

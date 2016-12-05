@@ -1,8 +1,7 @@
 #' Plot spectra
 #'
 #' Plots reflectance spectra in different arrangements.
-#'
-#' @export 
+#' 
 #' @param x (required) a data frame, possibly an object of class \code{rspec},
 #' with a column with wavelength data, named 'wl', and the remaining column containing
 #' spectra to plot.
@@ -11,20 +10,24 @@
 #' @param type what type of plot should be drawn. Possibilities are: 
 #' \itemize{
 #'  \item \code{overlay} (default) for plotting multiple spectra in a single panel with 
-#' a common y-axis
-#'  \item \code{stack} for plotting multiple spectra in a vertical arrangement
+#' a common y-axis.
+#'  \item \code{stack} for plotting multiple spectra in a vertical arrangement.
 #'  \item \code{heatmap} for plotting reflectance values by wavelength and a third variable 
-#'        (\code{varying})
+#'        (\code{varying}).
 #' }
-#' @param varying a numeric vector giving values for y-axis in \code{heatplot}
+#' @param varying a numeric vector giving values for y-axis in \code{heatplot}.
 #' @param n number of bins with which to interpolate colors and \code{varying} for the 
 #' heatplot.
 #' @param ... additional arguments passed to plot (or image for \code{'heatmap'}).
+#' 
+#' @export
+#' 
 #' @examples \dontrun{
 #' data(teal)
 #' plot(teal, type = 'overlay')
 #' plot(teal, type = 'stack')
 #' plot(teal, type = 'heatmap')}
+#' 
 #' @author Chad Eliason \email{cme16@@zips.uakron.edu}
 #' @seealso \code{\link{spec2rgb}}, \code{\link{image}}, \code{\link{plot}}
 
@@ -86,7 +89,10 @@ if (type=='heatmap') {
   	jc <- colorRampPalette(arg$col)
   	arg$col <- jc(n)
   	}
-
+  
+  if (is.null(arg$lty))
+    arg$lty <- 1
+  
   Index <- approx(varying, n = n)$y
   dat <- sapply(1:nrow(x), function(z){approx(x = varying, y = x[z, ], 
                 n = n)$y})
@@ -108,6 +114,17 @@ if (any(names(arg$col)%in%names(x))) {
   arg$col <- arg$col[select-1]
 }
 
+# line types for overlay plot & others
+if (length(arg$lty) < ncol(x)) {
+  arg$lty <- rep(arg$lty, ncol(x))
+  arg$lty <- arg$lty[1:ncol(x)]
+ }
+
+if (any(names(arg$lty)%in%names(x))) {
+  arg$col <- arg$lty[select-1]
+}
+
+
 # overlay different spec curves
 if (type=='overlay') {
 
@@ -120,12 +137,16 @@ if (type=='overlay') {
   arg$y <- x[, 1]
   col <- arg$col
   arg$col <- col[1]
+  lty <- arg$lty
+  arg$lty <- lty[1]
+
 
   do.call(plot, arg)
 
   if (ncol(x) > 1) {
     for (i in 2:ncol(x)) {
       arg$col <- col[i]
+      arg$lty <- lty[i]
       arg$y <- x[, i]
       do.call(lines, arg)
     }

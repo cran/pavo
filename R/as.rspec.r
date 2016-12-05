@@ -2,14 +2,17 @@
 #'
 #' Converts data frames or matrices containing spectral data to \code{rspec} object
 #'
-#' @param object (required) a data frame or matrix containing spectra to process
+#' @param object (required) a data frame or matrix containing spectra to process.
 #' @param whichwl specifies which column contains wavelengths. If NULL (default), function
 #' searches for column containing equally spaced numbers and sets it as wavelengths "wl". If no
-#' wavelengths are found or \code{whichwl} is not given, returns arbitrary index values
-#' @param interp whether to interpolate wavelengths in 1-nm bins (defaults to TRUE)
-#' @param lim vector specifying wavelength range to interpolate over (e.g., \code{c(300, 700)})
+#' wavelengths are found or \code{whichwl} is not given, returns arbitrary index values.
+#' @param interp whether to interpolate wavelengths in 1-nm bins (defaults to TRUE).
+#' @param lim vector specifying wavelength range to interpolate over (e.g., \code{c(300, 700)}).
+#' 
 #' @return an object of class \code{rspec} for use in further \code{pavo} functions
+#' 
 #' @export as.rspec is.rspec
+#' 
 #' @examples \dontrun{
 #'
 #' # Generate some fake reflectance data
@@ -64,7 +67,7 @@ if (!is.null(whichwl)){
       wl <- object[, wl_index]
       object <- as.data.frame(object[, -wl_index])
       name <- name[-wl_index]
-      cat('wavelengths found in column', wl_index,'\n')
+      message(paste0('wavelengths found in column ', wl_index))
     } else {
         wl <- seq(lim[1], lim[2], length=nrow(object))
         object <- as.data.frame(object)
@@ -76,7 +79,7 @@ if (!is.null(whichwl)){
       wl <- object[, wl_index]
       object <- as.data.frame(object[, -wl_index])
       name <- name[-wl_index]
-      cat('wavelengths found in column', wl_index,'\n')
+      message(paste0('wavelengths found in column ', wl_index))
       } else {
           wl <- 1:nrow(object)
           object <- as.data.frame(object)

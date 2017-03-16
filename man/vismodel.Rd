@@ -77,7 +77,8 @@ ocular transmission (from Hart et al. 2000).
 \item \code{Ei}: Hyperbolic-transformed quantum catch, where Ei = Qi / (Qi + 1).
 }}
 
-\item{bkg}{either a vector containing the background spectra, or one of the options:
+\item{bkg}{background spectrum. Note that this will have no effect when \code{vonkries = FALSE}. 
+Either a vector containing the spectral data, or one of the options:
 \itemize{ 
 \item \code{ideal}: homogeneous illuminance of 1 accross all wavelengths (default).
 \item \code{'green'}: green foliage.
@@ -123,11 +124,6 @@ tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
 }
 
 }
-\author{
-Rafael Maia \email{rm72@zips.uakron.edu}
-
-Thomas White \email{thomas.white026@gmail.com}
-}
 \references{
 Vorobyev, M., Osorio, D., Bennett, A., Marshall, N., & Cuthill, I. 
  (1998). Tetrachromacy, oil droplets and bird plumage colours. Journal Of Comparative 
@@ -161,4 +157,8 @@ CIE (2006). Fundamental chromaticity diagram with physiological axes.
  Parts 1 and 2. Technical Report 170-1. Vienna: Central Bureau of the Commission 
  Internationale de l' Eclairage.
 }
+\author{
+Rafael Maia \email{rm72@zips.uakron.edu}
 
+Thomas White \email{thomas.white026@gmail.com}
+}

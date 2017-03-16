@@ -1,8 +1,21 @@
+pavo 1.0.1
+------------------------------------------------------------------------------
+MINOR FEATURES AND BUG FIXES:
+
+* the use of relative quantum catches is now optional in the categorical colorspace (though still produces a warning), for greater flexibility 
+* updated several functions to work when rspec object has only one spectrum
+* fixed bug in voloverlap where interactive plots would result in error
+* fixed incorrect labels in the maxwell triangle plot
+* fixed a bug in as.rspec() in which lim was not applied when interpolate = FALSE
+* fixed bug in aggplot() which resulted in error when using lty, lwd arguments
+* warning if ocular media is being used in both vismodel() and sensmodel()
+* added some more informative messages and warnings
+
 pavo 1.0
 ------------------------------------------------------------------------------
 * See vignette for detailed description of changes.
 
-MAJOR CHANGES
+MAJOR CHANGES:
 * coldist() arguments have been changed. Now the empirically estimated value for the Weber fraction must be entered, instead of the noise-to-signal ratio. The noise-to-signal ratio is then calculated based on the empirically estimated Weber fraction for the reference cone type, and applied to the remaining cone types. This should avoid confusion between empirically estimated values for the Weber fraction and the noise-to-signal ratio, which are currently prevalent in the literature.
 * coldist() now has an additional argument, weber.achro, so that the value for the Weber fraction to be used to calculate achromatic contrast can be input independently of the cone ratios.
 * tcs() is deprecated, replaced by colspace().

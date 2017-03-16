@@ -44,7 +44,7 @@
 #   suggested solution: a secondary function that examines files and returns recorded WL 
 #     range (in a dataframe or table)
 
-getspecf <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = ".", 
+getspecf2 <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = ".", 
                      subdir = FALSE, subdir.names = FALSE){
 
 corrupt <- FALSE
@@ -67,91 +67,78 @@ if (length(file_names)==0) {
 
 range <- lim[1]:lim[2]
 
-# final <- data.frame(matrix(nrow=length(range), ncol=length(file_names)+1))
-# final[,1] <- range
-
-# Setting a progress bar
-# progbar <- txtProgressBar(min=0, max=length(files), style=2)
-
 ###
 # START OF WHAT WAS A LOOP
 ###
 
-raw <- scan(file = files[1], what = '', quiet = T, dec = decimal, 
-  sep = '\n', skipNul = TRUE)
+raw <- sapply(files, scan, what='', quiet = T, 
+  dec = decimal, sep = '\n', skipNul = TRUE, simplify=FALSE)
 
 # rough fix for 'JazIrrad' files that have a stram of calibration data at the end
-if(length(grep('Begin Calibration Data', raw)) > 0)
-  raw <- raw[1:grep('Begin Calibration Data', raw) - 1]
+calib <- sapply(raw, grep, pattern='Begin Calibration Data', simplify=FALSE)
+calibL <- !!unlist(lapply(calib, length))
+
+if(any(calibL)){
+for(i in seq_along(calibL))
+  if(calibL[i])
+    raw[[i]] <- raw[[i]][1:calib[[i]] - 1]
+  }
+
 
 
 # find last line with text
-start <- grep('[A-Da-dF-Zf-z]',raw)
+start <- lapply(raw, grep, pattern='[A-Da-dF-Zf-z]')
 
 # correct for spectrasuite files, which have a "End Processed Spectral Data" at the end
-isendline <- length(grep('End.*Spectral Data', raw)) > 0
-if(isendline)
-  start <- start[-length(start)]
+isendline <- lapply(raw, grep, pattern='End.*Spectral Data')
+isendline <- !!unlist(lapply(isendline, length))
 
-start <- max(start)
-end <- length(raw) - start
+if(any(isendline))
+ for(i in seq_along(isendline))
+   if(isendline[i]) start[[i]] <- start[[i]][-length(start[[i]])]
 
-if (isendline > 0)
-  end <- end - 1
+start <- unlist(lapply(start, max))
+
+end <- unlist(lapply(raw, length)) - start
+
+end[isendline] <- end[isendline] - 1
 
 # Avantes has an extra skipped line between header and data. Bad Avantes.
-newavaheader <- length(grep("Wave.*;Sample.*;Dark.*;Reference;Reflectance", raw)) > 0
 
-if(newavaheader) 
-  start <- start+1
+newavaheader <- lapply(raw, grep, pattern="Wave.*;Sample.*;Dark.*;Reference;Reflectance")
+newavaheader <- !!unlist(lapply(newavaheader, length))
+
+start[newavaheader] <- start[newavaheader] + 1
+
 
 # find if columns are separated by semicolon or tab
-issem <- length(grep(';', raw)) > 0
-istab <- length(grep('\t', raw)) > 0
 
-if (issem & istab)
+issem <- !!unlist(lapply(lapply(raw, grep, pattern=';'), length) )
+istab <- !!unlist(lapply(lapply(raw, grep, pattern='\t'), length) )
+
+if (any(apply(cbind(issem, istab), 1, all)))
   stop('inconsistent column delimitation in source files.')
 
 separ <- ifelse(issem, ';', '\t')
 
-# extract data from file
-rawtab <- suppressWarnings(read.table(files[1], dec = decimal, sep = separ, skip = start, nrows = end, row.names = NULL, skipNul = TRUE, header=FALSE))
+# gitit
+rawtab <- lapply(seq_along(raw), function(x)
+  suppressWarnings(
+  read.table(text=raw[[x]], dec = decimal, sep = separ[x], skip = start[x], nrows = end[x], 
+    row.names = NULL, skipNul = TRUE, header=FALSE)
+  )
+  )
 
-wl <- rawtab[, 1]
+lastcol <- unlist(lapply(rawtab, ncol))
 
-# convert non-numeric values to numeric
-if(any(c('character','factor') %in% apply(rawtab, 2, class))){
-  rawtab <- suppressWarnings(apply(rawtab, 2, 
-    function(x) as.numeric(as.character(x))))
-      
-  if(sum(apply(rawtab, 2, function(x) sum(is.na(x))))) 
-    corrupt <- TRUE
-}
+rawtab <- lapply(seq_along(rawtab), function(x) rawtab[[x]][c(1,lastcol[x])] )
 
-# remove columns where all values are NAs (due to poor tabulation)
-rawtab <- rawtab[ , colSums(is.na(rawtab)) < nrow(rawtab)]
-
-
-# set what type of data are in columns (null causes not to read)
-# Jaz and Avasoft8 have 5 columns, correct
-numcols <- dim(rawtab)[2]
-colClasses <- c(rep("NULL", numcols-1), "numeric")
-
-# read data
-read.all <- suppressWarnings(lapply(files, read.table, skip = start, nrows = end, dec = decimal, sep = separ, header = FALSE, colClasses = colClasses))
-
-# combine columns
-tempframe <- as.data.frame(do.call(cbind, read.all))
-
-if(any(apply(tempframe, 2, class) != 'numeric'))
+if(any(unlist(lapply(rawtab, apply, 2, class)) != 'numeric'))
   corrupt <- TRUE
 
-# remove columns where all values are NAs (due to poor tabulation)
-# tempframe <- tempframe[, colSums(is.na(tempframe)) < nrow(tempframe)]
+interp <- lapply(lapply(rawtab, approx, xout=range), '[', 'y')
 
-interp <- sapply(1:ncol(tempframe), FUN = function(x) {approx(x = wl, y = tempframe[, x], xout = range)$y})
-
-interp <- as.data.frame(cbind(range, interp))
+interp <- do.call(cbind.data.frame, c(wl=list(range), interp))
 
 names(interp) <- c("wl", as.character(strsplit(file_names, extension)))
 
@@ -162,23 +149,8 @@ if(corrupt){
   warning('one or more files contains character elements within wavelength and/or reflectance values - check for corrupt or otherwise poorly exported files. Verify values returned.')
   	}
 
+
 interp
 
 }
 
-
-
-
-
-
-# system.time(specs1 <- getspec('~/Desktop/glossystarlings', 'ttt'))
-# system.time(specs2 <- getspec2('~/Desktop/glossystarlings', 'ttt'))
-# system.time(specs3 <- getspec3('~/Desktop/glossystarlings', 'ttt'))
-
-# # library(pavo)
-
-# setwd("/Users/chad/github/pavo/examplespec")
-
-# getspec(ext='txt')
-# getspec2(ext='txt')
-# fastgetspec(ext='txt')

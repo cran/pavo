@@ -5,11 +5,12 @@
 \title{Visual Models}
 \usage{
 vismodel(rspecdata, visual = c("avg.uv", "avg.v", "bluetit", "star", "pfowl",
-  "apis", "canis", "cie2", "cie10", "musca"), achromatic = c("bt.dc", "ch.dc",
-  "st.dc", "ml", "l", "md.r1", "none"), illum = c("ideal", "bluesky", "D65",
-  "forestshade"), trans = c("ideal", "bluetit", "blackbird"),
-  qcatch = c("Qi", "fi", "Ei"), bkg = c("ideal", "green"),
-  vonkries = FALSE, scale = 1, relative = TRUE)
+  "apis", "canis", "cie2", "cie10", "musca", "segment"),
+  achromatic = c("none", "bt.dc", "ch.dc", "st.dc", "ml", "l", "md.r1",
+  "all"), illum = c("ideal", "bluesky", "D65", "forestshade"),
+  trans = c("ideal", "bluetit", "blackbird"), qcatch = c("Qi", "fi", "Ei"),
+  bkg = c("ideal", "green"), vonkries = FALSE, scale = 1,
+  relative = TRUE)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly an object of class \code{rspec}
@@ -19,36 +20,38 @@ remaining columns.}
 \item{visual}{the visual system to be used. Options are:
 \itemize{
 \item a data frame such as one produced containing by \code{sensmodel}, containing 
-   sensitivity for the user-defined visual system. The data frame must contain a \code{'wl'}
-   column with the range of wavelengths included, and the sensitivity for each other 
-   cone as a column.
+   user-defined sensitivity data for the receptors involved in colour vision. 
+   The data frame must contain a \code{'wl'} column with the range of wavelengths included, 
+   and the sensitivity for each other cone as a column.
+\item \code{apis}: Honeybee \emph{Apis mellifera} visual system.
 \item \code{avg.uv}: average avian UV system.
 \item \code{avg.v}: average avian V system.
 \item \code{bluetit}: Blue tit \emph{Cyanistes caeruleus} visual system.
-\item \code{star}: Starling \emph{Sturnus vulgaris} visual system.
-\item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system.
-\item \code{apis}: Honeybee \emph{Apis mellifera} visual system.
 \item \code{canis}: Canid \emph{Canis familiaris} visual system.
-\item \code{musca}: Housefly \emph{Musca domestica} visual system.
 \item \code{cie2}: 2-degree colour matching functions for CIE models of human 
  colour vision. Functions are linear transformations of the 2-degree cone fundamentals 
  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
 \item \code{cie10}: 10-degree colour matching functions for CIE models of human 
  colour vision. Functions are linear transformations of the 10-degree cone fundamentals 
  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
+\item \code{musca}: Housefly \emph{Musca domestica} visual system.
+\item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system.
+\item \code{segment}: Generic tetrachromat 'viewer' for use in the segment analysis of Endler (1990).
+\item \code{star}: Starling \emph{Sturnus vulgaris} visual system.
 }}
 
 \item{achromatic}{the sensitivity data to be used to calculate luminance (achromatic)
- cone stimulation. Either a vector containing the sensitivity for a single receptor, 
+ receptor stimulation. Either a vector containing the sensitivity for a single receptor, 
  or one of the options: 
 \itemize{
+ \item \code{none}: no achromatic stimulation calculated
 \item \code{bt.dc}: Blue tit \emph{Cyanistes caeruleus} double cone
  \item \code{ch.dc}: Chicken \emph{Gallus gallus} double cone
  \item \code{st.dc}: Starling \emph{Sturnus vulgaris} double cone
  \item \code{md.r1}: Housefly \emph{Musca domestica} R1-6 photoreceptor
- \item \code{ml}: sum of the two longest-wavelength photoreceptors
+ \item \code{ml}: the summed response of the two longest-wavelength photoreceptors
  \item \code{l}: the longest-wavelength photoreceptor
- \item \code{none}
+ \item \code{all}: the summed response of all photoreceptors
 }}
 
 \item{illum}{either a vector containing the illuminant, or one of the options:

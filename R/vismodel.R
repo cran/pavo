@@ -16,35 +16,37 @@
 #' @param visual the visual system to be used. Options are:
 #' \itemize{
 #'	\item a data frame such as one produced containing by \code{sensmodel}, containing 
-#'    sensitivity for the user-defined visual system. The data frame must contain a \code{'wl'}
-#'    column with the range of wavelengths included, and the sensitivity for each other 
-#'    cone as a column.
+#'    user-defined sensitivity data for the receptors involved in colour vision. 
+#'    The data frame must contain a \code{'wl'} column with the range of wavelengths included, 
+#'    and the sensitivity for each other cone as a column.
+#' \item \code{apis}: Honeybee \emph{Apis mellifera} visual system.
 #' \item \code{avg.uv}: average avian UV system.
 #' \item \code{avg.v}: average avian V system.
 #' \item \code{bluetit}: Blue tit \emph{Cyanistes caeruleus} visual system.
-#' \item \code{star}: Starling \emph{Sturnus vulgaris} visual system.
-#' \item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system.
-#' \item \code{apis}: Honeybee \emph{Apis mellifera} visual system.
 #' \item \code{canis}: Canid \emph{Canis familiaris} visual system.
-#' \item \code{musca}: Housefly \emph{Musca domestica} visual system.
 #' \item \code{cie2}: 2-degree colour matching functions for CIE models of human 
 #'  colour vision. Functions are linear transformations of the 2-degree cone fundamentals 
 #'  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
 #' \item \code{cie10}: 10-degree colour matching functions for CIE models of human 
 #'  colour vision. Functions are linear transformations of the 10-degree cone fundamentals 
 #'  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
+#' \item \code{musca}: Housefly \emph{Musca domestica} visual system.
+#' \item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system.
+#' \item \code{segment}: Generic tetrachromat 'viewer' for use in the segment analysis of Endler (1990).
+#' \item \code{star}: Starling \emph{Sturnus vulgaris} visual system.
 #' }
 #' @param achromatic the sensitivity data to be used to calculate luminance (achromatic)
-#'  cone stimulation. Either a vector containing the sensitivity for a single receptor, 
+#'  receptor stimulation. Either a vector containing the sensitivity for a single receptor, 
 #'  or one of the options: 
 #' \itemize{
+#'  \item \code{none}: no achromatic stimulation calculated
 #'	\item \code{bt.dc}: Blue tit \emph{Cyanistes caeruleus} double cone
 #'  \item \code{ch.dc}: Chicken \emph{Gallus gallus} double cone
 #'  \item \code{st.dc}: Starling \emph{Sturnus vulgaris} double cone
 #'  \item \code{md.r1}: Housefly \emph{Musca domestica} R1-6 photoreceptor
-#'  \item \code{ml}: sum of the two longest-wavelength photoreceptors
+#'  \item \code{ml}: the summed response of the two longest-wavelength photoreceptors
 #'  \item \code{l}: the longest-wavelength photoreceptor
-#'  \item \code{none}
+#'  \item \code{all}: the summed response of all photoreceptors
 #' }
 #' @param illum either a vector containing the illuminant, or one of the options:
 #' \itemize{ 
@@ -130,8 +132,8 @@
 #'  Internationale de l' Eclairage.
 
 vismodel <- function(rspecdata, 
-  visual = c('avg.uv', 'avg.v', 'bluetit', 'star', 'pfowl', 'apis', 'canis', 'cie2', 'cie10', 'musca'), 
-  achromatic = c('bt.dc','ch.dc', 'st.dc',"ml", 'l', 'md.r1', 'none'),
+  visual = c('avg.uv', 'avg.v', 'bluetit', 'star', 'pfowl', 'apis', 'canis', 'cie2', 'cie10', 'musca', 'segment'), 
+  achromatic = c('none', 'bt.dc','ch.dc', 'st.dc','ml', 'l', 'md.r1', 'all'),
   illum = c('ideal','bluesky','D65','forestshade'), 
   trans = c('ideal', 'bluetit','blackbird'),
   qcatch = c('Qi','fi', 'Ei'),
@@ -160,6 +162,9 @@ if(length(y[y < 0]) > 0){
 visual2 <- try(match.arg(visual), silent = T)
 sens <- vissyst
 achromatic2 <- try(match.arg(achromatic), silent=T)
+illum2 <- try(match.arg(illum), silent=T)
+bg2 <- try(match.arg(bkg), silent=T)
+tr2 <- try(match.arg(trans), silent=T)
 
 if(class(achromatic2) == 'try-error')
   if(is.logical(achromatic))
@@ -170,9 +175,7 @@ if(class(achromatic2) == 'try-error')
 
 qcatch <- match.arg(qcatch)
 
-# Defaults for CIE stuff. Ugly - better way to do this? Is it best to do it all silently 
-# like this and put notes in the doc mentioning which arguments are ignored? 
-  
+# Defaults for CIE-specific stuff. Bit ugly - better way to do this? 
 if(substr(visual2, 1, 3) == 'cie'){ 
   if(!vonkries) {
     vonkries <- TRUE
@@ -195,8 +198,58 @@ if(substr(visual2, 1, 3) == 'cie'){
   }  
 }
 
+# Defaults for segment analysis stuff. 
+if(visual2 == 'segment'){ 
+  if(vonkries){
+    vonkries <- FALSE
+    warning('segment analysis chosen, overriding vonkries to FALSE', call.=FALSE)
+  }
+  
+  if(!relative){
+    relative <- TRUE
+    warning('segment analysis chosen, overriding relative to TRUE', call.=FALSE)
+  }
+  
+  if(achromatic2 != 'all'){
+    achromatic2 <- 'all'
+    warning('segment analysis chosen, overriding achromatic to all', call.=FALSE)
+  }
+  
+  if(qcatch != 'Qi'){
+    qcatch <- 'Qi'
+    warning('segment analysis chosen, overriding qcatch to Qi', call.=FALSE)
+  }
+  
+  if(bg2 != 'ideal'){
+    bg2 <- 'ideal'
+    warning('segment analysis chosen, overriding bkg to ideal', call.=FALSE)
+  }
+  
+  if(tr2 != 'ideal'){
+    tr2 <- 'ideal'
+    warning('segment analysis chosen, overriding trans to ideal', call.=FALSE)
+  }
+  
+  if(illum2 != 'ideal'){
+    illum2 <- 'ideal'
+    warning('segment analysis chosen, overriding illum to ideal', call.=FALSE)
+  }
+}
 
-if(!inherits(visual2,'try-error')){
+# Grab the visual system
+if(visual2 == 'segment'){  # make a weird custom 'visual system' for segment analysis
+  S <- data.frame(matrix(0, nrow = length(wl), ncol = 4))
+  names(S) <- c('S1', 'S2', 'S3', 'S4')
+  segmts <- trunc(as.numeric(quantile(min(wl):max(wl))))
+  
+  S[wl %in% segmts[1]:segmts[2] ,1] <- 1
+  S[wl %in% segmts[2]:segmts[3] ,2] <- 1
+  S[wl %in% segmts[3]:segmts[4] ,3] <- 1
+  S[wl %in% segmts[4]:segmts[5] ,4] <- 1
+
+  sens_wl <- wl
+  
+}else if(!inherits(visual2,'try-error')){
     visual <- match.arg(visual)
     S <- sens[,grep(visual,names(sens))]
     names(S) <- gsub(paste(visual,'.',sep=''),'',names(S))
@@ -209,6 +262,9 @@ if(!inherits(visual2,'try-error')){
     }
 
 conenumb <- dim(S)[2]
+
+if(visual2 == 'segment')
+  conenumb <- 'seg'
 
 # transform from percentages to proportions according to Vorobyev 2003
 
@@ -229,7 +285,6 @@ if(max(y) > 1)
 
 bgil <- bgandilum
 
-illum2 <- try(match.arg(illum), silent=T)
 if(!inherits(illum2,'try-error')){
   illum <- bgil[,grep(illum2,names(bgil))]
   }else{
@@ -239,7 +294,7 @@ if(!inherits(illum2,'try-error')){
 if(illum2=='ideal')
   illum <- rep(1,dim(rspecdata)[1])
 
-bg2 <- try(match.arg(bkg), silent=T)
+
 if(!inherits(bg2,'try-error')){
   if(is.null(bkg)) stop('chosen background is NULL')
   bkg <- bgil[,grep(bg2,names(bgil))]
@@ -254,7 +309,6 @@ if(bg2=='ideal')
 
 trdat <- transmissiondata
 
-tr2 <- try(match.arg(trans), silent=T)
 if(!inherits(tr2,'try-error')){
   if(is.null(trans)) stop('chosen transmission is NULL')
   trans <- trdat[,grep(tr2,names(trdat))]
@@ -271,7 +325,6 @@ if(tr2 != 'ideal' & visual == 'user-defined'){
 		  warning('The visual system being used appears to already incorporate ocular transmission. Using anything other than trans=',dQuote('ideal'),'means ocular media effects are being applied a second time.', call.=FALSE)
 }
 
-
 # scale background from percentage to proportion
 if(max(bkg) > 1)
   bkg <- bkg/100
@@ -279,7 +332,6 @@ if(max(bkg) > 1)
 # scale transmission from percentage to proportion
 if(max(trans) > 1)
   trans <- trans/100
-
   
 # is the illuminant a matrix, dataframe or rspec?
 
@@ -313,6 +365,9 @@ y <- y * trans
 if(substr(visual2, 1, 3) == 'cie'){  # Slightly different for CIE
   K <- 100/colSums(S[2] * illum)
   Qi <- data.frame(sapply(indices, function(x) colSums(y * S[, x] * illum) * K))
+}else if(visual == 'segment'){ # Slightly different for segment
+  B <- apply(y, 2, sum)
+  Qi <- data.frame(sapply(indices, function(x) colSums(y * S[, x] * illum) * B))
 }else{
   Qi <- data.frame(sapply(indices, function(x) colSums(y * S[, x] * illum)))
 }
@@ -369,7 +424,7 @@ if(achromatic2=='bt.dc' | achromatic2=='ch.dc' | achromatic2=='st.dc' | achromat
 }
 
 if(achromatic2=='ml'){
-   L <- rowSums(S[,c(dim(S)[2]-1,dim(S)[2])])
+  L <- rowSums(S[,c(dim(S)[2]-1,dim(S)[2])])
   lum <- colSums(y*L*illum)
   Qi <- data.frame(cbind(Qi,lum))
 }
@@ -378,6 +433,16 @@ if(achromatic2=='l'){
   L <- S[, dim(S)[2]]
   lum <- colSums(y*L*illum)
   Qi <- data.frame(cbind(Qi,lum))
+}
+
+if(achromatic2=='all'){
+  L <- rowSums(S)
+  lum <- colSums(y*L*illum)
+  Qi <- data.frame(cbind(Qi,lum))
+}
+
+if(achromatic2=='segment'){
+  Qi <- data.frame(cbind(Qi, B))
 }
 
 if(achromatic2 == 'none'){
@@ -408,6 +473,7 @@ if(vonkries){
 fi <- log(Qi)  # fechner law (signal ~ log quantum catch)
 Ei <- Qi / (Qi + 1)  # hyperbolic transform
 
+# Convert to relative
 if(relative & !is.null(lum)){
   Qi[,-dim(Qi)[2]] <- Qi[,-dim(Qi)[2]]/rowSums(Qi[,-dim(Qi)[2]])
   fi[,-dim(fi)[2]] <- fi[,-dim(fi)[2]]/rowSums(fi[,-dim(fi)[2]])
@@ -419,18 +485,15 @@ if(relative & !is.null(lum)){
 }
 
 if(relative & is.null(lum)){
-  Qi <- Qi/rowSums(Qi)
-  fi <- fi/rowSums(fi)
-  Ei <- Ei/rowSums(Ei)
-
-# Place dark specs in achromatic center?
-# blacks <- which(norm.B < 0.05) #find dark specs
-# Qi[blacks,] <- 0.2500 #place dark specs in achromatic center
+    Qi <- Qi/rowSums(Qi)
+    fi <- fi/rowSums(fi)
+    Ei <- Ei/rowSums(Ei)
+    # Place dark specs in achromatic center?
+    # blacks <- which(norm.B < 0.05) #find dark specs
+    # Qi[blacks,] <- 0.2500 #place dark specs in achromatic center
 }
 
 # OUTPUT
-#res<-list(descriptive=descriptive,Qi=Qi, qi=qi, fi=fi)
-
 
 res <- switch(qcatch, Qi = Qi, fi = fi, Ei = Ei)
 

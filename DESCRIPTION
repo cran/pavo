@@ -2,21 +2,21 @@ Package: pavo
 Description: A cohesive framework for parsing, analyzing and organizing color from spectral data.
 Title: Perceptual Analysis, Visualization and Organization of Spectral
         Color Data in R
-Version: 1.0.1
+Version: 1.1.0
 License: GPL (>= 2)
-Date: 2017-03-15
+Date: 2017-05-05
 Authors@R: c(person("Rafael", "Maia", role = c("aut", "cre"),
     email = "rm72@zips.uakron.edu"),
+    person("Thomas", "White", role = "aut",
+    email = "thomas.white026@gmail.com"),
     person("Chad", "Eliason", role = "aut",
     email = "cme16@zips.uakron.edu"),
     person("Pierre-Paul", "Bitton", role = "aut",
-    email = "bittonp@uwindsor.ca"),
-    person("Thomas", "White", role = "aut",
-    email = "thomas.white026@gmail.com"))
+    email = "bittonp@uwindsor.ca"))
 Author: Rafael Maia [aut, cre],
+    Thomas White [aut],
     Chad Eliason [aut],
-    Pierre-Paul Bitton [aut],
-    Thomas White [aut]
+    Pierre-Paul Bitton [aut]
 Maintainer: Rafael Maia <rm72@zips.uakron.edu>
 URL: http://rafaelmaia.net/pavo/
 Depends: R(>= 2.10)
@@ -25,6 +25,6 @@ Suggests: rgl, testthat, knitr
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-03-15 15:33:28 UTC; rmaia
+Packaged: 2017-05-05 21:29:50 UTC; rmaia
 Repository: CRAN
-Date/Publication: 2017-03-16 08:44:22
+Date/Publication: 2017-05-05 22:04:08 UTC

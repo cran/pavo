@@ -147,126 +147,6 @@ newreceptornoise.quantum <- function(dat, n, weber, weber.ref, res, qndat){
   sqrt(numerator/denominator)
   }
 
-
-
-
-
-# tetrachromat functions
-
-ttdistcalc <- function(f1, f2, w1, w2, w3, w4){
-
-        dq1 <- f1[1]-f2[1]
-        dq2 <- f1[2]-f2[2]
-        dq3 <- f1[3]-f2[3]
-        dq4 <- f1[4]-f2[4]
-		
-		numer<-	((w1*w2)^2)*((dq4-dq3)^2) + 
-				((w1*w3)^2)*((dq4-dq2)^2) +
-				((w1*w4)^2)*((dq3-dq2)^2) +
-				((w2*w3)^2)*((dq4-dq1)^2) +
-				((w2*w4)^2)*((dq3-dq1)^2) +
-				((w3*w4)^2)*((dq2-dq1)^2)
-		
-		denom<- ((w1*w2*w3)^2) +
-				((w1*w2*w4)^2) + 
-				((w1*w3*w4)^2) +
-				((w2*w3*w4)^2)	
-			
-		as.numeric(sqrt(numer/denom))
-		}
-		
-qn.ttdistcalc <- function(f1, f2, qn1, qn2, n1, n2, n3, n4, v){
-
-        dq1 <- f1[1]-f2[1]
-        dq2 <- f1[2]-f2[2]
-        dq3 <- f1[3]-f2[3]
-        dq4 <- f1[4]-f2[4]
-        
-        w1 <- sqrt((v^2/n1) + (2/(qn1[1]+qn2[1])))
-        w2 <- sqrt((v^2/n2) + (2/(qn1[2]+qn2[2])))
-        w3 <- sqrt((v^2/n3) + (2/(qn1[3]+qn2[3])))
-        w4 <- sqrt((v^2/n4) + (2/(qn1[4]+qn2[4])))
-		
-		numer<-	((w1*w2)^2)*((dq4-dq3)^2) + 
-				((w1*w3)^2)*((dq4-dq2)^2) +
-				((w1*w4)^2)*((dq3-dq2)^2) +
-				((w2*w3)^2)*((dq4-dq1)^2) +
-				((w2*w4)^2)*((dq3-dq1)^2) +
-				((w3*w4)^2)*((dq2-dq1)^2)
-		
-		denom<- ((w1*w2*w3)^2) +
-				((w1*w2*w4)^2) + 
-				((w1*w3*w4)^2) +
-				((w2*w3*w4)^2)	
-			
-		as.numeric(sqrt(numer/denom))
-		}
-
-# dichromat functions
-
-didistcalc <- function(f1, f2, w1, w2){
-        dq1 <- f1[1]-f2[1]
-        dq2 <- f1[2]-f2[2]
-
-		numer<-	(dq1-dq2)^2
-		
-		denom<- (w1)^2+(w2)^2
-			
-		as.numeric(sqrt(numer/denom))
-		}
-
-qn.didistcalc <- function(f1, f2, qn1, qn2, n1, n2, v){
-        dq1 <- f1[1]-f2[1]
-        dq2 <- f1[2]-f2[2]
-
-        w1 <- sqrt((v^2/n1) + (2/(qn1[1]+qn2[1])))
-        w2 <- sqrt((v^2/n2) + (2/(qn1[2]+qn2[2])))
-		
-		numer<-	(dq1-dq2)^2
-		
-		denom<- (w1)^2+(w2)^2
-			
-		as.numeric(sqrt(numer/denom))
-		}
-
-# trichromat functions
-
-trdistcalc <- function(f1, f2, w1, w2, w3){
-        dq1 <- f1[1]-f2[1]
-        dq2 <- f1[2]-f2[2]
-        dq3 <- f1[3]-f2[3]
-		
-		numer<-	(w1^2*((dq3-dq2)^2)) +
-		        (w2^2*((dq3-dq1)^2)) +
-		        (w3^2*((dq1-dq2)^2))
-		
-		denom<- ((w1*w2)^2) +
-				((w1*w3)^2) +
-				((w2*w3)^2)	
-			
-		as.numeric(sqrt(numer/denom))
-		}
-
-qn.trdistcalc <- function(f1, f2, qn1, qn2, n1, n2, n3, v){
-        dq1 <- f1[1]-f2[1]
-        dq2 <- f1[2]-f2[2]
-        dq3 <- f1[3]-f2[3]
-        
-        w1 <- sqrt((v^2/n1) + (2/(qn1[1]+qn2[1])))
-        w2 <- sqrt((v^2/n2) + (2/(qn1[2]+qn2[2])))
-        w3 <- sqrt((v^2/n3) + (2/(qn1[3]+qn2[3])))
-		
-		numer<-	(w1^2*((dq3-dq2)^2)) +
-		        (w2^2*((dq3-dq1)^2)) +
-		        (w3^2*((dq1-dq2)^2))
-		
-		denom<- ((w1*w2)^2) +
-				((w1*w3)^2) +
-				((w2*w3)^2)	
-			
-		as.numeric(sqrt(numer/denom))
-		}
-
 # achromatic functions
 
 ttdistcalcachro <- function(f1, f2, weber.achro){
@@ -274,7 +154,7 @@ ttdistcalcachro <- function(f1, f2, weber.achro){
         dq1 <- as.numeric(dq1)
         w <- weber.achro
         round(abs(dq1/w), 7)
-		}
+        }
 
 qn.ttdistcalcachro <- function(f1,f2, qn1, qn2, weber.achro){
         dq1 <- f1[length(f1)]-f2[length(f1)]
@@ -282,6 +162,7 @@ qn.ttdistcalcachro <- function(f1,f2, qn1, qn2, weber.achro){
         w <- sqrt((weber.achro)^2 + (2/(qn1[length(qn1)]+qn2[length(qn1)])))
         round(abs(dq1/w),7)
     }
+
 
 ################################
 # END RECEPTOR NOISE FUNCTIONS #
@@ -304,7 +185,7 @@ achroseg <- function(coord1, coord2){
 
 # Achromatic 'green' receptor contrast in the hexagon
 achrohex <- function(coord1, coord2){
-  as.numeric(round(coord1['l'] - coord2['l'], 7))
+  as.numeric(round(coord1['l'] / coord2['l'], 7))
 }
 
 # Achromatic contrast in cielab
@@ -318,10 +199,56 @@ lab2d <- function(coord1, coord2){
                                          abs(coord1['b'] - coord2['b'])^2), 7))
 }
 
+# CIE2000 colour distance for CIELCh (LOLWAT)
+cie2000 <- function(coord1, coord2){
+  
+  # Lightness difference
+  dL <- coord2['L'] - coord1['L']
+  
+  # Mean lightness
+  mL <- (coord2['L'] + coord1['L'])/2
+  
+  # Chroma difference
+  dC <- coord2['C'] - coord1['C']
+  
+  # Mean chroma
+  mC <- (coord2['C'] + coord1['C'])/2
+  
+  # Hue difference
+  if(coord1['h'] - coord2['h'] <= 180)
+    dh <- coord2['h'] - coord1['h']
+  else if(coord1['h'] - coord2['h'] > 180 & coord2['h'] <= coord1['h'])
+    dh <- coord2['h'] + coord1['h'] + 360 
+  else if(coord1['h'] - coord2['h'] > 180 & coord2['h'] > coord1['h'])
+    dh <- coord2['h'] + coord1['h'] - 360
+  
+  # Mean hue
+  if(abs(coord2['h'] - coord1['h']) <= 180)
+    mh <- (coord2['h'] + coord1['h'])/2
+  else if(abs(coord2['h'] - coord1['h']) > 180 & coord2['h'] + coord1['h'] < 360)
+    mh <- (coord2['h'] + coord1['h'] + 360)/2 
+  else if(abs(coord2['h'] - coord1['h']) > 180 & coord2['h'] + coord1['h'] >= 360)
+    mh <- (coord2['h'] + coord1['h'] - 360)/2
+  
+  t <- 1 - (0.17 * cos(mh - 30)) + (0.24 * cos(2 * mh)) + (0.32 * cos(3 * mh + 6)) - (0.2 * cos(4 * mh - 63))
+    
+  sL <- 1 + ((0.17 * (mL - 50)^2) / sqrt(20 + (mL - 50)^2))
+  sC <-  1 + 0.045 * mC
+  sH <- 1 + 0.015 * mC * t
+  
+  Rt <- -2 * sqrt(mC^7 / (mC^7 + 25^7)) * sin(60 * exp(-1 * (((mh - 275)/25)^2)))
+  
+  as.numeric(round(sqrt((dL/sL)^2 + (dC/sC)^2 + (dh/sH)^2 + (Rt * (dC/sC) * (dh/sH)))), 7)
+}
+
 # Manhattan distance
 bloc2d <- function(coord1, coord2){
   as.numeric(round(abs(coord1['x'] - coord2['x']) + abs(coord1['y'] - coord2['y'])), 7)
 }
+
+#######################
+# END OTHER DISTANCES #
+#######################
 
 #####################
 # SUMMARY VARIABLES #
@@ -386,18 +313,19 @@ tcssum <- function(tcsres){
 # Calculate hexagon hue angle (in degrees, moving clockwise, with 1200 as 0)
 # in the colour hexagon
 angle360 <- function(x, y){
-  if(isTRUE(sign(x) == 1 && sign(y) == 1))
-    return(atan(abs(x)/abs(y)) * (180/pi))
-  if(isTRUE(sign(x) == 1 && sign(y) == -1))
-    return((atan(abs(y)/abs(x)) * (180/pi)) + 90)
-  if(isTRUE(sign(x) == -1 && sign(y) == -1))
-    return((atan(abs(x)/abs(y)) * (180/pi)) + 180)
-  if(isTRUE(sign(x) == -1 && sign(y) == 1))
-    return((atan(abs(y)/abs(x)) * (180/pi)) + 270)
+  
+  theta <- 90 - (atan2(y, x) * (180/pi))
+  if(theta < 0)
+    theta <- theta + 360
+  
+  theta
+
 }
 
 # Calculate the coarse hexagon sector
 coarse_sec <- function(x){
+  if(isTRUE(x == 0))
+    return('achro')
   if(isTRUE(x >= 30 && x < 90))
     return('bluegreen')
   if(isTRUE(x >= 90 && x < 150))

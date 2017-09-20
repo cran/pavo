@@ -21,8 +21,12 @@
 #'    \item \code{categorical}: the tetrachromatic categorical fly-model of Troje (1993). See \code{\link{categorical}} for details. (\link[=catplot]{plotting arguments})
 #'    \item \code{ciexyz}: CIEXYZ space. See \code{\link{cie}} for details. (\link[=cieplot]{plotting arguments})
 #'    \item \code{cielab}: CIELAB space. See \code{\link{cie}} for details. (\link[=cieplot]{plotting arguments})
+#'    \item \code{cielch}: CIELCh space. See \code{\link{cie}} for details. (\link[=cieplot]{plotting arguments})
 #'    \item \code{segment}: segment analysis of Endler (1990). See \code{\link{segspace}} for details. (\link[=segplot]{plotting arguments})
 #' }
+#'
+#' @param qcatch Which quantal catch metric is being inputted. Only used when input data is NOT
+#' an output from \code{\link{vismodel}}. Must be \code{Qi}, \code{fi} or \code{Ei}.
 #' 
 #' @examples \dontrun{
 #' data(flowers)
@@ -82,7 +86,7 @@
 #' Society, 41, 315-352.
 
 colspace <- function(vismodeldata, 
-                     space = c('auto', 'di', 'tri', 'tcs', 'hexagon', 'coc', 'categorical', 'ciexyz', 'cielab', 'segment'))
+                     space = c('auto', 'di', 'tri', 'tcs', 'hexagon', 'coc', 'categorical', 'ciexyz', 'cielab', 'cielch', 'segment'), qcatch=NULL)
   {
   
   space2 <- try(match.arg(space), silent = T)
@@ -91,24 +95,52 @@ colspace <- function(vismodeldata,
     stop('Invalid colorspace selected')
   
   if(space2 == 'auto'){
+  	res<- 
   	switch(as.character(attr(vismodeldata, 'conenumb')),
-  	  '2' = return(dispace(vismodeldata)),
-  	  '3' = return(trispace(vismodeldata)),
-  	  '4' = return(tcspace(vismodeldata)),
-  	  'seg' = return(segspace(vismodeldata))
+  	  '2' = dispace(vismodeldata),
+  	  '3' = trispace(vismodeldata),
+  	  '4' = tcspace(vismodeldata),
+  	  'seg' = segspace(vismodeldata)
   	  )
   } else{
+  	res <-
   	switch(space2,
-  	'di' = return(dispace(vismodeldata)),
-  	'tri' = return(trispace(vismodeldata)),
-  	'hexagon' = return(hexagon(vismodeldata)),
-  	'tcs' = return(tcspace(vismodeldata)),
-  	'coc' = return(coc(vismodeldata)),
-  	'categorical' = return(categorical(vismodeldata)),
-  	'ciexyz' = return(cie(vismodeldata, 'XYZ')),
-  	'cielab' = return(cie(vismodeldata, 'LAB')),
-  	'segment' = return(segspace(vismodeldata))
+  	'di' = dispace(vismodeldata),
+  	'tri' = trispace(vismodeldata),
+  	'hexagon' = hexagon(vismodeldata),
+  	'tcs' = tcspace(vismodeldata),
+  	'coc' = coc(vismodeldata),
+  	'categorical' = categorical(vismodeldata),
+  	'ciexyz' = cie(vismodeldata, 'XYZ'),
+  	'cielab' = cie(vismodeldata, 'LAB'),
+  	'cielch' = cie(vismodeldata, 'LCh'),
+  	'segment' = segspace(vismodeldata)
   	)
   }
   
+  # include achromatic if there is any
+  if(!is.null(attr(vismodeldata,'visualsystem.achromatic'))){
+    if(attr(vismodeldata, 'visualsystem.achromatic') != 'none'){
+      res$lum <- vismodeldata$lum
+    }  
+  }  
+  
+  # check qcatch if user-defined input
+  if(is.null(attr(res, 'qcatch'))){
+  	if(is.null(qcatch)){
+      qcatch <- 'Qi'
+      warning('input is not a "vismodel" object and argument "qcatch" is undefined; assuming quantum catch are not transformed (i.e. qcatch="Qi")')
+  	}
+  	attr(res, 'qcatch') <- qcatch 
+  }
+  
+  # check relative if user-defined input
+  if(is.null(attr(res, 'relative'))){
+  	attr(res, 'relative') <- FALSE
+  	receptcols <- res[, colnames(res) %in% c('u','s','m','l')]
+  	if(isTRUE(all.equal(rowSums(receptcols), rowSums(receptcols/rowSums(receptcols)), tol=0.001)))
+  	  attr(res, 'relative') <- TRUE
+  }
+
+res
 }

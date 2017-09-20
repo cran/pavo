@@ -4,39 +4,55 @@
 \alias{tetraplot}
 \title{Plot a static tetrahedral colorspace}
 \usage{
-tetraplot(tcsdata, vertexsize = 0.8, achro = TRUE, achrosize = 0.8,
-  achrocol = "grey", out.lwd = 1, out.lcol = "darkgrey", view = 70,
-  scale.y = 1, axis = FALSE, grid = FALSE, xlim = c(-1.22, 0.612),
-  ylim = c(-0.35, 0.707), zlim = c(-0.25, 0.75), margin = c(1, 1, 1, 1),
-  ...)
+tetraplot(tcsdata, theta = 45, phi = 10, perspective = TRUE,
+  range = c(1, 2), r = 1e+06, zoom = 1, achro = TRUE,
+  achro.col = "grey", achro.size = 1, achro.line = FALSE, achro.lwd = 1,
+  achro.lty = 3, tetrahedron = TRUE, vert.cex = 1, vert.range = c(1, 2),
+  out.lwd = 1, out.lcol = "darkgrey", margin = c(0, 0, 0, 0),
+  type = "p", view, scale.y, axis, grid, vertexsize, ...)
 }
 \arguments{
 \item{tcsdata}{(required) a data frame, possibly a result from the \code{colspace} 
 or \code{tetraspace} function, containing values for the 'x', 'y' and 'z' 
 coordinates as columns (labeled as such).}
 
-\item{vertexsize}{size of the points at the vertices (defaults to 0.8).}
+\item{theta}{angle to rotate the plot in the xy plane (defaults to 10).}
 
-\item{achrosize}{size of the point in the achromatic center (defaults to 0.8).}
+\item{phi}{angle to rotate the plot in the yz plane (defaults to 45).}
 
-\item{achrocol}{color of the point in the achromatic center (defaults to 'grey').}
+\item{perspective}{logical, should perspective be forced by using point size to reflect
+distance from the plane of view? (defaults to TRUE)}
 
-\item{out.lwd, out.lcol}{graphical parameters for the tetrahedral outline.}
+\item{range, }{vert.range multiplier applied to \code{cex} and \code{vert.cex}, respectively, 
+to indicate the size range variation reflecting the distance from the plane of view.}
 
-\item{view}{orientation of the tetrahedron in degrees (defaults to 70).}
+\item{r}{the distance of the eyepoint from the center of the plotting box. 
+Very high values approximate an orthographic projection (defaults to 1e6).
+See \code{\link{persp}} for details.}
 
-\item{scale.y}{numeric. Perspective scaling of the y axis (defaults to 0.45).}
+\item{zoom}{zooms in (values greater than 1) or out (values between 0 and 1) from the plotting area.}
 
-\item{axis}{logical. Draw X, Y and Z axis (defaults to FALSE).}
+\item{achro}{logical. Should the achromatic center be plotted? (defaults to \code{TRUE})}
 
-\item{grid}{logical. Draw grid (defaults to FALSE).}
+\item{achro.col, }{achro.size, achro.lwd, achro.lty graphical parameters for the achromatic coordinates.}
 
-\item{xlim, ylim, zlim}{axis limits.}
+\item{achro.line}{logical. Should the achromatic line be plotted? (defaults to \code{FALSE})}
 
-\item{margin}{vector of four numbers specifying drawing margins (defaults to c(1, 1, 1, 1)).}
+\item{tetrahedron}{logical. Should the tetrahedron be plotted? (defaults to \code{TRUE})}
+
+\item{vert.cex}{size of the points at the vertices (defaults to 1).}
+
+\item{out.lwd, }{out.lcol graphical parameters for the tetrahedral outline.}
+
+\item{margin}{vector of four numbers specifying drawing margins (defaults to c(0, 0, 0, 0)).}
+
+\item{type}{accepts a vector of length 1 or 2 with 'p' for points and/or 'l' for lines from the point to
+the base of the tetrahedron.}
+
+\item{view, }{scale.y, axis, grid deprecated arguments.}
 }
 \value{
-\code{tetraplot} creates a 3D plot using functions of the package \code{scatterplot3d}.
+\code{tetraplot} creates a 3D plot.
 }
 \description{
 Produces a static 3D tetrahedral plot.
@@ -69,5 +85,7 @@ Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns
 Rafael Maia \email{rm72@zips.uakron.edu}
 
 Thomas White \email{thomas.white026@gmail.com}
+
+Chad Eliason \email{cme16@zips.uakron.edu}
 }
 \keyword{internal}

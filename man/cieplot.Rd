@@ -5,43 +5,57 @@
 \title{CIE plot}
 \usage{
 cieplot(ciedata, mono = TRUE, out.lwd = NULL, out.lcol = "black",
-  out.lty = 1, view = 70, scale.y = 0.45, axis = FALSE, grid = FALSE,
-  xlim = c(-12.8, 12.7), ylim = c(-12.8, 12.7), zlim = c(0, 10),
-  margin = c(1, 1, 1, 1), ...)
+  out.lty = 1, theta = 45, phi = 10, r = 1e+06, zoom = 1,
+  box = FALSE, margin = c(0, 0, 0, 0), view, scale.y, axis, grid, ...)
 }
 \arguments{
 \item{ciedata}{(required). a data frame, possibly a result from the \code{colspace} 
-or \code{cie} function, containing values for 'x', 'y' and 'z' coordinates 
-as columns (labeled as such).}
+or \code{cie} function, containing values for 'x', 'y' and 'z'  coordinates for the CIEXYZ
+model, or LAB coordinates for the CIELAB (or CIELCh models), as columns (labeled as such).}
 
 \item{mono}{should the monochromatic loci (the 'horseshoe') be
-plotted? Defaults to \code{TRUE}.}
+plotted when \code{space = 'ciexyz'}? Defaults to \code{TRUE}.}
 
 \item{out.lwd, out.lcol, out.lty}{graphical parameters for the monochromatic loci outline.}
 
-\item{view}{orientation of the 3d plot in degrees, when \code{space = 'cielab'} (defaults to 70).}
+\item{theta}{angle to rotate the plot in the xy plane  when \code{space = 'cielab'} 
+(defaults to 10).}
 
-\item{scale.y}{numeric. Perspective scaling of the y axis (defaults to \code{0.45}).}
+\item{phi}{angle to rotate the plot in the yz plane  when \code{space = 'cielab'} 
+(defaults to 45).}
 
-\item{axis}{logical. Draw X, Y and Z axis (defaults to \code{FALSE}).}
+\item{r}{the distance of the eyepoint from the center of the plotting box 
+when \code{space = 'cielab'}. Very high values approximate an orthographic projection 
+(defaults to 1e6). See \code{\link{persp}} for details.
+. See \code{\link{persp}} for details.}
 
-\item{grid}{logical. Draw grid (defaults to \code{FALSE}).}
+\item{zoom}{zooms in (values greater than 1) or out (values between 0 and 1) from the plotting area
+when \code{space = 'cielab'}.}
 
-\item{xlim, ylim, zlim}{axis limits}
+\item{box}{logical. Should the plot area box and axes be plotted? (defaults to \code{FALSE})}
 
-\item{margin}{vector of four numbers specifying drawing margins (defaults to c(1,1,1,1))}
+\item{margin}{vector of four numbers specifying drawing margins for CIELAB plot
+(defaults to c(0,0,0,0))}
+
+\item{view, }{scale.y, axis, grid deprecated arguments.}
 
 \item{...}{Additional graphical options. See \code{\link{par}}.}
 }
 \description{
-Plot a CIE (XYZ or LAB) chromaticity diagram.
+Plot a CIE (XYZ, LAB, or LCH) chromaticity diagram.
 }
 \examples{
 \dontrun{
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'cie2', illum = 'D65')
-cie.flowers <- colspace(vis.flowers, space = 'ciexyz')
-plot(cie.flowers)
+
+# CIEXYZ
+vis.flowers <- vismodel(flowers, visual = 'cie10', illum = 'D65', vonkries = TRUE, relative = FALSE)
+xyz.flowers <- colspace(vis.flowers, space = 'ciexyz')
+plot(xyz.flowers)
+
+#CIELAB
+lab.flowers <- colspace(vis.flowers, space = 'cielab')
+plot(lab.flowers)
 }
 
 }
@@ -54,5 +68,7 @@ Westland S, Ripamonti C, Cheung V. (2012). Computational colour science
 }
 \author{
 Thomas White \email{thomas.white026@gmail.com}
+
+Rafael Maia \email{rm72@zips.uakron.edu}
 }
 \keyword{internal}

@@ -4,17 +4,18 @@
 \alias{legendtetra}
 \title{Add legend to a static tetrahedral colorspace}
 \usage{
-legendtetra(x = -1.4, y = -0.3, z = 0.7, ...)
+legendtetra(x = 0.8, y = 1.2, ...)
 }
 \arguments{
-\item{x, y, z}{a vector containing x, y and z values for the position of
-the legend.}
+\item{x, y}{position of the legend relative to plot limits
+ (usually a value between 0 and 1, but because of the perspective distortion,
+values greater than 1 are possible)}
 
 \item{...}{additional arguments passed to \code{\link{legend}}.}
 }
 \value{
-\code{legendtetra} adds a legend to astatic tetrahedral colorspace plot. 
-for additional information on which areguments are necessary and how they are used,
+\code{legendtetra} adds a legend to a static tetrahedral colorspace plot. 
+for additional information on which arguments are necessary and how they are used,
 see \code{\link{legend}}.
 }
 \description{

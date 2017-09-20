@@ -23,7 +23,7 @@
 #' 
 #' @references CIE(1932). Commission Internationale de l'Eclairage Proceedings, 1931. Cambridge: Cambridge University Press.
 #' @references Color matching functions obtained from Colour and Vision Research Laboratory 
-#' online data respository at \url{http://www.cvrl.org/}.
+#' online data repository at \url{http://www.cvrl.org/}.
 #' @references \url{http://www.cs.rit.edu/~ncs/color/t_spectr.html}.
 
 spec2rgb <- function(rspecdata, alpha = 1){
@@ -41,12 +41,12 @@ if (length(wl_index > 0)){
 if(min(wl) > 400 | max(wl) < 700)
   stop('wavelength range does not capture the full visible range (400 to 700)')
 
-rspecdata <- rspecdata[which(wl==400):which(wl==700),]
+rspecdata <- rspecdata[which(wl==400):which(wl==700), , drop=FALSE]
 names_rspecdata <- names(rspecdata)
 rspecdata <- as.matrix(rspecdata)
 
 # TEMP: cie2 or cie10?
-# sens <- pavo:::ciexyz[,1:4] #cie2
+# sens <- ciexyz[,1:4] #cie2
 sens <- ciexyz[,c(1,5:7)] #cie10
 
 # TEMP: removing wavelengths 390:400
@@ -84,9 +84,11 @@ xyzmat <- rbind(c(3.240479, -1.537150, -0.498535),
 rgb1 <- t(sapply(1:nrow(XYZ), function(x) {xyzmat %*% XYZ[x, ]}))
 
 # sRGB companding (e.g., see http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html)
-rgb1 <- sapply(1:ncol(rgb1), function(x) {
-  ifelse(rgb1[,x] <= 0.0031308, 12.92*rgb1[,x], 1.055*rgb1[,x]^(1/2.4) - 0.055)
+rgb1 <- lapply(1:ncol(rgb1), function(x) {
+  ifelse(rgb1[,x, drop=F] <= 0.0031308, 12.92*rgb1[,x, drop=F], 1.055*rgb1[,x, drop=F]^(1/2.4) - 0.055)
   })
+
+rgb1 <- do.call(cbind, rgb1)
 
 # clip RGB values outside {0-1}
 rgb1[rgb1 < 0] <- 0

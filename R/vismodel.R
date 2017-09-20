@@ -1,4 +1,4 @@
-#' Visual Models
+#' Visual models
 #' 
 #' Calculates quantum catches at each photoreceptor. Both raw and relative values 
 #' can be returned, for use in a suite of colorspace and non-colorspace models. 
@@ -8,10 +8,10 @@
 #'  remaining columns. 
 #' @param qcatch Which quantal catch metric to return. Options are:
 #' \itemize{
-#' \item \code{Qi}: Quantum catch for each photoreceptor 
-#' \item \code{fi}: Quantum catch according to Fechner law (the signal of the receptor
+#' \item \code{'Qi'}: Quantum catch for each photoreceptor 
+#' \item \code{'fi'}: Quantum catch according to Fechner law (the signal of the receptor
 #'  channel is proportional to the logarithm of the quantum catch)
-#' \item \code{Ei}: Hyperbolic-transformed quantum catch, where Ei = Qi / (Qi + 1).
+#' \item \code{'Ei'}: Hyperbolic-transformed quantum catch, where Ei = Qi / (Qi + 1).
 #' }
 #' @param visual the visual system to be used. Options are:
 #' \itemize{
@@ -19,38 +19,38 @@
 #'    user-defined sensitivity data for the receptors involved in colour vision. 
 #'    The data frame must contain a \code{'wl'} column with the range of wavelengths included, 
 #'    and the sensitivity for each other cone as a column.
-#' \item \code{apis}: Honeybee \emph{Apis mellifera} visual system.
-#' \item \code{avg.uv}: average avian UV system.
-#' \item \code{avg.v}: average avian V system.
-#' \item \code{bluetit}: Blue tit \emph{Cyanistes caeruleus} visual system.
-#' \item \code{canis}: Canid \emph{Canis familiaris} visual system.
-#' \item \code{cie2}: 2-degree colour matching functions for CIE models of human 
+#' \item \code{'apis'}: Honeybee \emph{Apis mellifera} visual system.
+#' \item \code{'avg.uv'}: average avian UV system.
+#' \item \code{'avg.v'}: average avian V system.
+#' \item \code{'bluetit'}: Blue tit \emph{Cyanistes caeruleus} visual system.
+#' \item \code{'canis'}: Canid \emph{Canis familiaris} visual system.
+#' \item \code{'cie2'}: 2-degree colour matching functions for CIE models of human 
 #'  colour vision. Functions are linear transformations of the 2-degree cone fundamentals 
 #'  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
-#' \item \code{cie10}: 10-degree colour matching functions for CIE models of human 
+#' \item \code{'cie10'}: 10-degree colour matching functions for CIE models of human 
 #'  colour vision. Functions are linear transformations of the 10-degree cone fundamentals 
 #'  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
-#' \item \code{musca}: Housefly \emph{Musca domestica} visual system.
-#' \item \code{pfowl}: Peafowl \emph{Pavo cristatus} visual system.
-#' \item \code{segment}: Generic tetrachromat 'viewer' for use in the segment analysis of Endler (1990).
-#' \item \code{star}: Starling \emph{Sturnus vulgaris} visual system.
+#' \item \code{'musca'}: Housefly \emph{Musca domestica} visual system.
+#' \item \code{'pfowl'}: Peafowl \emph{Pavo cristatus} visual system.
+#' \item \code{'segment'}: Generic tetrachromat 'viewer' for use in the segment analysis of Endler (1990).
+#' \item \code{'star'}: Starling \emph{Sturnus vulgaris} visual system.
 #' }
 #' @param achromatic the sensitivity data to be used to calculate luminance (achromatic)
 #'  receptor stimulation. Either a vector containing the sensitivity for a single receptor, 
 #'  or one of the options: 
 #' \itemize{
-#'  \item \code{none}: no achromatic stimulation calculated
-#'	\item \code{bt.dc}: Blue tit \emph{Cyanistes caeruleus} double cone
-#'  \item \code{ch.dc}: Chicken \emph{Gallus gallus} double cone
-#'  \item \code{st.dc}: Starling \emph{Sturnus vulgaris} double cone
-#'  \item \code{md.r1}: Housefly \emph{Musca domestica} R1-6 photoreceptor
-#'  \item \code{ml}: the summed response of the two longest-wavelength photoreceptors
-#'  \item \code{l}: the longest-wavelength photoreceptor
-#'  \item \code{all}: the summed response of all photoreceptors
+#'  \item \code{'none'}: no achromatic stimulation calculated
+#'	\item \code{'bt.dc'}: Blue tit \emph{Cyanistes caeruleus} double cone
+#'  \item \code{'ch.dc'}: Chicken \emph{Gallus gallus} double cone
+#'  \item \code{'st.dc'}: Starling \emph{Sturnus vulgaris} double cone
+#'  \item \code{'md.r1'}: Housefly \emph{Musca domestica} R1-6 photoreceptor
+#'  \item \code{'ml'}: the summed response of the two longest-wavelength photoreceptors
+#'  \item \code{'l'}: the longest-wavelength photoreceptor
+#'  \item \code{'all'}: the summed response of all photoreceptors
 #' }
 #' @param illum either a vector containing the illuminant, or one of the options:
 #' \itemize{ 
-#' \item \code{ideal}: homogeneous illuminance of 1 accross wavelengths (default)
+#' \item \code{'ideal'}: homogeneous illuminance of 1 across wavelengths (default)
 #' \item \code{'bluesky'} open blue sky.
 #' \item \code{'D65'}: standard daylight.
 #' \item \code{'forestshade'} forest shade.
@@ -58,13 +58,13 @@
 #' @param bkg background spectrum. Note that this will have no effect when \code{vonkries = FALSE}. 
 #' Either a vector containing the spectral data, or one of the options:
 #' \itemize{ 
-#' \item \code{ideal}: homogeneous illuminance of 1 accross all wavelengths (default).
+#' \item \code{'ideal'}: homogeneous illuminance of 1 across all wavelengths (default).
 #' \item \code{'green'}: green foliage.
 #' }
 #' @param trans either a vector containing the ocular or environmental transmission
 #' spectra, or one of the options:
 #' \itemize{ 
-#' \item \code{ideal}: homogeneous transmission of 1 accross all wavelengths (default)
+#' \item \code{'ideal'}: homogeneous transmission of 1 across all wavelengths (default)
 #' \item \code{'bluetit'}: blue tit \emph{Cyanistes caeruleus} 
 #' ocular transmission (from Hart et al. 2000).
 #' \item \code{'blackbird'}: blackbird \emph{Turdus merula} 
@@ -134,9 +134,9 @@
 vismodel <- function(rspecdata, 
   visual = c('avg.uv', 'avg.v', 'bluetit', 'star', 'pfowl', 'apis', 'canis', 'cie2', 'cie10', 'musca', 'segment'), 
   achromatic = c('none', 'bt.dc','ch.dc', 'st.dc','ml', 'l', 'md.r1', 'all'),
-  illum = c('ideal','bluesky','D65','forestshade'), 
-  trans = c('ideal', 'bluetit','blackbird'),
-  qcatch = c('Qi','fi', 'Ei'),
+  illum = c('ideal', 'bluesky', 'D65', 'forestshade'), 
+  trans = c('ideal', 'bluetit', 'blackbird'),
+  qcatch = c('Qi', 'fi', 'Ei'),
   bkg = c('ideal', 'green'), 
   vonkries = FALSE, scale = 1, relative = TRUE)
 {
@@ -151,13 +151,6 @@ y <- rspecdata[, -wl_index, drop=FALSE]
 if(length(y[y < 0]) > 0){
   warning(paste("The spectral data contain ", length(y[y < 0]), " negative value(s), which may produce unexpected results. Consider using procspec() to correct them."))
 }
-
-# in case rspecdata only has one spectrum
-# 01/10/2017: drop=TRUE above should fix it
-#if(is.null(dim(y))){
-#  y <- data.frame(rspecdata[,-wl_index])
-#  names(y) <- names(rspecdata)[-wl_index]
-#  }
 
 visual2 <- try(match.arg(visual), silent = T)
 sens <- vissyst
@@ -322,8 +315,27 @@ if(tr2=='ideal')
 if(tr2 != 'ideal' & visual == 'user-defined'){
 	if('sensmod' %in% class(fullS))
 		if(attr(fullS,'om'))
-		  warning('The visual system being used appears to already incorporate ocular transmission. Using anything other than trans=',dQuote('ideal'),'means ocular media effects are being applied a second time.', call.=FALSE)
+		  warning('The visual system being used appears to already incorporate ocular transmission. Using anything other than trans="ideal" means ocular media effects are being applied a second time.', call.=FALSE)
 }
+
+
+if('rspec' %in% class(bkg)){
+  bkgwhichused <- names(bkg)[2]
+  bkg <- bkg[,2]
+  warning(paste('Background is an rspec object; first spectrum (', 
+    dQuote(bkgwhichused),') has been used (remaining columns ignored)', sep='')
+    , call.=FALSE)
+}
+
+if('data.frame' %in% class(bkg) | 'matrix' %in% class(bkg) & 
+  !'rspec' %in% class(bkg)){
+  bkgwhichused <- names(bkg)[1]
+  bkg <- bkg[,1]
+  warning(paste('Background is a matrix or data frame; first column (', 
+    dQuote(bkgwhichused),') has been used (remaining columns ignored)', sep='')
+    , call.=FALSE)
+  }
+
 
 # scale background from percentage to proportion
 if(max(bkg) > 1)
@@ -473,25 +485,20 @@ if(vonkries){
 fi <- log(Qi)  # fechner law (signal ~ log quantum catch)
 Ei <- Qi / (Qi + 1)  # hyperbolic transform
 
+matrix(apply(Qi,2,min), nrow=dim(Qi)[2], ncol=dim(Qi)[2], byrow=TRUE)
+
 # Convert to relative
 if(relative & !is.null(lum)){
   Qi[,-dim(Qi)[2]] <- Qi[,-dim(Qi)[2]]/rowSums(Qi[,-dim(Qi)[2]])
   fi[,-dim(fi)[2]] <- fi[,-dim(fi)[2]]/rowSums(fi[,-dim(fi)[2]])
   Ei[,-dim(Ei)[2]] <- Ei[,-dim(Ei)[2]]/rowSums(Ei[,-dim(Ei)[2]])
-
-# Place dark specs in achromatic center?
-# blacks <- which(norm.B < 0.05) #find dark specs
-# Qi[blacks,] <- 0.2500 #place dark specs in achromatic center
-}
+  }
 
 if(relative & is.null(lum)){
     Qi <- Qi/rowSums(Qi)
     fi <- fi/rowSums(fi)
     Ei <- Ei/rowSums(Ei)
-    # Place dark specs in achromatic center?
-    # blacks <- which(norm.B < 0.05) #find dark specs
-    # Qi[blacks,] <- 0.2500 #place dark specs in achromatic center
-}
+    }
 
 # OUTPUT
 
@@ -519,4 +526,5 @@ attr(res, 'data.background') <- bkg
 attr(res, 'data.transmission') <- trans
 
 res
+
 }

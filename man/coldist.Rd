@@ -5,7 +5,7 @@
 \title{Color distances}
 \usage{
 coldist(modeldata, noise = c("neural", "quantum"), subset = NULL,
-  achro = TRUE, qcatch = NULL, n = c(1, 2, 2, 4), weber = 0.1,
+  achro = FALSE, qcatch = NULL, n = c(1, 2, 2, 4), weber = 0.1,
   weber.ref = "longest", weber.achro = 0.1, v, n1, n2, n3, n4)
 }
 \arguments{
@@ -15,7 +15,7 @@ in the form of a data frame with columns representing photoreceptors.}
 
 \item{noise}{how the noise will be calculated. (Ignored for \code{colspace} objects
  if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding, 
-categorical, segment, and cielab models)):
+categorical, segment, and cie models)):
 \itemize{
     \item \code{neural}: noise is proportional to the Weber fraction and 
  is independent of the intensity of the signal received (i.e. assumes bright conditions).
@@ -28,14 +28,14 @@ categorical, segment, and cielab models)):
 
 \item{subset}{If only some of the comparisons should be returned, a character vector of 
 length 1 or 2 can be provided, indicating which samples are desired. The subset vector 
-must match the labels of the imput samples, but partial matching (and regular expressions) 
+must match the labels of the input samples, but partial matching (and regular expressions) 
 are supported.}
 
 \item{achro}{Logical. If \code{TRUE}, last column of the data frame is used to calculate 
 the achromatic contrast, with noise based on the Weber fraction given by the argument
 \code{weber.achro}.
 If the data are from the hexagon model (i.e. \code{colspace(space = 'hexagon')}), it 
-instead returns long (or 'green') receptor contrast.}
+instead returns simple long (or 'green') receptor contrast.}
 
 \item{qcatch}{if the object is of class \code{vismodel} or \code{colspace}, 
  this argument is ignored. If the object is a data frame of quantal catches 
@@ -53,27 +53,27 @@ defaults to
 the Pekin robin \emph{Leiothrix lutea} densities: \code{c(1,2,2,4)}). 
 Ignored for \code{colspace} objects
 if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding, 
-categorical, and cielab models).}
+categorical, and cie models).}
 
 \item{weber}{The Weber fraction to be used. The noise-to-signal ratio \code{v} is unknown, 
-and therefore must be calculated based on the epirically estimated Weber 
+and therefore must be calculated based on the empirically estimated Weber 
 fraction of one of the cone classes. \code{v} is then applied to estimate the 
 Weber fraction of the other cones. by default, the value of 0.1 is used 
 (the empirically estimated value for the
 LWS cone from \emph{Leiothrix lutea}). Ignored for \code{colspace} objects
 if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding, 
-categorical, segment, and cielab models).}
+categorical, segment, and cie models).}
 
 \item{weber.ref}{the cone class used to obtain the empirical estimate of the 
  Weber fraction used for the \code{weber} argument. By default, \code{n4} is used, 
  representing the LWS cone for \emph{Leiothrix lutea}. Ignored for \code{colspace} objects
  if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding, 
-categorical, segment, and cielab models).}
+categorical, segment, and cie models).}
 
 \item{weber.achro}{the Weber fraction to be used to calculate achromatic contrast, when 
  \code{achro = TRUE}. Defaults to 0.1. Ignored for \code{colspace} objects
  if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding, 
-categorical, segment, and cielab models).}
+categorical, segment, and cie models).}
 
 \item{n1, n2, n3, n4, v}{deprecated arguments. see below.}
 }
@@ -103,9 +103,8 @@ the user to specify which receptor to use as the reference to obtain the
 desired Weber fraction, and \code{coldist} calculates internally the value of \code{v}
 to be used when calculating the Weber fraction for the remaining cones. 
 
-This allows
-a more explicit choice of Weber fraction, without the need to find the right value of
-\code{v} to use in order to obtain the desired signal-to-noise ratio. Additionally,
+This allows a more explicit choice of Weber fraction, without the need to find the 
+right value of \code{v} to use in order to obtain the desired signal-to-noise ratio. Furthermore,
 by allowing \code{n} to be entered as a vector, \code{coldist} can now handle visual
 systems with more than four photoreceptors.
 
@@ -158,6 +157,13 @@ Hart, N. S. (2001). The visual ecology of avian photoreceptors. Progress
 
 Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns 
  as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
+
+Olsson, P., Lind, O., & Kelber, A. (2015) Bird colour vision: 
+ behavioural thresholds reveal receptor noise. Journal of Experimental Biology, 
+ 218, 184-193.
+
+Lind, O. (2016) Colour vision and background adaptation in a passerine 
+ bird, the zebra finch (Taeniopygia guttata). Royal Society Open Science, 3, 160383.
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

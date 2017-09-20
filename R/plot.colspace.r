@@ -3,7 +3,7 @@
 #' Plots reflectance spectra in the appropriate colorspace.
 #' 
 #' @param x (required) an object of class \code{colspace}. 
-#' @param ... additional graphical options, which vary by modelled \code{space}. Refer 
+#' @param ... additional graphical options, which vary by modeled \code{space}. Refer 
 #'  to their individual documentation: 
 #'  \itemize{ 
 #'        \item \code{\link{diplot}}: dichromat space
@@ -60,6 +60,7 @@
 #' 
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @author Thomas White \email{thomas.white026@@gmail.com}
+#' @author Chad Eliason \email{cme16@zips.uakron.edu}
 #'  
 #' @importFrom graphics plot.default segments text
 #' @importFrom stats setNames
@@ -94,6 +95,10 @@ plot.colspace <- function(x, ...){
   #oPar <- par(no.readonly=TRUE)
   oPar <- par('mar','pty')
   on.exit(par(oPar))
+  
+  if('jnd2xyz' %in% attr(x, 'class')){
+    jndplot(x, ...)
+  }else{
 
   space <- attr(x, 'clrsp')
   
@@ -106,7 +111,8 @@ plot.colspace <- function(x, ...){
          'categorical' = catplot(x, ...),
          'CIEXYZ' = cieplot(x, ...),
          'CIELAB' = cieplot(x, ...),
+         'CIELCh' = cieplot(x, ...),
          'segment' = segplot(x, ...)
   )
-  
+  } 
 }

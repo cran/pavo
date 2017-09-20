@@ -5,7 +5,8 @@
 \title{Import spectra files}
 \usage{
 getspec(where = getwd(), ext = "txt", lim = c(300, 700), decimal = ".",
-  subdir = FALSE, subdir.names = FALSE, fast = TRUE)
+  sep = NULL, subdir = FALSE, subdir.names = FALSE, fast = FALSE,
+  cores = getOption("mc.cores", 2L))
 }
 \arguments{
 \item{where}{(required) folder in which files are located.}
@@ -19,14 +20,21 @@ considered (defaults to 300 and 700).}
 \item{decimal}{character to be used to identify decimal plates 
 (defaults to ".").}
 
+\item{sep}{column delimiting characters to be considered in addition to the
+default (which are: tab, space, and ";")}
+
 \item{subdir}{should subdirectories within the \code{where} folder be
 included in the search? (defaults to \code{FALSE}).}
 
 \item{subdir.names}{should subdirectory path be included in the name of the
-spectra? (defaults to \code{FALSE})/}
+spectra? (defaults to \code{FALSE}).}
 
-\item{fast}{logical. if \code{TRUE} (default), will try a fast algorithm that 
-assumes all spectra were produced using the same software configuration.}
+\item{fast}{logical. if \code{TRUE}, will try a fast algorithm that assumes
+all spectra were produced using the same software configuration (defaults
+to \code{FALSE}).}
+
+\item{cores}{Number of cores to be used. If greater than 1, import will use
+parallel processing (not available in Windows).}
 }
 \value{
 A data frame, of class \code{rspec}, containing individual imported

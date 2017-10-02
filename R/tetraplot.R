@@ -8,10 +8,10 @@
 #' @param tcsdata (required) a data frame, possibly a result from the \code{colspace} 
 #' or \code{tetraspace} function, containing values for the 'x', 'y' and 'z' 
 #' coordinates as columns (labeled as such).
-#' @param theta angle to rotate the plot in the xy plane (defaults to 10).
-#' @param phi angle to rotate the plot in the yz plane (defaults to 45).
+#' @param theta angle to rotate the plot in the xy plane (defaults to 45).
+#' @param phi angle to rotate the plot in the yz plane (defaults to 10).
 #' @param perspective logical, should perspective be forced by using point size to reflect
-#' distance from the plane of view? (defaults to TRUE)
+#' distance from the plane of view? (defaults to FALSE)
 #' @param range, vert.range multiplier applied to \code{cex} and \code{vert.cex}, respectively, 
 #' to indicate the size range variation reflecting the distance from the plane of view.
 #' @param r the distance of the eyepoint from the center of the plotting box. 
@@ -61,7 +61,7 @@
 #' @references Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns 
 #'  as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
 
-tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE, 
+tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = FALSE, 
   range = c(1, 2), r = 1e6, zoom = 1, 
   achro = TRUE, achro.col = 'grey', achro.size = 1, achro.line = FALSE, achro.lwd = 1, achro.lty = 3,
   tetrahedron = TRUE, vert.cex = 1, vert.range = c(1,2) ,out.lwd = 1, out.lcol = 'darkgrey',
@@ -92,8 +92,8 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   if(is.null(arg$ylab)) arg$ylab <- 'y'
   if(is.null(arg$zlab)) arg$zlab <- 'z'
         
-  col <- arg['col']
-  arg['col'] <- NULL
+  col <- arg$col
+  arg$col <- NULL
     
     
   # tetrahedron vertices
@@ -110,9 +110,11 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   rownames(sides) <- paste0(rep(
      do.call(paste0, data.frame(t(combn(c('u','s','m','l'), 2)))),each=2),
      c('.1', '.2'))
+     
+  plims <- any(sapply(list(arg$xlim, arg$ylim, arg$zlim), is.null))
 
   # if no limits are given, estimate based on tetrahedron or tcsdataa limits
-  if(any(sapply(list(arg$xlim, arg$ylim, arg$zlim), is.null))){
+  if(plims){
 
   	# first check if all xyzlim are null
   	if(!all(sapply(list(arg$xlim, arg$ylim, arg$zlim), is.null)))
@@ -130,16 +132,11 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
 
   }
 
-
   # draw blank 3d plot
-  # Save rotation matrix without plotting
-
-  pdf(file=NULL)
   M <- do.call(persp, c(list(x=arg$xlim,
                              y=arg$ylim,
                              z=matrix(c(arg$zlim,arg$zlim), nrow=2),
                              border=FALSE, r=r, box=FALSE, theta=theta, phi=phi), arg))
-  garbage <- dev.off()
 
   # position of points in projected space
   allcoords <- as.matrix(rbind(
@@ -163,7 +160,6 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
     "main", "sub", "theta", "phi", "r", "d", "scale", "expand", "col", "border", 
     "ltheta", "lphi", "shade", "box", "axes", "nticks", "ticktype", "...", "")
   
-
   argblank[perspargs] <- NULL  
   argblank$xlim <- tcoord['achro','x'] + c(-1,1)*max(abs(tcoord['achro','x'] - tcoord[,'x'])) / zoom
   argblank$ylim <- tcoord['achro','y'] + c(-1,1)*max(abs(tcoord['achro','y'] - tcoord[,'y'])) / zoom
@@ -175,8 +171,19 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   argblank$yaxt <- 'n'
   argblank$ylab <- ''
   argblank$xlab <- ''
+
+  if(!plims){
+  	prange <- cbind(x=arg$xlim, y=arg$ylim, z=arg$zlim, 1) %*% M
+  	prange[,1] <- prange[,1]/prange[,4]
+  	prange[,2] <- prange[,2]/prange[,4]
+  	
+  	argblank$xlim <- prange[,1]
+  	argblank$ylim <- prange[,2]
+  	
+  }
+
   
-  par(mar=margin, pty='s')  
+  par(mar=margin, pty='s', new = TRUE)  
   do.call(plot, argblank)
   
   # Get point coordinates
@@ -196,7 +203,8 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   dvals <- sqrt(dvals)
   dvals <- trange(dvals, range[1], range[2])
   
-  maxdatad <-  max(dvals[dvals[names(dvals) %in% rownames(tcsdata)]]) 
+  maxdatad <- max(dvals[names(dvals) %in% rownames(tcsdata)]) 
+  mindatad <- min(dvals[names(dvals) %in% rownames(tcsdata)]) 
   
   # turn depth vector to point size
   	psize <- dvals*arg$cex
@@ -222,7 +230,9 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   if(tetrahedron){
   	
     # vertice colors
-    vcols <- setNames(c('darkorchid1','cornflowerblue','mediumseagreen', 'firebrick1'), rownames(verts))   
+    vcols <- setNames(
+      c('darkorchid1','cornflowerblue','mediumseagreen', 'firebrick1'), 
+      rownames(verts))   
     
     # tetrahedron sides
     xytet <- cbind(sides, 1) %*% M
@@ -230,14 +240,22 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
     xytet[ ,2] <- xytet[ ,2]/xytet[ ,4] 
     colnames(xytet) <- c('x', 'y', 'depth', 'scale')
 
-    # which vertex are behind data
-    vinback <- dvals[c('u','s','m','l')] < maxdatad
-    
     segs <- cbind(xytet[c(1,3,5,7,9,11), c('x','y')], xytet[c(2,4,6,8,10,12), c('x','y')])
+
+    # which vertex are behind data
+    vinback <- dvals[c('u','s','m','l')] < mindatad
     
-    linback <- apply(do.call(rbind, 
-      lapply(names(vinback)[vinback], grepl, x=rownames(segs))), 2, all)
+    # sort segments by proximity
+    combdist <- setNames(
+      apply(combn(dvals[c('u','s','m','l')],2), 2, sum),
+      apply(combn(names(dvals[c('u','s','m','l')]),2), 2, paste0, collapse='')
+      )
     
+    # get 3 most in back
+    inback <- names(sort(combdist, )[1:3])
+    
+    linback <- grepl(paste0(inback, collapse='|'), rownames(segs))
+          
     segments(
       segs[linback,1,drop=F],
       segs[linback,2,drop=F],
@@ -257,7 +275,8 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
 
   # add achromatic center if it is behind the data
   if(achro && dvals["achro"] < maxdatad)
-    points(tcoord['achro',c('x','y'), drop=FALSE], col=NULL, bg=achro.col, pch=21, cex=psize['achro'])
+    points(tcoord['achro',c('x','y'), drop=FALSE], col=NULL, bg=achro.col, 
+      pch=22, cex=psize['achro']*achro.size)
     
   # add achromatic line if behind the data
   if(achro.line && dvals["achro"] < maxdatad)
@@ -267,14 +286,52 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   # add tcsdata points #
   ######################
   argpoints <- arg
-
   argpoints[perspargs] <- NULL
-  argpoints['col'] <- col
 
+  argpoints$col <- col
+  if(is.null(argpoints$bg)) argpoints$bg <- col
   argpoints$cex <- psize[names(psize) %in% rownames(tcsdata)]
-  
   argpoints$x <- xy
   
+  # ATTRIBUTES THAT RELATE TO POINTS:
+  # pch, cex, col, bg ...?
+  if(length(argpoints$col) < dim(argpoints$x)[1]){
+    if(dim(argpoints$x)[1] %% length(argpoints$col) > 0)
+      warning('data object length is not a multiple of "col"', call. = FALSE)
+    
+    argpoints$col <- rep(argpoints$col, dim(argpoints$x)[1])[seq(dim(argpoints$x)[1])]
+  }
+
+  if(length(argpoints$bg) < dim(argpoints$x)[1]){
+    if(dim(argpoints$x)[1] %% length(argpoints$bg) > 0)
+      warning('data object length is not a multiple of "bg"', call. = FALSE)
+    
+    argpoints$bg <- rep(argpoints$bg, dim(argpoints$x)[1])[seq(dim(argpoints$x)[1])]
+  }
+
+  if(length(argpoints$cex) < dim(argpoints$x)[1]){
+    if(dim(argpoints$x)[1] %% length(argpoints$cex) > 0)
+      warning('data object length is not a multiple of "cex"', call. = FALSE)
+    
+    argpoints$cex <- rep(argpoints$cex, dim(argpoints$x)[1])[seq(dim(argpoints$x)[1])]
+  }
+
+  if(length(argpoints$pch) < dim(argpoints$x)[1]){
+    if(dim(argpoints$x)[1] %% length(argpoints$pch) > 0)
+      warning('data object length is not a multiple of "pch"', call. = FALSE)
+    
+    argpoints$pch <- rep(argpoints$pch, dim(argpoints$x)[1])[seq(dim(argpoints$x)[1])]
+  }
+
+  # sort points by distance
+  ptorder <- order(dvals[rownames(tcsdata)])
+  
+  argpoints$x <- argpoints$x[ptorder, ]
+  argpoints$col <- argpoints$col[ptorder]
+  argpoints$bg <- argpoints$bg[ptorder]
+  argpoints$cex <- argpoints$cex[ptorder]
+  argpoints$pch <- argpoints$pch[ptorder]
+      
    if('l' %in% type){
    	 # calculate bottom of the points
      botpoints <- as.matrix(tcsdata[, c('x','y','z')])
@@ -298,7 +355,8 @@ tetraplot <- function(tcsdata, theta = 45, phi = 10, perspective = TRUE,
   
   # add achromatic center if it is in front of the data
   if(achro && dvals["achro"] > maxdatad)
-    points(tcoord['achro',c('x','y'), drop=FALSE], col=NULL, bg=achro.col, pch=21, cex=psize['achro'])
+    points(tcoord['achro',c('x','y'), drop=FALSE], col=NULL, bg=achro.col, 
+      pch=22, cex=psize['achro']*achro.size)
     
   # add achromatic line if in front of the data
   if(achro.line && dvals["achro"] > maxdatad)

@@ -46,8 +46,7 @@
 
 getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = ".", 
            sep=NULL, subdir = FALSE, subdir.names = FALSE, fast = FALSE, 
-           cores=getOption("mc.cores", 2L))
-  {
+           cores=getOption("mc.cores", 2L)){
   
   if(fast){
     cat("Attempting fast import. ")
@@ -79,8 +78,6 @@ getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = "
   if(length(file_names) == 0){
   	stop('No files found. Try a different extension value for argument "ext"')
   	} 
-
-  cat(length(files), ' files found; importing spectra\n')
   
   # Wavelength range
   range <- seq(lim[1],lim[2])
@@ -98,6 +95,17 @@ getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = "
   
   # Setting a progress bar
   #progbar <- txtProgressBar(min = 0, max = length(files), style = 2)
+
+  # On Windows, set cores to be 1
+    if (cores > 1 && .Platform$OS.type == "windows") {
+      cores <- 1
+      message('Parallel processing not available in Windows; "cores" set to 1.\n')
+    }
+    
+    if(length(files) <= cores)
+      cores <- 1 
+  
+  message(length(files), ' files found; importing spectra:') 
   
   gsp <- function(ff){
   
@@ -117,10 +125,7 @@ getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = "
       #      raw <- gsub('\\tinf', '\t0.0', raw)
       #      corrupt <- TRUE
       #    }
-    
-    # exclude columns that have text
-    raw <- raw[!grepl(paste0('[A-Da-dF-Zf-z]'), raw)]
-        
+            
     # substitute separators for a single value to be used in split
     raw <- gsub(seps, ";", raw)
     
@@ -129,6 +134,12 @@ getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = "
     
     # remove split character from first or last occurence
     raw <- gsub('^;|;$', '', raw)
+    
+    # exclude lines that have text
+    #raw <- raw[!grepl('[A-Da-dF-Zf-z]', raw)]
+    
+    # exclude any line that doesn't start with a number
+    raw <- raw[grepl('^[0-9\\-]', raw)]
 
     # split on separators
     rawsplit <- strsplit(raw, ";", fixed=TRUE)
@@ -137,6 +148,9 @@ getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = "
     
     if(dim(rawsplit)[2] < 2)
       stop('could not separate columns, choose a different value for "sep" argument', call.=FALSE)
+   
+   # convert decimal value to point
+   rawsplit <- gsub(paste0('\\',decimal), '.', rawsplit)
    
    # convert to numeric, check for NA
    suppressWarnings(class(rawsplit) <- 'numeric')
@@ -162,20 +176,35 @@ getspec <- function(where = getwd(), ext = 'txt', lim = c(300, 700), decimal = "
    #setTxtProgressBar(progbar, i)
     }
     
-
-    # On Windows, set cores to be 1
-    if (cores > 1 && .Platform$OS.type == "windows") {
-      cores <- 1
-      cat('Parallel processing not available in Windows; "cores" set to 1\n')
-    } 
     
-  tmp <- pbmclapply(files, gsp, mc.cores=cores)
+  tmp <- pbmclapply(files, function(x) 
+    tryCatch(gsp(x), 
+    error = function(e) NULL, 
+    warning = function(e) NULL
+    ), mc.cores=cores)
+    
+  specnames <- gsub(extension, '', file_names)
+  
+  if(any(unlist(lapply(tmp, is.null)))){
+  	whichfailed <- which(unlist(lapply(tmp, is.null)))
+  	# stop if all files are corrupt
+  	if(!length(whichfailed) < length(files))
+  	  stop('Could not import spectra, check input files and function arguments', call.=FALSE)
+    
+    # if not, import the ones remaining
+    warning('Could not import one or more files:\n', 
+      paste0(files[whichfailed], '\n'), 
+      call.=FALSE)  
+    
+    specnames <- specnames[-whichfailed]	
+  }
+
     
   tmp <- do.call(cbind, tmp)
 
   final <- cbind(range, tmp)
   
-  colnames(final) <- c('wl', gsub(extension, '', file_names))
+  colnames(final) <- c('wl', specnames)
   final <- as.data.frame(final)
   class(final) <- c('rspec', 'data.frame')
   
@@ -186,7 +215,7 @@ if(any(corrupt)){
   
   # Negative value check
   if(length(final[final < 0]) > 0){
-    message(paste("\nThe spectral data contain ", length(final[final < 0]), " negative value(s), which may produce unexpected results if used in models. Consider using procspec() to correct them."))
+    warning(paste("\nThe spectral data contain ", length(final[final < 0]), " negative value(s), which may produce unexpected results if used in models. Consider using procspec() to correct them."), call.=FALSE)
   }
 
   final

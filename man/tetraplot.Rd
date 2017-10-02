@@ -4,7 +4,7 @@
 \alias{tetraplot}
 \title{Plot a static tetrahedral colorspace}
 \usage{
-tetraplot(tcsdata, theta = 45, phi = 10, perspective = TRUE,
+tetraplot(tcsdata, theta = 45, phi = 10, perspective = FALSE,
   range = c(1, 2), r = 1e+06, zoom = 1, achro = TRUE,
   achro.col = "grey", achro.size = 1, achro.line = FALSE, achro.lwd = 1,
   achro.lty = 3, tetrahedron = TRUE, vert.cex = 1, vert.range = c(1, 2),
@@ -16,12 +16,12 @@ tetraplot(tcsdata, theta = 45, phi = 10, perspective = TRUE,
 or \code{tetraspace} function, containing values for the 'x', 'y' and 'z' 
 coordinates as columns (labeled as such).}
 
-\item{theta}{angle to rotate the plot in the xy plane (defaults to 10).}
+\item{theta}{angle to rotate the plot in the xy plane (defaults to 45).}
 
-\item{phi}{angle to rotate the plot in the yz plane (defaults to 45).}
+\item{phi}{angle to rotate the plot in the yz plane (defaults to 10).}
 
 \item{perspective}{logical, should perspective be forced by using point size to reflect
-distance from the plane of view? (defaults to TRUE)}
+distance from the plane of view? (defaults to FALSE)}
 
 \item{range, }{vert.range multiplier applied to \code{cex} and \code{vert.cex}, respectively, 
 to indicate the size range variation reflecting the distance from the plane of view.}

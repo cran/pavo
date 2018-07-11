@@ -4,32 +4,36 @@
 \alias{jnd2xyz}
 \title{Convert JND distances into perceptually-corrected Cartesian coordinates}
 \usage{
-jnd2xyz(coldistres, rotate = TRUE, center = c("mean", "achro"),
-  ref1 = "l", ref2 = "u", axis1 = c(1, 1, 0), axis2 = c(0, 0, 1))
+jnd2xyz(coldistres, center = TRUE, rotate = TRUE, rotcenter = c("mean",
+  "achro"), ref1 = "l", ref2 = "u", axis1 = c(1, 1, 0), axis2 = c(0, 0,
+  1))
 }
 \arguments{
 \item{coldistres}{(required) the output from a \code{coldist} call.}
 
+\item{center}{logical indicating if the data should be centered on its centroid
+(defaults to \code{TRUE}).}
+
 \item{rotate}{logical indicating if the data should be rotated (defaults to \code{TRUE}).}
 
-\item{center}{should the vectors for rotation be centered in the achromatic
+\item{rotcenter}{should the vectors for rotation be centered in the achromatic
 center ("achro") or the data centroid ("mean", the default)?}
 
-\item{ref1}{the cone to be used as a the first reference. May be NULL 
+\item{ref1}{the cone to be used as a the first reference. May be NULL
 (for no first rotation in the 3-dimensional case) or must match name
 in the original data that was used for \code{coldist}. Defaults to 'l'.}
 
-\item{ref2}{the cone to be used as a the second reference.May be NULL 
+\item{ref2}{the cone to be used as a the second reference.May be NULL
 (for no first rotation in the 3-dimensional case) or must match name
 in the original data that was used for \code{coldist}. Defaults to 'u'.
 (only used if data has 3 dimensions).}
 
-\item{axis1}{A vector of length 3 composed of 0's and 1's, with 
+\item{axis1}{A vector of length 3 composed of 0's and 1's, with
 1's representing the axes (x,y,z) to rotate around. Defaults to c(1,1,0), such
 that the rotation aligns with the xy plane (only used if data has 2 or 3 dimensions).
 Ignored if \code{ref1} is NULL (in 3-dimensional case only)}
 
-\item{axis2}{A vector of length 3 composed of 0's and 1's, with 
+\item{axis2}{A vector of length 3 composed of 0's and 1's, with
 1's representing the axes (x,y,z) to rotate around. Defaults to c(0,0,1), such
 that the rotation aligns with the z axis (only used if data has 3 dimensions).
 Ignored if \code{ref2} is NULL (in 3-dimensional case only)}
@@ -48,8 +52,11 @@ jnd2xyz(cd.flowers)
 
 }
 \references{
-Pike, T.W. (2012). Preserving perceptual distances in chromaticity diagrams. 
+Pike, T.W. (2012). Preserving perceptual distances in chromaticity diagrams.
 Behavioral Ecology, 23, 723-728.
+
+Maia, R., White, T. E., (2018) Comparing colors using visual models.
+Behavioral Ecology, ary017 doi: 10.1093/beheco/ary017.
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

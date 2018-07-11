@@ -240,7 +240,8 @@ head(musca_sense)
 sensdata(visual = 'musca', achromatic = 'md.r1', plot = TRUE, ylab = 'Absorbance')
 
 ## ---- echo=TRUE, eval=TRUE, results='hide'-------------------------------
-vismod1 <- vismodel(sppspec, visual = "avg.uv", illum = 'D65', relative = FALSE)
+vismod1 <- vismodel(sppspec, visual = "avg.uv", achromatic = 'bt.dc', 
+                    illum = 'D65', relative = FALSE)
 vismod1
 
 ## ---- echo=FALSE, eval=TRUE----------------------------------------------
@@ -277,7 +278,8 @@ vismod.idi
 sapply(vismod.idi, function(x) round(x,4))
 
 ## ---- echo=TRUE, eval=TRUE-----------------------------------------------
-coldist(vismod1, noise = 'neural', n = c(1, 2, 2, 4), weber = 0.1)
+coldist(vismod1, noise = 'neural', achro = TRUE, n = c(1, 2, 2, 4), 
+        weber = 0.1, weber.achro=0.1)
 coldist(vismod.idi, n = c(1, 2),  weber = 0.1)
 
 ## ---- echo = TRUE, eval = TRUE, results = 'hide'-------------------------

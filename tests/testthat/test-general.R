@@ -5,8 +5,7 @@ test_that('Class assignment', {
   data(flowers)
   
   # Check rspec
-  flowers <- as.rspec(as.data.frame(flowers))
-  expect_is(flowers, "rspec")
+  # See test-S3rspec.R
   
   # Check vismodel
   vis.flowers <- vismodel(flowers, visual = 'apis')
@@ -24,4 +23,13 @@ test_that('Class assignment', {
   vis.hex <- vismodel(flowers, relative = FALSE, qcatch = 'Ei', vonkries = TRUE, visual = 'apis')
   col.hex <- colspace(vis.hex, space = 'hex')
   expect_is(col.hex, 'colspace')
+})
+
+test_that("plot utilities", {
+  
+  data(sicalis)
+  expect_known_hash(spec2rgb(sicalis), "0d3e41a7b6")
+  
+  expect_error(spec2rgb(sicalis[300:nrow(sicalis),]), "full visible range")
+  expect_error(spec2rgb(sicalis[,-1]), "No wavelengths supplied")
 })

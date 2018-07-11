@@ -1,30 +1,74 @@
+pavo 1.4
+------------------------------------------------------------------------------
+NEW FEATURES
+
+* getspec() can now read OceanOptics `.ProcSpec` files
+* added the visual system of _Ctenophorous ornatus_, the (trichromatic) ornate dragon lizard
+
+MAJOR CHANGES
+
+* getspecf (and the argument fast = TRUE in getspec) have been deprecated
+* summary.rspec() returned incorrect values for S7. If you use S7, please re-run
+your analyses
+
+MINOR FEATURES AND BUG FIXES 
+
+* summary.rspec() now properly outputs `NA` for monotonically decreasing spectra
+* fixed warning when subset.rspec was provided with a logical vector
+* fixed harmless warning when summary.colspace() was used on a tcs object
+* `by` argument in merge.rspec() is no longer ignored
+* fixed bug in voloverlap() when plot = TRUE
+* fixed bug in vismodel() when transmission has more than one column
+* fixed bug in vismodel() that applied von Kries correction to achromatic channel
+* added argument fill=FALSE in voloverlap()
+* fixed bug in jndplot() when suppressing the plotting of arrows
+* better handling of subset data when using summary.colspace() and summary.vismodel()
+* fixed bug in coldist() when `noise = "quantum"` and `achro = TRUE` were used
+* fixed bug in jndplot() when `arrow = "none"` and `achro = TRUE`
+* spec2rgb() now takes into account the 390-400 nm wavelength range into account when possible
+* as.rspec() no longer fails with tibbles
+* bin option of procspec() now works for all values of bins
+* non-relative quantum catches from dataframe object were not correctly scaled
+in "di", "tri", "categorical" and "coc" colspaces
+* fixed a bug in colspace where it would incorrectly infer a preference for 
+a general trichromatic space, when a cie model is more appropriate
+* fixed a bug so that cie color matching functions can be more easily be used in
+a general trichromatic space (i.e. maxwell triangle)
+
 pavo 1.3.1
 ------------------------------------------------------------------------------
+
 NEW FUNCTIONS
+
 * bootcoldist() uses bootstrap to calculate the confidence intervals on the mean color distance between samples
 
-MINOR FEATURES AND BUG FIXES:
+MINOR FEATURES AND BUG FIXES 
+
 * fixed bug in coldist() when fewer samples than the number of photoreceptors 
 * fixed bug in getspec() that would cause it to crash with errors
 * fixed bug in tetraplot() when saving images
 
 pavo 1.3.0
 ------------------------------------------------------------------------------
-NEW FUNCTIONS:
+
+NEW FUNCTIONS 
+
 * jnd2xyz() converts distances (in JND, resulting from a coldist() call) into cartesian coordinates
 * plot() methods for objects resulting from jnd2xyz()
 * jndrot() produces rotations of Cartesian coordinates resulting from jnd2xyz()
 * coldist2mat() converts coldist() result from a pairwise data.frame to a distance matrix
 * sensdata() function for retrieving and/or visualising pavo's in-build spectral data 
 
-MAJOR CHANGES:
+MAJOR CHANGES 
+
 * tetraplot() and cieplot() have been completely rewritten to allow finer viewing control
 * tetraplot() allows forced perspective using size to denote distance
 * voloverlap() and vol() have also been changed to work with the new tetraplot() options
 * getspec() has been rewritten to be faster, more general, and allow parallel processing
 * subset functions now allow more than one argument to be used, and allow further attributes to be passed onto grep (e.g. invert = TRUE)
 
-MINOR FEATURES AND BUG FIXES:
+MINOR FEATURES AND BUG FIXES 
+
 * fixed bug in coldist() on log-transformation when object was neither of class vismodel nor colspace
 * fixed bug in dL calculation when input is a colspace object
 * fixed bug in vismodel() when a data frame, matrix or rspec object was passed as the background
@@ -42,24 +86,26 @@ MINOR FEATURES AND BUG FIXES:
 pavo 1.2.0
 ------------------------------------------------------------------------------
 
-MAJOR CHANGES:
+MAJOR CHANGES 
+
 * added the CIELch model accessed via colspace(space = 'cielch')
 * added the sensdata() function for retrieving and/or visualising pavo's in-build spectral data 
 
-MINOR FEATURES AND BUG FIXES:
+MINOR FEATURES AND BUG FIXES 
+
 * vignettes have been amalgamated & the single, main vignette is now up-to-date
 * added more informative labels for the segment analysis plot
 
 pavo 1.1.0
 ------------------------------------------------------------------------------
-MAJOR CHANGES:
 
-NEW FUNCTIONS:
-* segspace() replaces the deprecated segclass(), and is accessed via the colspace() argument space = 'segment'. The results of segspace() 
+NEW FUNCTIONS
+
+* segspace() replaces the deprecated segclass(), and is accessed via the colspace() argument space = 'segment'. The results of segspace()  
 are also now compatible with coldist() for the estimation of Euclidean colour-distances.
-* segplot() is a plot for Endler's (1990) segment analysis, and is accessed — along with all other 2d plots — via plot.colspace()
+* segplot() is a plot for Endler's (1990) segment analysis, and is accessed — along with all other 2d plots — via plot.colspace()  
 
-MINOR FEATURES AND BUG FIXES:
+MINOR FEATURES AND BUG FIXES
 
 * the use of relative quantum catches is now optional in the categorical colorspace (though still produces a warning), for greater flexibility 
 * updated several functions to work when rspec object has only one spectrum
@@ -74,14 +120,16 @@ MINOR FEATURES AND BUG FIXES:
 
 pavo 1.0
 ------------------------------------------------------------------------------
+
 * See vignette for detailed description of changes.
 
-MAJOR CHANGES:
+MAJOR CHANGES
+
 * coldist() arguments have been changed. Now the empirically estimated value for the Weber fraction must be entered, instead of the noise-to-signal ratio. The noise-to-signal ratio is then calculated based on the empirically estimated Weber fraction for the reference cone type, and applied to the remaining cone types. This should avoid confusion between empirically estimated values for the Weber fraction and the noise-to-signal ratio, which are currently prevalent in the literature.
 * coldist() now has an additional argument, weber.achro, so that the value for the Weber fraction to be used to calculate achromatic contrast can be input independently of the cone ratios.
 * tcs() is deprecated, replaced by colspace().
 
-NEW FUNCTIONS:
+NEW FUNCTIONS
 
 * colspace() replaces tcs() and introduces several new colorspaces
 * plot() methods for several colspace() outputs, including a static tetrahedral colorspace
@@ -90,7 +138,7 @@ NEW FUNCTIONS:
 * axistetra() draws reference x, y and z axis arrows in static tetrahedral plots
 * legendtetra() adds legends to static tetrahedral plots
 
-MINOR FEATURES AND BUG FIXES:
+MINOR FEATURES AND BUG FIXES
 
 * summary.colspace() for tcs spaces now returns relative color volume as well as absolute
 * tcsvol() and voloverlap() now allow control for line width
@@ -109,26 +157,31 @@ MINOR FEATURES AND BUG FIXES:
 pavo 0.5-6
 ------------------------------------------------------------------------------
 BUG FIXES
+
 * fixed bug in calculaiton of dichromat contrast in coldist()
 
 pavo 0.5-5
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES
+
 * fixed bug in calculaiton of H3 in summary.rspec()
 
 pavo 0.5-4
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES
+
 * changed default values for coldist()
 
 pavo 0.5-2
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES
+
 * fixes to the blue tit visual system, changed vismodel() argument to "bluetit"
 
 pavo 0.5-1
 ------------------------------------------------------------------------------
 MINOR FEATURES AND BUG FIXES
+
 * vismodel() accepts matrix, data.frame or rspec objects for the illuminant, updated warning messages associated with this use
 * vismodel() accepts user-defined achromatic receptors
 * tcsplot(), tcsvol() & tcspoints(): transparency control passed to user
@@ -140,6 +193,7 @@ pavo 0.5
 * updated citation()
 
 MINOR FEATURES AND BUG FIXES
+
 * vismodel() vonkries = TRUE does not return a NULL result
 * vismodel() works with a single spectrum object
 * tcsplot() allows greater control of tetrahedron appearance

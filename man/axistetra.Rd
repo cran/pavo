@@ -5,16 +5,16 @@
 \title{Plot reference axes in a static tetrahedral colorspace}
 \usage{
 axistetra(x = 0, y = 1.3, size = 0.1, arrowhead = 0.05,
-  col = par("fg"), lty = par("lty"), lwd = par("lwd"), label = TRUE,
-  adj.label = list(x = c(0.003, 0), y = c(0.003, 0.003), z = c(0, 0.003)),
-  label.cex = 1, label.col = NULL)
+  col = par("fg"), lty = par("lty"), lwd = par("lwd"),
+  label = TRUE, adj.label = list(x = c(0.003, 0), y = c(0.003, 0.003),
+  z = c(0, 0.003)), label.cex = 1, label.col = NULL)
 }
 \arguments{
 \item{x, y}{position of the legend relative to plot limits
  (usually a value between 0 and 1, but because of the perspective distortion,
 values greater than 1 are possible)}
 
-\item{size}{length of the arrows. Can be either a single value 
+\item{size}{length of the arrows. Can be either a single value
 (applied for x, y and z) or a vector of 3 separate values for each axis.}
 
 \item{arrowhead}{size of the arrowhead.}
@@ -23,13 +23,13 @@ values greater than 1 are possible)}
 
 \item{label}{logical, include x, y and z labels (defaults to TRUE).}
 
-\item{adj.label}{position adjustment for the labels. a list of 3 named objects 
+\item{adj.label}{position adjustment for the labels. a list of 3 named objects
 for x, y and z arrows, each with 2 values for x and y adjustment.}
 
 \item{label.cex, label.col}{graphical parameters for the labels.}
 }
 \value{
-\code{axistetra} adds reference arrows showing the direction of the 
+\code{axistetra} adds reference arrows showing the direction of the
 3-dimensional axes in a static tetrahedral colorspace plot.
 }
 \description{

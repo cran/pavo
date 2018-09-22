@@ -73,7 +73,7 @@ S6 (Contrast): Rmax - Rmin. Because it uses both Rmin and Rmax, this measure may
 sensitive to spectral noise. REF 5, 6
 
 S7 (Spectral saturation): Difference between the relative reflectance before and after
-the wavelength at which reflectance is halfway between its minimum (Rmin) 
+the wavelength at which reflectance is halfway between its minimum (Rmin)
 and its maximum (Rmax). Somewhat sensitive
 to noise and can be misleading when more than one maxima and/or minima are present.
 REF 3, 9
@@ -81,7 +81,7 @@ REF 3, 9
 S8 (Chroma): (Rmax - Rmin)/B2. Because it uses both Rmin and Rmax, this measure may be
 sensitive to spectral noise. REF 3, 13
 
-S9 (Carotenoid chroma): (R450 - R700)/R700. Should only be used when the color
+S9 (Carotenoid chroma): (R700 - R450)/R700. Should only be used when the color
 of the surface is clearly due to carotenoid pigmentation and R450 is lower than
 R700. Could be sensitive to noise. REF 8
 

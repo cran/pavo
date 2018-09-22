@@ -4,8 +4,8 @@
 \alias{vol}
 \title{Plot a tetrahedral color space}
 \usage{
-vol(tcsdata, alpha = 0.2, grid = TRUE, fill = TRUE, new = FALSE, view,
-  scale.y, axis, ...)
+vol(tcsdata, alpha = 0.2, grid = TRUE, fill = TRUE, new = FALSE,
+  view, scale.y, axis, ...)
 }
 \arguments{
 \item{tcsdata}{(required) object of class \code{colspace}.}
@@ -16,18 +16,18 @@ vol(tcsdata, alpha = 0.2, grid = TRUE, fill = TRUE, new = FALSE, view,
 
 \item{fill}{logical. if \code{TRUE} (default), fills the volume defined by the points.}
 
-\item{new}{logical. Should a new plot be started or draw over an open plot? 
+\item{new}{logical. Should a new plot be started or draw over an open plot?
 (defaults to FALSE)}
 
 \item{view, scale.y, axis}{deprecated arguments.}
 
-\item{...}{additional graphical options. See \code{link{polygon}} and \code{\link{tetraplot}}.}
+\item{...}{additional graphical options. See \code{\link{polygon}} and \code{\link{tetraplot}}.}
 }
 \value{
 \code{vol} creates a 3D convex hull within a static tetrahedral plot.
 }
 \description{
-Produces a 3D convex hull in tetrahedral color space when plotting a 
+Produces a 3D convex hull in tetrahedral color space when plotting a
 non-interactive tetrahedral plot.
 }
 \author{

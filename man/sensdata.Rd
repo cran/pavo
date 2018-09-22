@@ -5,11 +5,11 @@
 \title{Retrieve or plot in-built data}
 \usage{
 sensdata(visual = c("none", "all", "avg.uv", "avg.v", "bluetit",
-  "ctenophorus", "star", "pfowl", "apis", "canis", "cie2", "cie10", "musca"),
-  achromatic = c("none", "all", "bt.dc", "ch.dc", "st.dc", "md.r1"),
-  illum = c("none", "all", "bluesky", "D65", "forestshade"),
-  trans = c("none", "all", "bluetit", "blackbird"), bkg = c("none", "all",
-  "green"), plot = FALSE, ...)
+  "ctenophorus", "star", "pfowl", "apis", "canis", "cie2", "cie10",
+  "musca", "habronattus", "rhinecanthus"), achromatic = c("none", "all",
+  "bt.dc", "ch.dc", "st.dc", "md.r1", "ra.dc"), illum = c("none", "all",
+  "bluesky", "D65", "forestshade"), trans = c("none", "all", "bluetit",
+  "blackbird"), bkg = c("none", "all", "green"), plot = FALSE, ...)
 }
 \arguments{
 \item{visual}{visual systems. Options are:
@@ -21,31 +21,34 @@ sensdata(visual = c("none", "all", "avg.uv", "avg.v", "bluetit",
 \item \code{'avg.v'}: average avian V system.
 \item \code{'bluetit'}: Blue tit \emph{Cyanistes caeruleus} visual system.
 \item \code{'canis'}: Canid \emph{Canis familiaris} visual system.
-\item \code{'cie2'}: 2-degree colour matching functions for CIE models of human 
- colour vision. Functions are linear transformations of the 2-degree cone fundamentals 
+\item \code{'cie2'}: 2-degree colour matching functions for CIE models of human
+ colour vision. Functions are linear transformations of the 2-degree cone fundamentals
  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
-\item \code{'cie10'}: 10-degree colour matching functions for CIE models of human 
- colour vision. Functions are linear transformations of the 10-degree cone fundamentals 
+\item \code{'cie10'}: 10-degree colour matching functions for CIE models of human
+ colour vision. Functions are linear transformations of the 10-degree cone fundamentals
  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
-\item \code{'ctenophorus'}: Ornate dragon lizatd \emph{Ctenophorus ornatus}.
+\item \code{'ctenophorus'}: Ornate dragon lizard \emph{Ctenophorus ornatus}.
 \item \code{'musca'}: Housefly \emph{Musca domestica} visual system.
 \item \code{'pfowl'}: Peafowl \emph{Pavo cristatus} visual system.
 \item \code{'star'}: Starling \emph{Sturnus vulgaris} visual system.
+\item \code{'habronattus'}: Jumping spider \emph{Habronattus pyrrithrix}.
+\item \code{'rhinecanthus'}: Triggerfish \emph{Rhinecanthus aculeatus}.
 }}
 
 \item{achromatic}{the sensitivity data used to calculate luminance (achromatic)
- receptor stimulation. Options are: 
+ receptor stimulation. Options are:
 \itemize{
  \item \code{'none'}: no achromatic sensitivity data.
  \item \code{'all'}: all achromatic sensitivity data.
-\item \code{'bt.dc'}: Blue tit \emph{Cyanistes caeruleus} double cone.
+    \item \code{'bt.dc'}: Blue tit \emph{Cyanistes caeruleus} double cone.
  \item \code{'ch.dc'}: Chicken \emph{Gallus gallus} double cone.
  \item \code{'st.dc'}: Starling \emph{Sturnus vulgaris} double cone.
  \item \code{'md.r1'}: Housefly \emph{Musca domestica} R1-6 photoreceptor.
+ \item \code{'ra.dc'}: Triggerfish \emph{Rhinecanthus aculeatus} double cone.
 }}
 
 \item{illum}{illuminants. Options are:
-\itemize{ 
+\itemize{
 \item \code{'none'}: no illuminant data.
 \item \code{'all'}: all background spectral data.
 \item \code{'bluesky'} open blue sky.
@@ -54,17 +57,17 @@ sensdata(visual = c("none", "all", "avg.uv", "avg.v", "bluetit",
 }}
 
 \item{trans}{Ocular transmission data. Options are:
-\itemize{ 
+\itemize{
 \item \code{'none'}: no transmission data.
 \item \code{'all'}: all transmission data.
-\item \code{'bluetit'}: blue tit \emph{Cyanistes caeruleus} 
+\item \code{'bluetit'}: blue tit \emph{Cyanistes caeruleus}
 ocular transmission (from Hart et al. 2000).
-\item \code{'blackbird'}: blackbird \emph{Turdus merula} 
+\item \code{'blackbird'}: blackbird \emph{Turdus merula}
 ocular transmission (from Hart et al. 2000).
 }}
 
 \item{bkg}{background spectra. Options are:
-\itemize{ 
+\itemize{
 \item \code{'none'}: no background spectral data.
 \item \code{'all'}: all background spectral data.
 \item \code{'green'}: green foliage.
@@ -75,7 +78,7 @@ ocular transmission (from Hart et al. 2000).
 \item{...}{additional graphical options passed to \code{\link{plot.rspec}} when \code{plot = TRUE}.}
 }
 \value{
-An object of class \code{rspec} (when \code{plot = FALSE}), containing 
+An object of class \code{rspec} (when \code{plot = FALSE}), containing
 a wavelength column \code{'wl'} and spectral data binned at 1 nm intervals from 300-700 nm.
 }
 \description{
@@ -86,7 +89,7 @@ Retrieve (as an rspec object) or plot pavo's in-built spectral data.
 # Plot the honeybee's receptors
 sensdata(visual = 'apis', ylab = 'Absorbance', plot = TRUE)
 
-# Plot the vverage UV vs V avian receptors
+# Plot the average UV vs V avian receptors
 sensdata(visual = c('avg.v', 'avg.uv'), ylab = 'Absorbance', plot = TRUE)
 
 # Retrieve the CIE colour matching functions as an rspec object

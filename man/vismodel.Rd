@@ -4,12 +4,13 @@
 \alias{vismodel}
 \title{Visual models}
 \usage{
-vismodel(rspecdata, visual = c("avg.uv", "avg.v", "bluetit", "ctenophorus",
-  "star", "pfowl", "apis", "canis", "cie2", "cie10", "musca", "segment"),
-  achromatic = c("none", "bt.dc", "ch.dc", "st.dc", "ml", "l", "md.r1",
-  "all"), illum = c("ideal", "bluesky", "D65", "forestshade"),
-  trans = c("ideal", "bluetit", "blackbird"), qcatch = c("Qi", "fi", "Ei"),
-  bkg = c("ideal", "green"), vonkries = FALSE, scale = 1,
+vismodel(rspecdata, visual = c("avg.uv", "avg.v", "bluetit",
+  "ctenophorus", "star", "pfowl", "apis", "canis", "cie2", "cie10",
+  "musca", "segment", "habronattus", "rhinecanthus"),
+  achromatic = c("none", "bt.dc", "ch.dc", "st.dc", "md.r1", "ra.dc",
+  "ml", "l", "all"), illum = c("ideal", "bluesky", "D65", "forestshade"),
+  trans = c("ideal", "bluetit", "blackbird"), qcatch = c("Qi", "fi",
+  "Ei"), bkg = c("ideal", "green"), vonkries = FALSE, scale = 1,
   relative = TRUE)
 }
 \arguments{
@@ -34,25 +35,28 @@ remaining columns.}
 \item \code{'cie10'}: 10-degree colour matching functions for CIE models of human
  colour vision. Functions are linear transformations of the 10-degree cone fundamentals
  of Stockman & Sharpe (2000), as ratified by the CIE (2006).
-\item \code{'ctenophorus'}: Ornate dragon lizatd \emph{Ctenophorus ornatus}.
+\item \code{'ctenophorus'}: Ornate dragon lizard \emph{Ctenophorus ornatus}.
 \item \code{'musca'}: Housefly \emph{Musca domestica}.
 \item \code{'pfowl'}: Peafowl \emph{Pavo cristatus}.
 \item \code{'segment'}: Generic tetrachromat 'viewer' for use in the segment analysis of Endler (1990).
 \item \code{'star'}: Starling \emph{Sturnus vulgaris}.
+\item \code{'habronattus'}: Jumping spider \emph{Habronattus pyrrithrix}.
+\item \code{'rhinecanthus'}: Triggerfish \emph{Rhinecanthus aculeatus}.
 }}
 
 \item{achromatic}{the sensitivity data to be used to calculate luminance (achromatic)
  receptor stimulation. Either a vector containing the sensitivity for a single receptor,
  or one of the options:
 \itemize{
- \item \code{'none'}: no achromatic stimulation calculated
-    \item \code{'bt.dc'}: Blue tit \emph{Cyanistes caeruleus} double cone
- \item \code{'ch.dc'}: Chicken \emph{Gallus gallus} double cone
- \item \code{'st.dc'}: Starling \emph{Sturnus vulgaris} double cone
- \item \code{'md.r1'}: Housefly \emph{Musca domestica} R1-6 photoreceptor
- \item \code{'ml'}: the summed response of the two longest-wavelength photoreceptors
- \item \code{'l'}: the longest-wavelength photoreceptor
- \item \code{'all'}: the summed response of all photoreceptors
+ \item \code{'none'}: no achromatic stimulation calculated.
+    \item \code{'bt.dc'}: Blue tit \emph{Cyanistes caeruleus} double cone.
+ \item \code{'ch.dc'}: Chicken \emph{Gallus gallus} double cone.
+ \item \code{'st.dc'}: Starling \emph{Sturnus vulgaris} double cone.
+ \item \code{'md.r1'}: Housefly \emph{Musca domestica} R1-6 photoreceptor.
+ \item \code{'ra.dc'}: Triggerfish \emph{Rhinecanthus aculeatus} double cone.
+ \item \code{'ml'}: the summed response of the two longest-wavelength photoreceptors.
+ \item \code{'l'}: the longest-wavelength photoreceptor.
+ \item \code{'all'}: the summed response of all photoreceptors.
 }}
 
 \item{illum}{either a vector containing the illuminant, or one of the options:

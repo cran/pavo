@@ -4,9 +4,9 @@
 \alias{getspec}
 \title{Import spectra files}
 \usage{
-getspec(where = getwd(), ext = "txt", lim = c(300, 700), decimal = ".",
-  sep = NULL, subdir = FALSE, subdir.names = FALSE,
-  cores = getOption("mc.cores", 2L), fast)
+getspec(where = getwd(), ext = "txt", lim = c(300, 700),
+  decimal = ".", sep = NULL, subdir = FALSE, subdir.names = FALSE,
+  cores = getOption("mc.cores", 2L), ignore.case = TRUE, fast)
 }
 \arguments{
 \item{where}{(required) folder in which files are located.}
@@ -32,6 +32,9 @@ spectra? (defaults to \code{FALSE}).}
 \item{cores}{Number of cores to be used. If greater than 1, import will use
 parallel processing (not available in Windows).}
 
+\item{ignore.case}{Logical. Should the extension search be case insensitive?
+(defaults to TRUE)}
+
 \item{fast}{deprecated argument. use \code{cores} for parallel processing
 instead.}
 }
@@ -44,7 +47,7 @@ Reflectance values are interpolated to the nearest wavelength integer.
 Finds and imports spectra files from a folder. Currently works
 for reflectance files generated in Ocean Optics SpectraSuite (USB2000,
 USB4000 and Jaz spectrometers), CRAIC software (after exporting) and
-Avantes (after exporting).
+Avantes (before or after exporting).
 }
 \examples{
 \dontrun{

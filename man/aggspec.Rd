@@ -31,7 +31,6 @@ Combines spectra (by taking the average, for example) according to
 an index or a vector of identities.
 }
 \examples{
-\dontrun{
 data(teal)
 
 # Average every two spectra
@@ -39,12 +38,10 @@ teal.sset1 <- aggspec(teal, by = 2)
 plot(teal.sset1)
 
 # Create factor and average spectra by levels 'a' and 'b'
-ind <- rep(c('a', 'b'), times = 6)
+ind <- rep(c("a", "b"), times = 6)
 teal.sset2 <- aggspec(teal, by = ind)
 
 plot(teal.sset2)
-}
-
 }
 \references{
 Montgomerie R (2006) Analyzing colors. In: Hill G, McGraw K (eds)

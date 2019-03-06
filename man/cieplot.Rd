@@ -6,7 +6,7 @@
 \usage{
 cieplot(ciedata, mono = TRUE, out.lwd = NULL, out.lcol = "black",
   out.lty = 1, theta = 45, phi = 10, r = 1e+06, zoom = 1,
-  box = FALSE, margin = c(0, 0, 0, 0), view, scale.y, axis, grid, ...)
+  box = FALSE, margin = c(0, 0, 0, 0), ...)
 }
 \arguments{
 \item{ciedata}{(required). a data frame, possibly a result from the \code{colspace}
@@ -37,27 +37,22 @@ when \code{space = 'cielab'}.}
 \item{margin}{vector of four numbers specifying drawing margins for CIELAB plot
 (defaults to c(0,0,0,0))}
 
-\item{view, }{scale.y, axis, grid deprecated arguments.}
-
 \item{...}{Additional graphical options. See \code{\link{par}}.}
 }
 \description{
 Plot a CIE (XYZ, LAB, or LCH) chromaticity diagram.
 }
 \examples{
-\dontrun{
 data(flowers)
 
 # CIEXYZ
-vis.flowers <- vismodel(flowers, visual = 'cie10', illum = 'D65', vonkries = TRUE, relative = FALSE)
-xyz.flowers <- colspace(vis.flowers, space = 'ciexyz')
+vis.flowers <- vismodel(flowers, visual = "cie10", illum = "D65", vonkries = TRUE, relative = FALSE)
+xyz.flowers <- colspace(vis.flowers, space = "ciexyz")
 plot(xyz.flowers)
 
-#CIELAB
-lab.flowers <- colspace(vis.flowers, space = 'cielab')
+# CIELAB
+lab.flowers <- colspace(vis.flowers, space = "cielab")
 plot(lab.flowers)
-}
-
 }
 \references{
 Smith T, Guild J. (1932) The CIE colorimetric standards and their use.
@@ -65,6 +60,14 @@ Smith T, Guild J. (1932) The CIE colorimetric standards and their use.
 
 Westland S, Ripamonti C, Cheung V. (2012). Computational colour science
    using MATLAB. John Wiley & Sons.
+
+Stockman, A., & Sharpe, L. T. (2000). Spectral sensitivities of
+ the middle- and long-wavelength sensitive cones derived from measurements in
+ observers of known genotype. Vision Research, 40, 1711-1737.
+
+CIE (2006). Fundamental chromaticity diagram with physiological axes.
+ Parts 1 and 2. Technical Report 170-1. Vienna: Central Bureau of the Commission
+ Internationale de l Eclairage.
 }
 \author{
 Thomas White \email{thomas.white026@gmail.com}

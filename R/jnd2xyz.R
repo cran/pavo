@@ -26,13 +26,11 @@
 #' that the rotation aligns with the z axis (only used if data has 3 dimensions).
 #' Ignored if \code{ref2} is NULL (in 3-dimensional case only)
 #'
-#' @examples \dontrun{
+#' @examples
 #' data(flowers)
 #' vis.flowers <- vismodel(flowers)
 #' cd.flowers <- coldist(vis.flowers)
 #' jnd2xyz(cd.flowers)
-#' }
-#'
 #' @author Rafael Maia \email{rm72@zips.uakron.edu}
 #'
 #' @export
@@ -40,11 +38,12 @@
 #' @references Pike, T.W. (2012). Preserving perceptual distances in chromaticity diagrams.
 #' Behavioral Ecology, 23, 723-728.
 #' @references Maia, R., White, T. E., (2018) Comparing colors using visual models.
-#' Behavioral Ecology, ary017 doi: 10.1093/beheco/ary017.
+#' Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
 
 
 jnd2xyz <- function(coldistres, center = TRUE, rotate = TRUE,
-                    rotcenter = c("mean", "achro"), ref1 = "l", ref2 = "u", axis1 = c(1, 1, 0), axis2 = c(0, 0, 1)) {
+                    rotcenter = c("mean", "achro"), ref1 = "l", ref2 = "u",
+                    axis1 = c(1, 1, 0), axis2 = c(0, 0, 1)) {
 
   # Accessory functions
   pos2 <- function(d12, d13, d23) {

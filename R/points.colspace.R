@@ -1,9 +1,9 @@
-#' Plot points in a colorspace
+#' Plot points in a colourspace
 #'
-#' Add points to a colorspace plot
+#' Add points to a colourspace plot
 #'
 #'
-#' @param x (required) an object of class \code{colspace}.
+#' @inheritParams plot.colspace
 #' @param ... additional graphical options. See \code{\link{par}}.
 #'
 #' @return \code{points.colspace} adds points to a colorspace plot. When \code{space = 'tcs'},

@@ -3,20 +3,17 @@
 \name{projplot}
 \alias{projplot}
 \alias{projpoints}
-\title{Hue projection plot}
+\title{2D projection of a tetrahedral colourspace}
 \usage{
 projplot(tcsdata, ...)
 
-projpoints(tcsres, ...)
+projpoints(tcsdata, ...)
 }
 \arguments{
-\item{tcsdata}{(required) color space coordinates, possibly a result from the \code{\link{tcs}} function,
+\item{tcsdata}{(required) tetrahedral color space coordinates, possibly a result from \code{\link{colspace}},
 containing values for the 'h.theta' and 'h.phi' coordinates as columns (labeled as such).}
 
 \item{...}{additional parameters to be passed to the plotting of data points.}
-
-\item{tcsres}{(required) color space coordinates, possibly a result from the \code{\link{tcs}} function,
-containing values for the 'h.theta' and 'h.phi' coordinates as columns (labeled as such).}
 }
 \value{
 \code{projplot} creates a 2D plot  of color points projected from the tetrahedron
@@ -26,7 +23,7 @@ to its encapsulating sphere, and is ideal to visualize differences in hue.
 produced by \code{projplot}.
 }
 \description{
-Produces a 2D projection plot of points in a color space
+Produces a 2D projection plot of points in a tetrahedral colour space
 
 Adds points to a tetrahedral colorspace projection
 }
@@ -36,22 +33,18 @@ has been used in the past. Among other advantages, the Mollweide projection pres
 relationships within latitudes without distortion.
 }
 \examples{
-\dontrun{
 data(sicalis)
-vis.sicalis <- vismodel(sicalis, visual = 'avg.uv')
-tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
-projplot(tcs.sicalis, pch = 16, col = setNames(rep(1:3, 7), rep(c('C', 'T', 'B'), 7)))
-}
-
+vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
+tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
+projplot(tcs.sicalis, pch = 16, col = setNames(rep(seq_len(3), 7), rep(c("C", "T", "B"), 7)))
 }
 \references{
 Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage
  color in a tetrahedral color space: A phylogenetic analysis of new world buntings.
  The American Naturalist, 171(6), 755-776.
 
-Endler, J. A., Westcott, D., Madden, J., & Robson, T. (2005). Animal
- visual systems and the evolution of color patterns: Sensory processing illuminates
- signal evolution. Evolution, 59(8), 1795-1818.
+Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns
+ as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

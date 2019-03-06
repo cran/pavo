@@ -1,7 +1,6 @@
-#' Colorimetric variables
+#' Colourimetric variables
 #'
-#' Calculates all 23 colorimetric variables reviewed in
-#' Montgomerie (2006).
+#' Calculates all 23 colourimetric variables reviewed in Montgomerie (2006).
 #'
 #' @param object (required) a data frame, possibly an object of class \code{rspec},
 #' with a column with wavelength data, named 'wl', and the remaining column containing
@@ -101,13 +100,11 @@
 #'
 #' @export
 #'
-#' @examples \dontrun{
+#' @examples
 #' data(sicalis)
 #' summary(sicalis)
 #' summary(sicalis, subset = TRUE)
-#' summary(sicalis, subset = c('B1', 'H4'))
-#' }
-#'
+#' summary(sicalis, subset = c("B1", "H4"))
 #' @author Pierre-Paul Bitton \email{bittonp@@windsor.ca}, Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
 #' @references Montgomerie R. 2006. Analyzing colors. In Hill, G.E, and McGraw, K.J., eds.
@@ -125,7 +122,7 @@
 #' Naturalist 160:683-691.
 #'
 #' 4- Delhey, K., A. Johnsen, A. Peters, S. Andersson, and B. Kempenaers. 2003. Paternity analysis reveals
-#' opposing selection pressures on crown coloration in the blue tit (parus caeruleus). Proceedings
+#' opposing selection pressures on crown coloration in the blue tit (Parus caeruleus). Proceedings
 #' of the Royal Society B 270:2057-2063.
 #'
 #' 5- Keyser, A. and G. Hill. 1999. Condition-dependent variation in the blue-ultraviolet coloration of a
@@ -135,7 +132,7 @@
 #' male blue grosbeaks. Behavioural Ecology 11:202-209.
 #'
 #' 7- Ornborg, J., S. Andersson, S. Griffith, and B. Sheldon. 2002. Seasonal changes in a ultraviolet
-#' structural colour signal in blue tits, parus caeruleus. Biological Journal of the Linnean Society
+#' structural colour signal in blue tits, Parus caeruleus. Biological Journal of the Linnean Society
 #' 76:237-245.
 #'
 #' 8- Peters, A., A. Denk, K. Delhey, and B. Kempenaers. 2004. Carotenoid-based bill colour as an
@@ -153,7 +150,7 @@
 #' variation in ultraviolet-blue plumage colour. Proceedings of the Royal Society B
 #' 270:1455-1460.
 #'
-#' 12- Siefferman, L. and G. Hill. 2005. Uv-blue structural coloration and competition for nestboxes in male
+#' 12- Siefferman, L. and G. Hill. 2005. UV-blue structural coloration and competition for nestboxes in male
 #' eastern bluebirds. Animal Behaviour 69:67-72.
 #'
 #' 13- Smiseth, P., J. Ornborg, S. Andersson, and T. Amundsen. 2001. Is male plumage reflectance
@@ -162,9 +159,8 @@
 summary.rspec <- function(object, subset = FALSE, wlmin = NULL, wlmax = NULL, ...) {
   wl_index <- which(names(object) == "wl")
   wl <- object[, wl_index]
-  # object <- object[,-wl_index]
 
-  # set WL min & max
+  # Set WL min & max
   lambdamin <- max(wlmin, min(wl))
   lambdamax <- min(wlmax, max(wl))
 
@@ -175,25 +171,22 @@ summary.rspec <- function(object, subset = FALSE, wlmin = NULL, wlmax = NULL, ..
     stop("wlmax is larger than the range of spectral data")
   }
 
-  # restrict to range of wlmin:wlmax
+  # Restrict to range of wlmin:wlmax
   object <- object[which(wl == lambdamin):which(wl == lambdamax), ]
   wl <- object[, wl_index]
 
-  select <- (1:ncol(object))[-wl_index]
-  # object <- object[,-wl_index]
+  select <- (seq_len(ncol(object)))[-wl_index]
   object <- object[, select, drop = FALSE]
-
-
   output.mat <- matrix(nrow = ncol(object), ncol = 23)
 
   # Three measures of brightness
-  B1 <- sapply(object, sum)
+  B1 <- colSums(object)
 
-  B2 <- sapply(object, mean)
+  B2 <- colMeans(object)
 
-  B3 <- sapply(object, max)
+  B3 <- vapply(object, max, numeric(1))
 
-  Rmin <- sapply(object, min)
+  Rmin <- vapply(object, min, numeric(1))
 
   Rmid <- (B3 + Rmin) / 2
 
@@ -285,31 +278,31 @@ summary.rspec <- function(object, subset = FALSE, wlmin = NULL, wlmax = NULL, ..
   Carotchroma <- (R700 - R450) / R700
 
   # H3
-  index_Rmid <- sapply(1:ncol(object), function(x) {
+  index_Rmid <- vapply(seq_len(ncol(object)), function(x) {
     which.min(abs(object[, x] - Rmid[x]))
-  })
+  }, numeric(1))
   H3 <- wl[index_Rmid]
 
   # S7
 
-  S7 <- sapply(1:ncol(object), function(col) {
+  S7 <- vapply(seq_len(ncol(object)), function(col) {
     spec <- object[, col]
     index_Rmid_spec <- index_Rmid[col]
-    spec_low <- spec[1:index_Rmid_spec]
+    spec_low <- spec[seq_len(index_Rmid_spec)]
     spec_high <- spec[index_Rmid_spec:length(spec)]
 
     return(sum(spec_low) - sum(spec_high))
-  })
+  }, numeric(1))
 
   S7 <- S7 / B1
 
 
   # S3
-  S3 <- sapply(1:ncol(object), function(col) {
+  S3 <- vapply(seq_len(ncol(object)), function(col) {
     spec <- object[, col]
     H1_spec <- H1[col]
     sum(spec[wl >= (H1_spec - 50) & wl <= (H1_spec + 50)])
-  })
+  }, numeric(1))
   S3 <- S3 / B1
 
   # Spectral saturation
@@ -383,7 +376,7 @@ summary.rspec <- function(object, subset = FALSE, wlmin = NULL, wlmax = NULL, ..
     if (all(subset %in% colvarnames)) {
       color.var <- color.var[subset]
     } else {
-      stop(paste("Names in", dQuote("subset"), "do not match color variable names"))
+      stop("Names in ", dQuote("subset"), " do not match color variable names")
     }
   }
 

@@ -2,14 +2,14 @@
 % Please edit documentation in R/coldist.R
 \name{coldist}
 \alias{coldist}
-\title{Color distances}
+\title{Colour distances}
 \usage{
 coldist(modeldata, noise = c("neural", "quantum"), subset = NULL,
-  achro = FALSE, qcatch = NULL, n = c(1, 2, 2, 4), weber = 0.1,
-  weber.ref = "longest", weber.achro = 0.1, v, n1, n2, n3, n4)
+  achromatic = FALSE, qcatch = NULL, n = c(1, 2, 2, 4),
+  weber = 0.1, weber.ref = "longest", weber.achro = 0.1)
 }
 \arguments{
-\item{modeldata}{(required) quantum catch color data. Can be the result
+\item{modeldata}{(required) quantum catch colour data. Can be the result
 from \code{\link{vismodel}}, or \code{\link{colspace}}. Data may also be independently calculated quantum catches,
 in the form of a data frame with columns representing photoreceptors.}
 
@@ -17,7 +17,7 @@ in the form of a data frame with columns representing photoreceptors.}
  if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding,
 categorical, segment, and cie models)):
 \itemize{
-    \item \code{neural}: noise is proportional to the Weber fraction and
+    \item \code{neural} (default): noise is proportional to the Weber fraction and
  is independent of the intensity of the signal received (i.e. assumes bright conditions).
     \item \code{quantum}: noise is the sum of the neural noise and receptor noise,
  and is thus proportional to the Weber fraction and inversely proportional
@@ -31,7 +31,7 @@ length 1 or 2 can be provided, indicating which samples are desired. The subset 
 must match the labels of the input samples, but partial matching (and regular expressions)
 are supported.}
 
-\item{achro}{Logical. If \code{TRUE}, last column of the data frame is used to calculate
+\item{achromatic}{Logical. If \code{TRUE}, last column of the data frame is used to calculate
 the achromatic contrast, with noise based on the Weber fraction given by the argument
 \code{weber.achro}.
 If the data are from the hexagon model (i.e. \code{colspace(space = 'hexagon')}), it
@@ -43,7 +43,7 @@ instead returns simple long (or 'green') receptor contrast.}
  used, so that the noise can be calculated accordingly:
 \itemize{
  \item \code{Qi}: Quantum catch for each photoreceptor
- \item \code{fi}: Quantum catch according to Fechner law (the signal of the receptor
+ \item \code{fi}: Quantum catch according to Fechner's law (the signal of the receptor
    channel is proportional to the logarithm of the quantum catch)
  }}
 
@@ -73,11 +73,9 @@ categorical, segment, and cie models).}
 categorical, segment, and cie models).}
 
 \item{weber.achro}{the Weber fraction to be used to calculate achromatic contrast, when
- \code{achro = TRUE}. Defaults to 0.1. Ignored for \code{colspace} objects
+ \code{achromatic = TRUE}. Defaults to 0.1. Ignored for \code{colspace} objects
  if model is not a receptor noise model (i.e. hexagon, colour-opponent-coding,
 categorical, segment, and cie models).}
-
-\item{n1, n2, n3, n4, v}{deprecated arguments. see below.}
 }
 \value{
 A data frame containing up to 4 columns.
@@ -89,8 +87,8 @@ color-opponent-coding space, green-receptor contrast in the hexagon, and lightne
 contrast in the cielab model.
 }
 \description{
-Calculates color distances. When data are the result of \code{\link{vismodel}},
-it applies the receptor-noise model of Vorobyev et al. (1998) to calculate color distances
+Calculates colour distances. When data are the result of \code{\link{vismodel}},
+it applies the receptor-noise model of Vorobyev et al. (1998) to calculate colour distances
 with noise based on relative photoreceptor densities. It also accepts \code{\link{colspace}} data
 from the hexagon, colour-opponent-coding, categorical, segment, and cielab models, in which case euclidean
 distances (hexagon, cielab, categorical, segment) or manhattan distances (coc) are returned.
@@ -118,34 +116,36 @@ argument directly, and not based on \code{v} and \code{n4} as before.
 \dontrun{
 # Dichromat
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'canis', relative = FALSE)
-didist.flowers <- coldist(vis.flowers)
+vis.flowers <- vismodel(flowers, visual = "canis", relative = FALSE)
+didist.flowers <- coldist(vis.flowers, n = c(1, 2))
 
 # Trichromat
-vis.flowers <- vismodel(flowers, visual = 'apis', relative = FALSE)
-tridist.flowers <- coldist(vis.flowers)
+vis.flowers <- vismodel(flowers, visual = "apis", relative = FALSE)
+tridist.flowers <- coldist(vis.flowers, n = c(1, 2, 1))
 
 # Trichromat, color-hexagon model (euclidean distances)
-vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei',
-                        relative = FALSE, vonkries = TRUE, achro = 'l', bkg = 'green')
-hex.flowers <- colspace(vis.flowers, space = 'hexagon')
+vis.flowers <- vismodel(flowers,
+  visual = "apis", qcatch = "Ei",
+  relative = FALSE, vonkries = TRUE, achro = "l", bkg = "green"
+)
+hex.flowers <- colspace(vis.flowers, space = "hexagon")
 hexdist.flowers <- coldist(hex.flowers)
 
 # Trichromat, color-opponent-coding model (manhattan distances)
-vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei', relative = FALSE, vonkries = TRUE)
-coc.flowers <- colspace(vis.flowers, space = 'coc')
+vis.flowers <- vismodel(flowers, visual = "apis", qcatch = "Ei", relative = FALSE, vonkries = TRUE)
+coc.flowers <- colspace(vis.flowers, space = "coc")
 hexdist.flowers <- coldist(coc.flowers)
 
 # Tetrachromat
 data(sicalis)
-vis.sicalis <- vismodel(sicalis, visual = 'avg.uv', relative = FALSE)
+vis.sicalis <- vismodel(sicalis, visual = "avg.uv", relative = FALSE)
 tetradist.sicalis.n <- coldist(vis.sicalis)
 
 # This will also work, but give you several warnings you shouldn't ignore!!
 col.sicalis <- colspace(vis.sicalis)
 tetradist.sicalis.n <- coldist(col.sicalis)
 
-tetradist.sicalis.q <- coldist(vis.sicalis, noise = 'quantum')
+tetradist.sicalis.q <- coldist(vis.sicalis, noise = "quantum")
 }
 
 }
@@ -169,7 +169,7 @@ Lind, O. (2016) Colour vision and background adaptation in a passerine
 
 Olsson, P., Lind, O., & Kelber, A. (2017) Chromatic and achromatic
  vision: parameter choice and limitations for reliable model predictions.
- Behavioral Ecology, doi: 10.1093/beheco/arx133
+ Behavioral Ecology, \doi{10.1093/beheco/arx133}
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

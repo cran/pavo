@@ -2,7 +2,7 @@
 % Please edit documentation in R/sensmodel.R
 \name{sensmodel}
 \alias{sensmodel}
-\title{modeling spectral sensitivity}
+\title{Modeling spectral sensitivity}
 \usage{
 sensmodel(peaksens, range = c(300, 700), lambdacut = NULL,
   Bmid = NULL, oiltype = NULL, beta = TRUE, om = NULL,
@@ -46,15 +46,15 @@ Models spectral sensitivity (with oil droplets; optional) based on peak cone sen
 according to the models of Govardovskii et al. (2000) and Hart & Vorobyev (2005).
 }
 \examples{
-\dontrun{
 # Blue tit visual system based on Hart et al (2000)
-bluesens <- sensmodel(c(371,448,502,563), beta = F, lambdacut = c(330, 413, 507, 572),
-oiltype = c("T", "C", "Y","R"), om = TRUE)
+bluesens <- sensmodel(c(371, 448, 502, 563),
+  beta = FALSE,
+  lambdacut = c(330, 413, 507, 572),
+  oiltype = c("T", "C", "Y", "R"), om = TRUE
+)
 
 # Danio aequipinnatus based on Govardovskii et al. (2000)
 daniosens <- sensmodel(c(357, 411, 477, 569))
-}
-
 }
 \references{
 Govardovskii VI, Fyhrquist N, Reuter T, Kuzmin DG and Donner K. 2000.

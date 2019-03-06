@@ -39,12 +39,9 @@ Calculates coordinates and colorimetric variables that represent reflectance spe
 in the avian tetrahedral color space.
 }
 \examples{
-\dontrun{
 data(sicalis)
-vis.sicalis <- vismodel(sicalis, visual = 'avg.uv')
-tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
-}
-
+vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
+tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 }
 \references{
 Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage

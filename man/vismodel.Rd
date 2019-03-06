@@ -8,10 +8,10 @@ vismodel(rspecdata, visual = c("avg.uv", "avg.v", "bluetit",
   "ctenophorus", "star", "pfowl", "apis", "canis", "cie2", "cie10",
   "musca", "segment", "habronattus", "rhinecanthus"),
   achromatic = c("none", "bt.dc", "ch.dc", "st.dc", "md.r1", "ra.dc",
-  "ml", "l", "all"), illum = c("ideal", "bluesky", "D65", "forestshade"),
-  trans = c("ideal", "bluetit", "blackbird"), qcatch = c("Qi", "fi",
-  "Ei"), bkg = c("ideal", "green"), vonkries = FALSE, scale = 1,
-  relative = TRUE)
+  "cf.r", "ml", "l", "all"), illum = c("ideal", "bluesky", "D65",
+  "forestshade"), trans = c("ideal", "bluetit", "blackbird"),
+  qcatch = c("Qi", "fi", "Ei"), bkg = c("ideal", "green"),
+  vonkries = FALSE, scale = 1, relative = TRUE)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly an object of class \code{rspec}
@@ -25,7 +25,7 @@ remaining columns.}
    The data frame must contain a \code{'wl'} column with the range of wavelengths included,
    and the sensitivity for each other cone as a column.
 \item \code{'apis'}: Honeybee \emph{Apis mellifera}.
-\item \code{'avg.uv'}: average avian UV system.
+\item \code{'avg.uv'}: average avian UV system (default).
 \item \code{'avg.v'}: average avian V system.
 \item \code{'bluetit'}: Blue tit \emph{Cyanistes caeruleus}.
 \item \code{'canis'}: Canid \emph{Canis familiaris}.
@@ -48,12 +48,13 @@ remaining columns.}
  receptor stimulation. Either a vector containing the sensitivity for a single receptor,
  or one of the options:
 \itemize{
- \item \code{'none'}: no achromatic stimulation calculated.
+ \item \code{'none'}: no achromatic stimulation calculated (default).
     \item \code{'bt.dc'}: Blue tit \emph{Cyanistes caeruleus} double cone.
  \item \code{'ch.dc'}: Chicken \emph{Gallus gallus} double cone.
  \item \code{'st.dc'}: Starling \emph{Sturnus vulgaris} double cone.
  \item \code{'md.r1'}: Housefly \emph{Musca domestica} R1-6 photoreceptor.
  \item \code{'ra.dc'}: Triggerfish \emph{Rhinecanthus aculeatus} double cone.
+ \item \code{'cf.r'}: Canid \emph{Canis familiaris} cone.
  \item \code{'ml'}: the summed response of the two longest-wavelength photoreceptors.
  \item \code{'l'}: the longest-wavelength photoreceptor.
  \item \code{'all'}: the summed response of all photoreceptors.
@@ -79,8 +80,8 @@ ocular transmission (from Hart et al. 2000).
 
 \item{qcatch}{Which quantal catch metric to return. Options are:
 \itemize{
-\item \code{'Qi'}: Quantum catch for each photoreceptor
-\item \code{'fi'}: Quantum catch according to Fechner law (the signal of the receptor
+\item \code{'Qi'}: Quantum catch for each photoreceptor (default)
+\item \code{'fi'}: Quantum catch according to Fechner's law (the signal of the receptor
  channel is proportional to the logarithm of the quantum catch)
 \item \code{'Ei'}: Hyperbolic-transformed quantum catch, where Ei = Qi / (Qi + 1).
 }}
@@ -114,23 +115,25 @@ Calculates quantum catches at each photoreceptor. Both raw and relative values
 can be returned, for use in a suite of colorspace and non-colorspace models.
 }
 \examples{
-\dontrun{
 # Dichromat (dingo)
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'canis')
-di.flowers <- colspace(vis.flowers, space = 'di')
+vis.flowers <- vismodel(flowers, visual = "canis")
+di.flowers <- colspace(vis.flowers, space = "di")
 
 # Trichromat (honeybee)
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'apis')
-tri.flowers <- colspace(vis.flowers, space = 'tri')
+vis.flowers <- vismodel(flowers, visual = "apis")
+tri.flowers <- colspace(vis.flowers, space = "tri")
 
 # Tetrachromat (blue tit)
 data(sicalis)
-vis.sicalis <- vismodel(sicalis, visual = 'bluetit')
-tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
-}
+vis.sicalis <- vismodel(sicalis, visual = "bluetit")
+tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 
+# Tetrachromat (starling), receptor-noise model
+data(sicalis)
+vis.star <- vismodel(sicalis, visual = "star", achromatic = "bt.dc", relative = FALSE)
+dist.star <- coldist(vis.star, achromatic = TRUE)
 }
 \references{
 Vorobyev, M., Osorio, D., Bennett, A., Marshall, N., & Cuthill, I.
@@ -167,6 +170,9 @@ Stockman, A., & Sharpe, L. T. (2000). Spectral sensitivities of
 CIE (2006). Fundamental chromaticity diagram with physiological axes.
  Parts 1 and 2. Technical Report 170-1. Vienna: Central Bureau of the Commission
  Internationale de l' Eclairage.
+
+Neitz, J., Geist, T., Jacobs, G.H. (1989) Color vision in the dog.
+Visual Neuroscience, 3, 119-125.
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

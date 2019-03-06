@@ -25,21 +25,19 @@
 #'
 #' @export
 #'
-#' @examples \dontrun{
+#' @examples
 #' 
 #' # Load reflectance data
 #' data(sicalis)
 #' 
 #' # Create grouping variable based on spec names
-#' bysic <- gsub("^ind[0-9].",'', names(sicalis)[-1])
+#' bysic <- gsub("^ind[0-9].", "", names(sicalis)[-1])
 #' 
 #' # Plot using various error functions and options
 #' aggplot(sicalis, bysic)
-#' aggplot(sicalis, bysic, FUN.error=function(x) quantile(x, c(0.0275,0.975)))
-#' aggplot(sicalis, bysic, shade = spec2rgb(sicalis), lcol = 1)
-#' aggplot(sicalis, bysic, lcol = 1, FUN.error = function(x) sd(x)/sqrt(length(x)))
-#' }
-#'
+#' aggplot(sicalis, bysic, FUN.error = function(x) quantile(x, c(0.0275, 0.975)))
+#' aggplot(sicalis, bysic, shadecol = spec2rgb(sicalis), lcol = 1)
+#' aggplot(sicalis, bysic, lcol = 1, FUN.error = function(x) sd(x) / sqrt(length(x)))
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu},
 #' Chad Eliason \email{cme16@@zips.uakron.edu}
 #'
@@ -48,17 +46,17 @@
 
 aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
                     lcol = NULL, shadecol = NULL, alpha = 0.2, legend = FALSE, ...) {
-  if (is.numeric(by)) {
-    if (by == 1) {
-      stop("Cannot group single spectra (use plot instead)")
-    }
+  if (isTRUE(by == 1)) {
+    stop("Cannot group single spectra (use plot instead)")
   }
 
   # take aggregated data
   cntplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.center)
   errplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.error)
 
-  if (any(is.na(errplotspecs[, -1]))) stop("Could not calculate errors. Do any groups have n = 1?")
+  if (anyNA(errplotspecs[, -1])) {
+    stop("Could not calculate errors. Do any groups have n = 1?", call. = FALSE)
+  }
 
   # make wavelength vector
   wl_index <- which(names(rspecdata) == "wl")
@@ -66,32 +64,30 @@ aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
   wl_index_err <- which(names(errplotspecs) == "wl")
 
   if (length(wl_index) > 0) {
-    haswl <- TRUE
     wl <- rspecdata[, wl_index, drop = TRUE]
     cntplotspecs <- as.data.frame(cntplotspecs[, -wl_index_cnt])
     errplotspecs <- as.data.frame(errplotspecs[, -wl_index_err])
   } else {
-    haswl <- FALSE
-    wl <- 1:nrow(rspecdata)
+    wl <- seq_len(nrow(rspecdata))
     warning("No wavelengths provided; using arbitrary index values")
   }
 
-  indexsub <- 1:dim(cntplotspecs)[2]
+  indexsub <- seq_along(cntplotspecs)
 
   if (as.integer(dim(errplotspecs)[1] / 2) == as.integer(dim(cntplotspecs)[1]) &&
     as.integer(dim(errplotspecs)[1] %% 2) == 0) {
-    polygon_data <- sapply(indexsub, function(x)
+    polygon_data <- vapply(indexsub, function(x)
       c(
         errplotspecs[seq(dim(errplotspecs)[1]) %% 2 == 1, x],
         rev(errplotspecs[seq(dim(errplotspecs)[1]) %% 2 == 0, x])
-      ))
+      ), numeric(nrow(errplotspecs)))
   } else {
-    polygon_data <- sapply(indexsub, function(x)
-      c(cntplotspecs[, x] + errplotspecs[, x], rev(cntplotspecs[, x] - errplotspecs[, x])))
+    polygon_data <- vapply(
+      indexsub, function(x)
+        c(cntplotspecs[, x] + errplotspecs[, x], rev(cntplotspecs[, x] - errplotspecs[, x])),
+      numeric(nrow(errplotspecs) * 2)
+    )
   }
-
-
-
 
   polygon_wl <- c(wl, rev(wl))
 
@@ -101,17 +97,14 @@ aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
   if (is.null(arg$xlab)) {
     arg$xlab <- "Wavelength (nm)"
   }
+  if (is.null(arg$ylab)) {
+    arg$ylab <- "Reflectance (%)"
+  }
   if (is.null(arg$xlim)) {
     arg$xlim <- range(wl)
   }
   if (is.null(arg$ylim)) {
     arg$ylim <- range(polygon_data)
-  }
-  if (is.null(arg$xlab)) {
-    arg$xlab <- "Wavelength (nm)"
-  }
-  if (is.null(arg$ylab)) {
-    arg$ylab <- "Reflectance (%)"
   }
 
   # line width
@@ -143,23 +136,17 @@ aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
   if (length(shadecol) < ncol(cntplotspecs)) {
     shadecol <- rep(shadecol, ncol(cntplotspecs))
   }
-  # if (any(class(shadecol)=='spec2rgb'))
-  #   shadecol <- spec2rgb(cbind(wl,cntplotspecs))
-  # this messes up when you give a normal color string; need to look for # or something about hex.
 
   if (length(lcol) < ncol(cntplotspecs)) {
     lcol <- rep(lcol, ncol(cntplotspecs))
   }
-  # if (any(class(lcol)=='spec2rgb'))
-  #   lcol <- spec2rgb(cbind(wl,cntplotspecs))
-  # this messes up when you give a normal color string; need to look for # or something about hex.
 
   col_list <- c(
     "#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
     "#FF7F00", "#FFFF33", "#A65628", "#F781BF"
   )
 
-  col_list <- rep(col_list, length = dim(cntplotspecs)[2])
+  col_list <- rep(col_list, length.out = dim(cntplotspecs)[2])
 
   if (is.null(shadecol)) {
     shadecol <- col_list

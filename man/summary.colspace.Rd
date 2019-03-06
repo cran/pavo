@@ -2,21 +2,21 @@
 % Please edit documentation in R/summary.colspace.R
 \name{summary.colspace}
 \alias{summary.colspace}
-\title{Colorspace data summary}
+\title{Colourspace data summary}
 \usage{
 \method{summary}{colspace}(object, by = NULL, ...)
 }
 \arguments{
 \item{object}{(required) a \code{colspace} object.}
 
-\item{by}{when the input is in \code{tcs} colorspace, \code{by} is either
-a single value specifying the range of color points for which
-summary tetrahedral-colorspace variables should be calculated (for example, \code{by} = 3
-indicates summary will be calculated for groups of 3 consecutive color points (rows)
-in the quantum catch color data frame) or a vector containing identifications for
-the rows in the quantum catch color data frame (in which case summaries will be
+\item{by}{when the input is in \code{tcs} colourspace, \code{by} is either
+a single value specifying the range of colour points for which
+summary tetrahedral-colourspace variables should be calculated (for example, \code{by} = 3
+indicates summary will be calculated for groups of 3 consecutive colour points (rows)
+in the quantum catch colour data frame) or a vector containing identifications for
+the rows in the quantum catch colour data frame (in which case summaries will be
 calculated for each group of points sharing the same identification). If \code{by}
-is left blank, the summary statistics are calculated across all color points in the
+is left blank, the summary statistics are calculated across all colour points in the
 data.}
 
 \item{...}{class consistency (ignored).}
@@ -49,20 +49,20 @@ in which case the following variables are output instead:
 Returns the attributes of \code{colspace} objects.
 }
 \examples{
-\dontrun{
 # Colour hexagon
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei', relative = FALSE,
-                        vonkries = TRUE, bkg = 'green')
+vis.flowers <- vismodel(flowers,
+  visual = "apis", qcatch = "Ei", relative = FALSE,
+  vonkries = TRUE, bkg = "green"
+)
 flowers.hex <- hexagon(vis.flowers)
 summary(flowers.hex)
 
 # Tetrahedral model
 data(sicalis)
-vis.sicalis <- vismodel(sicalis, visual='avg.uv')
+vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
 csp.sicalis <- colspace(vis.sicalis)
-summary(csp.sicalis, by = rep(c('C', 'T', 'B'), 7))}
-
+summary(csp.sicalis, by = rep(c("C", "T", "B"), 7))
 }
 \references{
 Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage

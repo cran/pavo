@@ -3,9 +3,7 @@
 #' Calculates coordinates and colorimetric variables that represent reflectance spectra
 #' in the hymenopteran color hexagon.
 #'
-#' @param vismodeldata (required) quantum catch color data. Can be either the result
-#'  from \code{\link{vismodel}} or independently calculated data (in the form of a data frame
-#'  with three columns named 's', 'm', 'l', representing a trichromatic viewer).
+#' @inheritParams trispace
 #'
 #' @return A data frame of class \code{colspace} consisting of the following columns:
 #' @return \code{s}, \code{m}, \code{l}: the quantum catch data used to calculate
@@ -20,13 +18,12 @@
 #'  composed of five sectors: blue, bluegreen, green, uvgreen, uv, and uvblue.
 #'
 #' @examples
-#' \dontrun{
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei', relative = FALSE,
-#'                         vonkries = TRUE, achro = 'l', bkg = 'green')
-#' flowers.hex <- colspace(vis.flowers, space = 'hexagon')
-#' }
-#'
+#' vis.flowers <- vismodel(flowers,
+#'   visual = "apis", qcatch = "Ei", relative = FALSE,
+#'   vonkries = TRUE, achro = "l", bkg = "green"
+#' )
+#' flowers.hex <- colspace(vis.flowers, space = "hexagon")
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
 #' @export
@@ -47,7 +44,7 @@ hexagon <- function(vismodeldata) {
   dat <- vismodeldata
 
   # if object is vismodel:
-  if ("vismodel" %in% attr(dat, "class")) {
+  if (is.vismodel(dat)) {
 
     # check if trichromat
     if (attr(dat, "conenumb") < 3) {
@@ -75,16 +72,25 @@ hexagon <- function(vismodeldata) {
 
   # if not, check if it has more (or less) than 3 columns
 
-  if (!("vismodel" %in% attr(dat, "class"))) {
+  else {
     if (ncol(dat) < 3) {
       stop("Input data is not a ", dQuote("vismodel"), " object and has fewer than three columns", call. = FALSE)
     }
     if (ncol(dat) == 3) {
-      warning("Input data is not a ", dQuote("vismodel"), " object; treating columns as quantum catch for ", dQuote("s"), ", ", dQuote("m"), ", and ", dQuote("l"), " receptors, respectively", call. = FALSE)
+      warning("Input data is not a ", dQuote("vismodel"),
+        " object; treating columns as quantum catch for ",
+        dQuote("s"), ", ", dQuote("m"), ", and ", dQuote("l"),
+        " receptors, respectively",
+        call. = FALSE
+      )
     }
 
     if (ncol(dat) > 3) {
-      warning("Input data is not a ", dQuote("vismodel"), " object *and* has more than three columns; treating the first three columns as quantum catch for ", dQuote("s"), ", ", dQuote("m"), ", and ", dQuote("l"), " receptors, respectively", call. = FALSE)
+      warning("Input data is not a ", dQuote("vismodel"),
+        " object *and* has more than three columns; treating the first three columns as quantum catch for ",
+        dQuote("s"), ", ", dQuote("m"), ", and ", dQuote("l"), " receptors, respectively",
+        call. = FALSE
+      )
     }
 
     dat <- dat[, 1:3]
@@ -112,9 +118,9 @@ hexagon <- function(vismodeldata) {
 
   # colorimetrics
   r.vec <- sqrt(x^2 + y^2)
-  h.theta <- sapply(1:length(x), function(i) angle360(x[i], y[i]))
+  h.theta <- vapply(seq_along(x), function(i) angle360(x[i], y[i]), numeric(1))
   sec.fine <- round(floor(h.theta / 10), 0) * 10
-  sec.coarse <- sapply(1:length(x), function(x) coarse_sec(h.theta[x]))
+  sec.coarse <- vapply(seq_along(x), function(x) coarse_sec(h.theta[x]), character(1))
 
   res.p <- data.frame(s, m, l, x, y, h.theta, r.vec, sec.fine, sec.coarse, row.names = rownames(dat))
   # res.p <- data.frame(s, m, l, x, y, r.vec, row.names = rownames(dat))

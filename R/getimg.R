@@ -21,19 +21,17 @@
 #' @export
 #'
 #' @importFrom pbmcapply pbmclapply
-#' @importFrom imager load.image
 #'
-#' @examples \dontrun{
+#' @examples
 #' # Single image
-#' papilio <- getimg(system.file("testdata/images/papilio.png", package = 'pavo'))
-#'
+#' papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
+#' 
 #' # Multiple images
-#' snakes <- getimg(system.file("testdata/images/snakes", package = 'pavo'))
-#' }
-#'
+#' snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
 
-getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE, max.size = 1, cores = getOption("mc.cores", 2L)) {
+getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE,
+                   max.size = 1, cores = getOption("mc.cores", 2L)) {
 
   ## ------------------------------ Checks ------------------------------ ##
 
@@ -49,9 +47,10 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE, max.
 
   # If file extensions are in 'imgpath', it's a single image being directly specified
   if (grepl(paste(ext, collapse = "|"), imgpath, ignore.case = TRUE)) {
-    imgdat <- load.image(imgpath)
-
-    imgdat <- as.rimg(drop(as.array(imgdat)), name = sub(".*\\/", "", sub("[.][^.]+$", "", imgpath)))
+    imgdat <- grabimg(imgpath)
+    imgdat <- as.rimg(drop(as.array(imgdat)),
+      name = sub(".*\\/", "", sub("[.][^.]+$", "", imgpath))
+    )
 
     # Warn of slowness if dimensions are large
     if ((dim(imgdat)[1] * dim(imgdat)[2]) > (1000 * 1000)) {
@@ -65,7 +64,10 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE, max.
     extension <- paste0("\\.", ext, "$", collapse = "|")
 
     # File names
-    file_names <- list.files(imgpath, pattern = extension, recursive = subdir, include.dirs = subdir)
+    file_names <- list.files(imgpath,
+      pattern = extension,
+      recursive = subdir, include.dirs = subdir
+    )
     files <- paste0(imgpath, "/", file_names)
 
     if (subdir.names) {
@@ -83,7 +85,7 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE, max.
     imgnames <- gsub(extension, "", file_names)
 
     # Stop if max size estimated to exceed available memory
-    imgsize <- prod(dim(load.image(files[1])))
+    imgsize <- prod(dim(grabimg(files[1])))
     totalsize <- ((imgsize * 8) * length(file_names)) / (1024^3)
     if (totalsize > max.size) {
       stop("Total size of images likely exceeds available memory. Check max.size is set appropriately.")
@@ -96,17 +98,55 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE, max.
 
     # Crudely avoid a bug in pbmclapply when handling large objects.
     if (totalsize < 0.1) {
-      imgdat <- pbmclapply(1:length(file_names), function(x) load.image(files[x]), mc.cores = cores)
-      imgdat <- lapply(1:length(imgdat), function(x) drop(as.array(imgdat[[x]])))
+      imgdat <- pbmclapply(files, grabimg, mc.cores = cores)
     } else {
-      imgdat <- lapply(1:length(file_names), function(x) load.image(files[x]))
-      imgdat <- lapply(1:length(imgdat), function(x) drop(as.array(imgdat[[x]])))
+      imgdat <- lapply(files, grabimg)
     }
 
+    imgdat <- lapply(imgdat, function(x) drop(as.array(x)))
     imgdat <- as.rimg(imgdat, imgnames)
 
-    # Simplify if it's a single image  (TODO LESS SHITE)
+    # Simplify if it's a single image
     if (length(imgdat) == 1) imgdat <- cimg2rimg(imgdat[[1]])
   }
   imgdat
+}
+
+## Grab images
+#' @importFrom readbitmap read.bitmap
+grabimg <- function(file) {
+  bmp <- read.bitmap(file)
+  if (!is.null(attr(bmp, "header"))) {
+    bmp <- bmp / 255
+  }
+  if (length(dim(bmp)) == 3) { # 3 channels (colour)
+    bmp <- mirrorx(bmp)
+    bmp <- rot90(bmp)
+  }
+  else { # 1 channel (B&W), duplicate to 3d for classification convenience
+    bmp <- replicate(3, bmp, simplify = "array")
+    bmp <- mirrorx(bmp)
+    bmp <- rot90(bmp)
+  }
+  bmp
+}
+
+## Rotate matrices 90-degrees
+rot90 <- function(x) {
+  permVec <- c(2, 1, 3:length(dim(x)))
+  rotA <- aperm(x, permVec)
+  rotA <- rotA[dim(x)[2]:1, , ]
+  rotA
+}
+
+## Mirror matrices about x axis
+mirrorx <- function(x) {
+  if (length(dim(x)) == 3) {
+    for (i in seq_len(dim(x)[3])) {
+      x[, , i] <- x[, , i][, rev(seq_len(ncol(x[, , i])))]
+    }
+  } else {
+    x <- x[, rev(seq_len(ncol(x)))]
+  }
+  x
 }

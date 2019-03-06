@@ -12,13 +12,13 @@
 \item{axes}{should axes be drawn? (defaults to \code{TRUE})}
 
 \item{col}{optional vector of colours when plotting colour-classified images.
-Defaults to the mean RGB values of the k-means centres (i.e. the average 'original' 
+Defaults to the mean RGB values of the k-means centres (i.e. the average 'original'
 colours).}
 
 \item{...}{additional graphical parameters. Also see \code{\link{par}}.}
 }
 \value{
-a image plot.
+an image plot.
 }
 \description{
 Plot unprocessed or colour-classified image data. If the
@@ -27,13 +27,13 @@ one by one.
 }
 \examples{
 \dontrun{
-papilio <- getimg(system.file("testdata/images/papilio.png", package = 'pavo'))
+papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
 plot(papilio)
 papilio_class <- classify(papilio, kcols = 4)
 plot(papilio_class)
 
 # Multiple images
-snakes <- getimg(system.file("testdata/images/snakes", package = 'pavo'))
+snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
 plot(snakes)
 snakes_class <- classify(snakes, kcols = 3)
 plot(snakes_class)

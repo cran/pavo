@@ -25,10 +25,15 @@ test_that("Class assignment", {
   expect_is(col.hex, "colspace")
 })
 
-test_that("plot utilities", {
-  data(sicalis)
-  #expect_known_hash(spec2rgb(sicalis), "0d3e41a7b6")
+test_that("sensdata", {
+  expect_true(all(names(as.data.frame(vissyst)) %in% names(sensdata("all", "all"))))
+})
 
-  expect_error(spec2rgb(sicalis[300:nrow(sicalis), ]), "full visible range")
-  expect_error(spec2rgb(sicalis[, -1]), "No wavelengths supplied")
+test_that("peakshape", {
+  data(flowers)
+
+  expect_equivalent(round(colSums(peakshape(flowers, select = 1:5, lim = c(300, 700), plot = FALSE)[2:3])), c(216, 2617))
+
+  test <- read.csv("known_output/FWHM_lims.csv")
+  expect_equal(peakshape(test, plot = FALSE)[, 4], c(144, 52))
 })

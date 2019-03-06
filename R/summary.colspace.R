@@ -1,18 +1,16 @@
-#' Colorspace data summary
+#' Colourspace data summary
 #'
 #' Returns the attributes of \code{colspace} objects.
 #'
-#' @import geometry
-#'
 #' @param object (required) a \code{colspace} object.
-#' @param by when the input is in \code{tcs} colorspace, \code{by} is either
-#'  a single value specifying the range of color points for which
-#'  summary tetrahedral-colorspace variables should be calculated (for example, \code{by} = 3
-#'  indicates summary will be calculated for groups of 3 consecutive color points (rows)
-#'  in the quantum catch color data frame) or a vector containing identifications for
-#'  the rows in the quantum catch color data frame (in which case summaries will be
+#' @param by when the input is in \code{tcs} colourspace, \code{by} is either
+#'  a single value specifying the range of colour points for which
+#'  summary tetrahedral-colourspace variables should be calculated (for example, \code{by} = 3
+#'  indicates summary will be calculated for groups of 3 consecutive colour points (rows)
+#'  in the quantum catch colour data frame) or a vector containing identifications for
+#'  the rows in the quantum catch colour data frame (in which case summaries will be
 #'  calculated for each group of points sharing the same identification). If \code{by}
-#'  is left blank, the summary statistics are calculated across all color points in the
+#'  is left blank, the summary statistics are calculated across all colour points in the
 #'  data.
 #' @param ... class consistency (ignored).
 #'
@@ -32,20 +30,21 @@
 #'
 #' @export
 #'
-#' @examples \dontrun{
+#' @examples
 #' # Colour hexagon
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei', relative = FALSE,
-#'                         vonkries = TRUE, bkg = 'green')
+#' vis.flowers <- vismodel(flowers,
+#'   visual = "apis", qcatch = "Ei", relative = FALSE,
+#'   vonkries = TRUE, bkg = "green"
+#' )
 #' flowers.hex <- hexagon(vis.flowers)
 #' summary(flowers.hex)
-#'
+#' 
 #' # Tetrahedral model
 #' data(sicalis)
-#' vis.sicalis <- vismodel(sicalis, visual='avg.uv')
+#' vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
 #' csp.sicalis <- colspace(vis.sicalis)
-#' summary(csp.sicalis, by = rep(c('C', 'T', 'B'), 7))}
-#'
+#' summary(csp.sicalis, by = rep(c("C", "T", "B"), 7))
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
 #' @references Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage
@@ -77,7 +76,7 @@ summary.colspace <- function(object, by = NULL, ...) {
     if (!is.null(by)) {
       if (length(by) == 1) {
         by.many <- by
-        by <- rep(1:(dim(object)[1] / by), each = by)
+        by <- rep(seq_len(dim(object)[1] / by), each = by)
         by <- factor(by,
           labels = row.names(object)[seq(1, length(row.names(object)), by = by.many)]
         )
@@ -91,7 +90,7 @@ summary.colspace <- function(object, by = NULL, ...) {
       row.names(res.c) <- "all.points"
     }
 
-    if (any(is.na(res.c$c.vol))) {
+    if (anyNA(res.c$c.vol)) {
       warning("Not enough points to calculate volume", call. = FALSE)
     }
 

@@ -43,20 +43,17 @@ Converts a \code{coldist} output into Cartesian coordinates that are
 perceptually-corrected (i.e. Euclidean distances = JND distances)
 }
 \examples{
-\dontrun{
 data(flowers)
 vis.flowers <- vismodel(flowers)
 cd.flowers <- coldist(vis.flowers)
 jnd2xyz(cd.flowers)
-}
-
 }
 \references{
 Pike, T.W. (2012). Preserving perceptual distances in chromaticity diagrams.
 Behavioral Ecology, 23, 723-728.
 
 Maia, R., White, T. E., (2018) Comparing colors using visual models.
-Behavioral Ecology, ary017 doi: 10.1093/beheco/ary017.
+Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

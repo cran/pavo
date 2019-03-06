@@ -2,9 +2,6 @@
 #'
 #' Adds points to a tetrahedral colorspace projection
 #'
-#' @param tcsres (required) color space coordinates, possibly a result from the \code{\link{tcs}} function,
-#' containing values for the 'h.theta' and 'h.phi' coordinates as columns (labeled as such).
-#'
 #' @return \code{projpoints} creates points in a projection color space plot
 #' produced by \code{projplot}.
 #'
@@ -12,18 +9,17 @@
 #'
 #' @export
 
-projpoints <- function(tcsres, ...) {
+projpoints <- function(tcsdata, ...) {
 
-  # no longer tcs object
-  # if(class(tcsres)=='tcs'){
-  # dat <- tcsres$tcs
-  # }else{
-  # dat <- tcsres
-  # }
+  # Check for mapproj
+  if (!requireNamespace("mapproj", quietly = TRUE)) {
+    stop("Package \"mapproj\" needed for projection plots. Please install it.",
+      call. = FALSE
+    )
+  }
 
-
-  points.theta <- tcsres[, "h.theta"]
-  points.phi <- tcsres[, "h.phi"]
+  points.theta <- tcsdata[, "h.theta"]
+  points.phi <- tcsdata[, "h.phi"]
 
   n <- length(points.theta)
 
@@ -49,13 +45,13 @@ projpoints <- function(tcsres, ...) {
 
   # map projection coordinates
 
-  mp <- mapproject(coords.theta, coords.phi, projection = "mollweide")
+  mp <- mapproj::mapproject(coords.theta, coords.phi, projection = "mollweide")
 
-  mp.v.theta <- mp$x[1:9]
-  mp.v.phi <- mp$y[1:9]
+  mp.v.theta <- mp$x[seq_len(9)]
+  mp.v.phi <- mp$y[seq_len(9)]
 
-  mp.p.theta <- mp$x[-c(1:9)]
-  mp.p.phi <- mp$y[-c(1:9)]
+  mp.p.theta <- mp$x[-c(seq_len(9))]
+  mp.p.phi <- mp$y[-c(seq_len(9))]
 
   points(mp.p.phi ~ mp.p.theta, ...)
 

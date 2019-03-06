@@ -35,19 +35,16 @@ matches \emph{either} condition will be included. It's a union, not an
 intersect.
 }
 \examples{
-\dontrun{
 data(sicalis)
 vis.sicalis <- vismodel(sicalis)
-tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
+tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 
 # Subset all 'crown' patches (C in file names)
 head(subset(sicalis, "C"))
 subset(vis.sicalis, "C")
-subset(tcs.sicalis, "C")[, 1:5]
-subset(sicalis, c("B","C"))
-subset(sicalis, "T", invert=TRUE)
-}
-
+subset(tcs.sicalis, "C")[, seq_len(5)]
+subset(sicalis, c("B", "C"))
+subset(sicalis, "T", invert = TRUE)
 }
 \author{
 Chad Eliason \email{cme16@zips.uakron.edu}

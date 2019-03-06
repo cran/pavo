@@ -8,34 +8,32 @@
 #'  or \code{categorical} function, containing values for 'x' and 'y' coordinates
 #'  as columns (labeled as such).
 #' @param labels plot category labels inside? Defaults to \code{TRUE}.
-#' @param labels.cex character expansion factor for category labels when \code{labels = TRUE}).
-#' @param ... additional graphical options. See \code{\link{par}}.
+#' @inheritParams triplot
 #'
 #' @examples
-#' \dontrun{
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, qcatch = 'Qi', visual = 'musca', achro = 'none', relative = TRUE)
-#' cat.flowers <- colspace(vis.flowers, space = 'categorical')
+#' vis.flowers <- vismodel(flowers, qcatch = "Qi", visual = "musca", achro = "none", relative = TRUE)
+#' cat.flowers <- colspace(vis.flowers, space = "categorical")
 #' plot(cat.flowers)
-#' }
-#'
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
 #' @export
 #'
 #' @keywords internal
 #'
-#' @references Troje N. (1993). Spectral categories in the learning behaviour
-#'  of blowflies. Zeitschrift fur Naturforschung C, 48, 96-96.
+#' @inherit categorical references
 
 catplot <- function(catdata, labels = TRUE, labels.cex = 0.9, ...) {
 
   # Check if object is of class colorspace and tetrachromat
-  if (!("colspace" %in% attr(catdata, "class")) & is.element(FALSE, c("x", "y") %in% names(catdata))) {
-    stop("object is not of class ", dQuote("colspace"), ", and does not contain x, y coordinates")
+  if (!is.colspace(catdata) & !all(c("x", "y") %in% names(catdata))) {
+    stop(
+      "object is not of class ", dQuote("colspace"),
+      ", and does not contain x, y coordinates"
+    )
   }
 
-  if (("colspace" %in% attr(catdata, "class")) & attr(catdata, "clrsp") != "categorical") {
+  if (is.colspace(catdata) & attr(catdata, "clrsp") != "categorical") {
     stop(dQuote("colspace"), " object is not a result of categorical()")
   }
 
@@ -66,7 +64,7 @@ catplot <- function(catdata, labels = TRUE, labels.cex = 0.9, ...) {
   abline(h = 0, v = 0, col = "grey") # Divide up categories
 
   # Category labels (todo: make this more flexible/robust?)
-  if (labels == TRUE) {
+  if (labels) {
     legend(x = "topleft", legend = "p- y+", bty = "n", cex = labels.cex)
     legend(x = "topright", legend = "p+ y+", bty = "n", cex = labels.cex)
     legend(x = "bottomleft", legend = "p- y-", bty = "n", cex = labels.cex)

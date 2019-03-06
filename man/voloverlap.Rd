@@ -89,12 +89,13 @@ the two input volumes, which may be more adequate in most cases.
 \examples{
 \dontrun{
 data(sicalis)
-tcs.sicalis.C <- subset(colspace(vismodel(sicalis)), 'C')
-tcs.sicalis.T <- subset(colspace(vismodel(sicalis)), 'T')
-tcs.sicalis.B <- subset(colspace(vismodel(sicalis)), 'B')
+tcs.sicalis.C <- subset(colspace(vismodel(sicalis)), "C")
+tcs.sicalis.T <- subset(colspace(vismodel(sicalis)), "T")
+tcs.sicalis.B <- subset(colspace(vismodel(sicalis)), "B")
 voloverlap(tcs.sicalis.T, tcs.sicalis.B)
 voloverlap(tcs.sicalis.T, tcs.sicalis.C, plot = T)
-voloverlap(tcs.sicalis.T, tcs.sicalis.C, plot = T, col = 1:3) }
+voloverlap(tcs.sicalis.T, tcs.sicalis.C, plot = T, col = seq_len(3))
+}
 
 }
 \references{
@@ -110,7 +111,7 @@ multidimensionality of the niche reveals functional diversity changes in benthic
 marine biotas across geological time. Ecology Letters, 14(6), 561-568.
 
 Maia, R., White, T. E., (2018) Comparing colors using visual models.
- Behavioral Ecology, ary017 doi: 10.1093/beheco/ary017.
+ Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}, with code from Sebastien Villeger

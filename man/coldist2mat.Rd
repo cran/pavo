@@ -18,18 +18,15 @@ Converts a \code{coldist} output into a distance matrix where samples
 are rows and columns.
 }
 \examples{
-\dontrun{
 data(flowers)
-vis.flowers <- vismodel(flowers, achro=TRUE)
+vis.flowers <- vismodel(flowers, achro = TRUE)
 cd.flowers <- coldist(vis.flowers)
-coldist2mat(cd.flowers)[['dS']]
-coldist2mat(cd.flowers)[['dL']]
-}
-
+coldist2mat(cd.flowers)[["dS"]]
+coldist2mat(cd.flowers)[["dL"]]
 }
 \references{
 Maia, R., White, T. E., (2018) Comparing colors using visual models.
- Behavioral Ecology, ary017 doi: 10.1093/beheco/ary017.
+ Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}

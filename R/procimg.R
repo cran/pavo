@@ -14,13 +14,17 @@
 #' and the user asked to select either end of the scale corresponding to the input value.
 #' @param outline interactively specify the focal object in
 #' an image by clicking around its outline. The xy-coordinates of the resulting
-#' closed polygon are saved as an attribute, for use in genrating a masking layer &
+#' closed polygon are saved as an attribute, for use in generating a masking layer &
 #' separating animals/plants from backgrounds in further analyses. This is particularly
 #' useful when backgrounds are complex, such as in natural settings.
+#' @param reclass interactively specify an area on a colour-classified image that is
+#' to be reclassified as the numeric value provided. e.g. when \code{reclass = 1}, the user
+#' will be asked to select a polygon on the image, within which all colour-category values will be
+#' changes to \code{1}.
 #' @param col the color of the marker points and/or line, when using interactive options.
 #' @param smooth should the polygon specified when \code{outline = TRUE} be smoothed
 #' using Chaikin's corner-cuting algorithm? Defaults to \code{FALSE}.
-#' @param iterations the number of smoothing iterations, when \code{smooth = TRUE}. 
+#' @param iterations the number of smoothing iterations, when \code{smooth = TRUE}.
 #' Defaults to \code{1}.
 #' @param plotnew should plots be opened in a new window? Defaults to \code{FALSE}.
 #' @param ... additional graphical parameters. Also see \code{\link{par}}.
@@ -30,15 +34,14 @@
 #'
 #' @export
 #'
-#' @importFrom imager imresize imrotate
-#'
-#' @examples \dontrun{
+#' @examples
+#' \dontrun{
 #' # Single image
-#' papilio <- getimg(system.file("testdata/images/papilio.png", package = 'pavo'))
+#' papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
 #' papilio <- procimg(papilio, scaledist = 10)
 #'
 #' # Assign individual scales to each image, after slightly reducing their size.
-#' snakes <- getimg(system.file("testdata/images/snakes", package = 'pavo'))
+#' snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
 #' snakes <- procimg(snakes, scaledist = c(10, 14), resize = 0.95)
 #' }
 #'
@@ -48,8 +51,8 @@
 #' Computer Graphics and Image Processing 3, 346-349.
 
 procimg <- function(image, resize = NULL, rotate = NULL, scaledist = NULL,
-                    outline = FALSE, smooth = FALSE, iterations = 1L, col = "red",
-                    plotnew = FALSE, ...) {
+                    outline = FALSE, reclass = NULL, smooth = FALSE, iterations = 1L,
+                    col = "red", plotnew = FALSE, ...) {
 
   ## ------------------------------ Checks ------------------------------ ##
 
@@ -64,115 +67,107 @@ procimg <- function(image, resize = NULL, rotate = NULL, scaledist = NULL,
   }
 
   ## Options
-  if (is.null(scaledist) && !outline && is.null(resize) && is.null(rotate)) {
+  if (is.null(scaledist) && !outline && is.null(resize) && is.null(rotate) && is.null(reclass)) {
     stop("No options selected.")
   }
 
-  multi_image <- inherits(image, "list") # Single or multiple images?
+  ## Check for imager if rotating or resizing
+  if (!is.null(resize) || !is.null(rotate)) {
+    if (!requireNamespace("imager", quietly = TRUE)) {
+      stop("Package \"imager\" required for image resizing and rotation. Please install it.",
+        call. = FALSE
+      )
+    }
+  }
+
+  ## If it's a single image, store it in a list for processing convenience,
+  ## before converting it back at the end
+  if (!inherits(image, "list")) {
+    image <- list(image)
+  }
 
   ## ------------------------------ Main ------------------------------ ##
 
-  if (multi_image) { # Multiple images
+  ## Resize ##
+  if (attr(image[[1]], "state") == "colclass" && is.numeric(resize)) {
+    message("Cannot resize colour-classified images.")
+    resize <- NULL
+  }
+  if (is.numeric(resize)) {
+    imgnames <- lapply(image, function(x) attr(x, "imgname"))
+    image <- lapply(image, function(x) rimg2cimg(x))
+    image <- lapply(image, function(x) imager::imresize(x, resize))
+    image <- lapply(seq_along(image), function(x) cimg2rimg(image[[x]], name = imgnames[[x]]))
+    class(image) <- c("rimg", "list")
+  }
 
-    ## Resize ##
-    if (attr(image[[1]], "state") == "colclass" && is.numeric(resize)) {
-      message("Cannot resize colour-classified images.")
-      resize <- NULL
+  ## Rotate ##
+  if (attr(image[[1]], "state") == "colclass" && is.numeric(rotate)) {
+    message("Cannot rotate colour-classified images.")
+    rotate <- NULL
+  }
+  if (is.numeric(rotate)) {
+    imgnames <- lapply(image, function(x) attr(x, "imgname"))
+    image <- lapply(image, function(x) rimg2cimg(x))
+    image <- lapply(image, function(x) imager::imrotate(x, rotate))
+    image <- lapply(seq_along(image), function(x) cimg2rimg(image[[x]], imgnames[[x]]))
+    class(image) <- c("rimg", "list")
+  }
+
+  ## Scale ##
+  if (is.numeric(scaledist)) {
+
+    # Formatting
+    if (length(scaledist) == 1) {
+      scaledist <- as.list(rep(scaledist, length(image)))
     }
-    if (is.numeric(resize)) {
-      imgnames <- lapply(image, function(x) attr(x, "imgname"))
-      image <- lapply(image, function(x) rimg2cimg(x))
-      image <- lapply(image, function(x) imresize(x, resize))
-      image <- lapply(1:length(image), function(x) cimg2rimg(image[[x]], name = imgnames[[x]]))
-      class(image) <- c("rimg", "list")
-    }
-
-    ## Rotate ##
-    if (attr(image[[1]], "state") == "colclass" && is.numeric(rotate)) {
-      message("Cannot rotate colour-classified images.")
-      rotate <- NULL
-    }
-    if (is.numeric(rotate)) {
-      imgnames <- lapply(image, function(x) attr(x, "imgname"))
-      image <- lapply(image, function(x) rimg2cimg(x))
-      image <- lapply(image, function(x) imrotate(x, rotate))
-      image <- lapply(1:length(image), function(x) cimg2rimg(image[[x]], imgnames[[x]]))
-      class(image) <- c("rimg", "list")
-    }
-
-    ## Scale ##
-    if (is.numeric(scaledist)) {
-
-      # Formatting
-      if (length(scaledist) == 1) {
-        scaledist <- as.list(rep(scaledist, length(image)))
-      }
-      if (length(scaledist) > 1 && length(scaledist) != length(image)) {
-        stop("Number of scales provided greater than one, but unequal to the the number of images. Provide a single scale to be recycled, or one per image.")
-      }
-
-      if (plotnew) dev.new(noRStudioGD = TRUE)
-      message("Scale calibration: Select both ends of the scale, images will progress automatically.")
-      for (i in 1:length(image)) {
-        attr(image[[i]], "px_scale") <- scaler(image_i = image[[i]], scaledist_i = scaledist[[i]], col = col, ...)
-        attr(image[[i]], "raw_scale") <- scaledist[[i]]
-      }
-      if (plotnew) dev.off()
+    if (length(scaledist) > 1 && length(scaledist) != length(image)) {
+      stop("Number of scales provided greater than one, but unequal to the the number of images. Provide a single scale to be recycled, or one per image.")
     }
 
-    ## Select outline ##
-    if (outline) {
-      if (plotnew) dev.new(noRStudioGD = TRUE)
-      for (i in 1:length(image)) {
-        message("Select the outline of focal stimulus, and press [esc] when complete.
-                The first and last points will be automatically connected.")
-        attr(image[[i]], "outline") <- outliner(image[[i]], smooth, iterations, col = col, ...)
-      }
-      if (plotnew) dev.off()
-    }
-  } else {
-
-    ## Resize ##
-    if (attr(image, "state") == "colclass" && is.numeric(resize)) {
-      message("Cannot resize colour-classified images.")
-      resize <- NULL
-    }
-    if (is.numeric(resize)) {
-      imgname <- attr(image, "imgname")
-      image <- rimg2cimg(image)
-      image <- imresize(image, resize)
-      image <- cimg2rimg(image, imgname)
-    }
-
-    ## Rotate ##
-    if (attr(image, "state") == "colclass" && is.numeric(rotate)) {
-      message("Cannot rotate colour-classified images.")
-      rotate <- NULL
-    }
-    if (is.numeric(rotate)) {
-      imgname <- attr(image, "imgname")
-      image <- rimg2cimg(image)
-      image <- imrotate(image, rotate)
-      image <- cimg2rimg(image, imgname)
-    }
-
-    ## Scale ##
     if (plotnew) dev.new(noRStudioGD = TRUE)
-    if (is.numeric(scaledist)) {
-      message("Scale calibration: Select both ends of the scale.")
-      attr(image, "px_scale") <- scaler(image_i = image, scaledist_i = scaledist, col = col, ...)
-      attr(image, "raw_scale") <- scaledist
+    message("Scale calibration: Select both ends of the scale, images will progress automatically.")
+    for (i in seq_along(image)) {
+      attr(image[[i]], "px_scale") <- scaler(
+        image_i = image[[i]],
+        scaledist_i = scaledist[[i]], col = col, ...
+      )
+      attr(image[[i]], "raw_scale") <- scaledist[[i]]
     }
     if (plotnew) dev.off()
+  }
 
-    ## Select outline of focal stimulus ##
+  ## Select outline ##
+  if (outline) {
     if (plotnew) dev.new(noRStudioGD = TRUE)
-    if (outline) {
+    for (i in seq_along(image)) {
       message("Select the outline of focal stimulus, and press [esc] when complete.
-              The first and last points will be automatically connected.")
-      attr(image, "outline") <- outliner(image, smooth, iterations, col = col, ...)
+                The first and last points will be automatically connected.")
+      attr(image[[i]], "outline") <- outliner(image[[i]], smooth, iterations, col = col, ...)
     }
     if (plotnew) dev.off()
+  }
+
+  ## Manual classification correction ##
+  if (attr(image[[1]], "state") == "raw" && !is.null(reclass)) {
+    message("Cannot fix colour-classification on unclassified images.")
+    reclass <- NULL
+  }
+  if (!is.null(reclass)) {
+    if (plotnew) dev.new(noRStudioGD = TRUE)
+    for (i in seq_along(image)) {
+      message("Select the area to be reclassified, and press [esc] when complete.
+              The first and last points will be automatically connected.")
+      patch_poly <- outliner(image[[i]], smooth, iterations, col = col, ...)
+      if (!is.null(patch_poly)) {
+        image[[i]] <- polymask(image[[i]], patch_poly, "inside", reclass)
+      }
+    }
+    if (plotnew) dev.off()
+  }
+
+  if (length(image) == 1) {
+    image <- image[[1]]
   }
 
   image
@@ -209,27 +204,31 @@ outliner <- function(image_i, smooth_i, iterations_i, col, ...) {
 
   # Get coordinates
   xy <- locator(type = "p", col = col, lwd = 2)
-  xy <- cbind(xy$x, xy$y)
-  xy <- rbind(xy, xy[1, ])
+  if (!is.null(xy)) {
+    xy <- cbind(xy$x, xy$y)
+    xy <- rbind(xy, xy[1, ])
 
-  # Smooth coordinates (Chaikin’s corner cutting)
-  if (smooth_i) {
-    for (i in seq.int(iterations_i)) {
-      n_pts <- nrow(xy)
-      qr <- matrix(NA_real_,
-        nrow = 2 * (n_pts - 1) + 1,
-        ncol = 2
-      )
-      qr[seq(1, nrow(qr) - 1, by = 2), ] <- 0.75 * xy[-n_pts, ] + 0.25 * xy[-1, ]
-      qr[seq(2, nrow(qr) - 1, by = 2), ] <- 0.75 * xy[-1, ] + 0.25 * xy[-n_pts, ]
-      qr[nrow(qr), ] <- qr[1, ]
-      xy <- qr
+    # Smooth coordinates (Chaikin’s corner cutting)
+    if (smooth_i) {
+      for (i in seq.int(iterations_i)) {
+        n_pts <- nrow(xy)
+        qr <- matrix(NA_real_,
+          nrow = 2 * (n_pts - 1) + 1,
+          ncol = 2
+        )
+        qr[seq(1, nrow(qr) - 1, by = 2), ] <- 0.75 * xy[-n_pts, ] + 0.25 * xy[-1, ]
+        qr[seq(2, nrow(qr) - 1, by = 2), ] <- 0.75 * xy[-1, ] + 0.25 * xy[-n_pts, ]
+        qr[nrow(qr), ] <- qr[1, ]
+        xy <- qr
+      }
     }
+
+    xy <- as.data.frame(xy)
+    names(xy) <- c("x", "y")
+    lines(xy)
+
+    xy
+  } else {
+    NULL
   }
-
-  xy <- as.data.frame(xy)
-  names(xy) <- c("x", "y")
-  lines(xy)
-
-  xy
 }

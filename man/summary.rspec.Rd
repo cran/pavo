@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.rspec.R
 \name{summary.rspec}
 \alias{summary.rspec}
-\title{Colorimetric variables}
+\title{Colourimetric variables}
 \usage{
 \method{summary}{rspec}(object, subset = FALSE, wlmin = NULL,
   wlmax = NULL, ...)
@@ -103,8 +103,7 @@ H5 (Hue): Wavelength at bmax. Sensitive to noise and may be variable if there is
 more than one maxima and minima. REF 5
 }
 \description{
-Calculates all 23 colorimetric variables reviewed in
-Montgomerie (2006).
+Calculates all 23 colourimetric variables reviewed in Montgomerie (2006).
 }
 \note{
 If minimum wavelength is over 400, UV chroma is not computed.
@@ -117,13 +116,10 @@ Smoothing affects only B3, S2, S4, S6, S10, H2, and H5 calculation. All other
 variables can be reliably extracted using non-smoothed data.
 }
 \examples{
-\dontrun{
 data(sicalis)
 summary(sicalis)
 summary(sicalis, subset = TRUE)
-summary(sicalis, subset = c('B1', 'H4'))
-}
-
+summary(sicalis, subset = c("B1", "H4"))
 }
 \references{
 Montgomerie R. 2006. Analyzing colors. In Hill, G.E, and McGraw, K.J., eds.
@@ -142,7 +138,7 @@ ornaments, and a trade-off between agonistic and epigamic signaling in a widowbi
 Naturalist 160:683-691.
 
 4- Delhey, K., A. Johnsen, A. Peters, S. Andersson, and B. Kempenaers. 2003. Paternity analysis reveals
-opposing selection pressures on crown coloration in the blue tit (parus caeruleus). Proceedings
+opposing selection pressures on crown coloration in the blue tit (Parus caeruleus). Proceedings
 of the Royal Society B 270:2057-2063.
 
 5- Keyser, A. and G. Hill. 1999. Condition-dependent variation in the blue-ultraviolet coloration of a
@@ -152,7 +148,7 @@ structurally based plumage ornament. Proceedings of the Royal Society B 266:771-
 male blue grosbeaks. Behavioural Ecology 11:202-209.
 
 7- Ornborg, J., S. Andersson, S. Griffith, and B. Sheldon. 2002. Seasonal changes in a ultraviolet
-structural colour signal in blue tits, parus caeruleus. Biological Journal of the Linnean Society
+structural colour signal in blue tits, Parus caeruleus. Biological Journal of the Linnean Society
 76:237-245.
 
 8- Peters, A., A. Denk, K. Delhey, and B. Kempenaers. 2004. Carotenoid-based bill colour as an
@@ -170,7 +166,7 @@ Functional Ecology 17:555-561.
 variation in ultraviolet-blue plumage colour. Proceedings of the Royal Society B
 270:1455-1460.
 
-12- Siefferman, L. and G. Hill. 2005. Uv-blue structural coloration and competition for nestboxes in male
+12- Siefferman, L. and G. Hill. 2005. UV-blue structural coloration and competition for nestboxes in male
 eastern bluebirds. Animal Behaviour 69:67-72.
 
 13- Smiseth, P., J. Ornborg, S. Andersson, and T. Amundsen. 2001. Is male plumage reflectance

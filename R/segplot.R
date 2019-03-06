@@ -7,31 +7,20 @@
 #' @param segdata (required) a data frame, possibly a result from the \code{colspace}
 #'  or \code{segspace} function, containing values for 'LM' and 'MS'
 #'  as columns (labeled as such).
-#' @param labels plot category labels inside? Defaults to \code{TRUE}.
-#' @param lab.cex character expansion factor for category labels when \code{labels = TRUE}).
-#' @param out.lwd,out.lcol,out.lty graphical parameters for plot outline.
-#' @param tick.loc a numeric vector specifying the location of tick marks on x & y axes. (defaults to c(-1, -0.5, 0.5, 1))
-#' @param margins margins for the plot. (defaults to c(1, 1, 2, 2))
-#' @param square square plotting area? (defaults to \code{TRUE})
-#' @param ... additional graphical options. See \code{\link{par}}.
+#' @inheritParams cocplot
 #'
 #' @examples
-#' \dontrun{
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, visual = 'segment', achromatic = 'all')
-#' seg.flowers <- colspace(vis.flowers, space = 'segment')
+#' vis.flowers <- vismodel(flowers, visual = "segment", achromatic = "all")
+#' seg.flowers <- colspace(vis.flowers, space = "segment")
 #' plot(seg.flowers)
-#' }
-#'
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
 #' @export
 #'
 #' @keywords internal
 #'
-#' @references Endler, J. A. (1990) On the measurement and classification of
-#' color in studies of animal color patterns. Biological Journal of the Linnean
-#' Society, 41, 315-352.
+#' @inherit segspace references
 
 segplot <- function(segdata, labels = TRUE, lab.cex = 0.9,
                     out.lwd = 1, out.lty = 1, out.lcol = "black",
@@ -39,11 +28,14 @@ segplot <- function(segdata, labels = TRUE, lab.cex = 0.9,
                     margins = c(1, 1, 2, 2), square = TRUE, ...) {
 
   # Check if object is of class colorspace and tetrachromat
-  if (!("colspace" %in% attr(segdata, "class")) & is.element(FALSE, c("LM", "MS") %in% names(segdata))) {
-    stop("object is not of class ", dQuote("colspace"), ", and does not contain LM, MS segment data")
+  if (!is.colspace(segdata) & !all(c("LM", "MS") %in% names(segdata))) {
+    stop(
+      "object is not of class ", dQuote("colspace"),
+      ", and does not contain LM, MS segment data"
+    )
   }
 
-  if (("colspace" %in% attr(segdata, "class")) & attr(segdata, "clrsp") != "segment") {
+  if (is.colspace(segdata) & attr(segdata, "clrsp") != "segment") {
     stop(dQuote("colspace"), " object is not a result of segspace()")
   }
 
@@ -60,10 +52,10 @@ segplot <- function(segdata, labels = TRUE, lab.cex = 0.9,
     arg$pch <- 19
   }
   if (is.null(arg$xlim)) {
-    arg$xlim <- c(-1, 1)
+    arg$xlim <- c(-1.05, 1.01)
   }
   if (is.null(arg$ylim)) {
-    arg$ylim <- c(-1, 1)
+    arg$ylim <- c(-1.05, 1.05)
   }
   if (is.null(arg$xlab)) {
     arg$xlab <- " "
@@ -73,22 +65,22 @@ segplot <- function(segdata, labels = TRUE, lab.cex = 0.9,
   }
   arg$bty <- "n"
   arg$axes <- FALSE
+  arg$type <- "n"
 
   # Plot
   arg$x <- segdata$MS
   arg$y <- segdata$LM
 
-  do.call(plot, c(arg, type = "n"))
+  do.call(plot, arg)
   axis(1, at = tick.loc, pos = 0, cex.axis = 0.8) # todo - best way to handle user specs?
   axis(2, at = tick.loc, pos = 0, cex.axis = 0.8, las = 2)
 
   # Segment edge coordinates
   segX <- c(0, 1, 0, -1, 0)
   segY <- c(1, 0, -1, 0, 1)
-  segout <- data.frame(segX, segY)
 
   # Segplot outline
-  for (x in 1:length(segX)) {
+  for (x in seq_along(segX)) {
     segments(segX[x], segY[x], segX[x + 1], segY[x + 1], lwd = out.lwd, col = out.lcol, lty = out.lty)
   }
 

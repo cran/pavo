@@ -27,12 +27,9 @@ Calculates coordinates and colorimetric variables that represent reflectance spe
 in the color opponent coding model of hymenopteran vision.
 }
 \examples{
-\dontrun{
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei', relative = FALSE, vonkries = TRUE)
-coc.flowers <- colspace(vis.flowers, space = 'coc')
-}
-
+vis.flowers <- vismodel(flowers, visual = "apis", qcatch = "Ei", relative = FALSE, vonkries = TRUE)
+coc.flowers <- colspace(vis.flowers, space = "coc")
 }
 \references{
 Backhaus W. (1991). Color opponent coding in the visual system

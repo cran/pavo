@@ -1,10 +1,8 @@
-#' Hue projection plot
+#' 2D projection of a tetrahedral colourspace
 #'
-#' Produces a 2D projection plot of points in a color space
+#' Produces a 2D projection plot of points in a tetrahedral colour space
 #'
-#' @import mapproj
-#'
-#' @param tcsdata (required) color space coordinates, possibly a result from the \code{\link{tcs}} function,
+#' @param tcsdata (required) tetrahedral color space coordinates, possibly a result from \code{\link{colspace}},
 #' containing values for the 'h.theta' and 'h.phi' coordinates as columns (labeled as such).
 #' @param ... additional parameters to be passed to the plotting of data points.
 #'
@@ -18,32 +16,25 @@
 #'
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
-#' @examples \dontrun{
+#' @examples
 #' data(sicalis)
-#' vis.sicalis <- vismodel(sicalis, visual = 'avg.uv')
-#' tcs.sicalis <- colspace(vis.sicalis, space = 'tcs')
-#' projplot(tcs.sicalis, pch = 16, col = setNames(rep(1:3, 7), rep(c('C', 'T', 'B'), 7)))
-#' }
-#'
-#' @references Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage
-#'  color in a tetrahedral color space: A phylogenetic analysis of new world buntings.
-#'  The American Naturalist, 171(6), 755-776.
-#' @references Endler, J. A., Westcott, D., Madden, J., & Robson, T. (2005). Animal
-#'  visual systems and the evolution of color patterns: Sensory processing illuminates
-#'  signal evolution. Evolution, 59(8), 1795-1818.
+#' vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
+#' tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
+#' projplot(tcs.sicalis, pch = 16, col = setNames(rep(seq_len(3), 7), rep(c("C", "T", "B"), 7)))
+#' @inherit tcspace references
 
 projplot <- function(tcsdata, ...) {
+
+  # Check for mapproj
+  if (!requireNamespace("mapproj", quietly = TRUE)) {
+    stop("Package \"mapproj\" needed for projection plots. Please install it.",
+      call. = FALSE
+    )
+  }
 
   # oPar <- par(no.readonly=TRUE)
   oPar <- par("mar")
   on.exit(par(oPar))
-
-  # no longer tcs object
-  # if(class(tcsdata)=='tcs'){
-  # dat <- tcsdata$tcs
-  # }else{
-  # dat <- tcsdata
-  # }
 
   points.theta <- tcsdata[, "h.theta"]
   points.phi <- tcsdata[, "h.phi"]
@@ -72,20 +63,20 @@ projplot <- function(tcsdata, ...) {
 
   # map projection coordinates
 
-  mp <- mapproject(coords.theta, coords.phi, projection = "mollweide")
+  mp <- mapproj::mapproject(coords.theta, coords.phi, projection = "mollweide")
 
-  mp.v.theta <- mp$x[1:9]
-  mp.v.phi <- mp$y[1:9]
+  mp.v.theta <- mp$x[seq_len(9)]
+  mp.v.phi <- mp$y[seq_len(9)]
 
-  mp.p.theta <- mp$x[-c(1:9)]
-  mp.p.phi <- mp$y[-c(1:9)]
+  mp.p.theta <- mp$x[-c(seq_len(9))]
+  mp.p.phi <- mp$y[-c(seq_len(9))]
 
   # plot
 
-  cu <- t(col2rgb("#984EA3")) / 255
-  cs <- t(col2rgb("#377EB8")) / 255
-  cm <- t(col2rgb("#4DAF4A")) / 255
-  cl <- t(col2rgb("#E41A1C")) / 255
+  cu <- "#984EA3"
+  cs <- "#377EB8"
+  cm <- "#4DAF4A"
+  cl <- "#E41A1C"
 
   par(mar = c(0, 0, 0, 0))
   plot(0, 0,
@@ -93,9 +84,12 @@ projplot <- function(tcsdata, ...) {
     xlim = c(-2, 2), ylim = c(-1, 1)
   )
 
-  map.grid(c(-180, 180, -90, 90), labels = FALSE, col = "grey")
+  mapproj::map.grid(c(-180, 180, -90, 90), labels = FALSE, col = "grey")
 
-  points(mp.v.phi ~ mp.v.theta, pch = 20, cex = 1.5, col = c(rep("grey", 4), rgb(cl), rgb(cl), rgb(cm), rgb(cs), rgb(cu)))
+  points(mp.v.phi ~ mp.v.theta,
+    pch = 20, cex = 1.5,
+    col = c(rep("grey", 4), cl, cl, cm, cs, cu)
+  )
 
   points(mp.p.phi ~ mp.p.theta, ...)
 }

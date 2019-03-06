@@ -8,22 +8,20 @@
 #' @return A list containing one or two matrices, for dS and dL, depending
 #' if the original object had dS and dL columns
 #'
-#' @examples \dontrun{
+#' @examples
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, achro=TRUE)
+#' vis.flowers <- vismodel(flowers, achro = TRUE)
 #' cd.flowers <- coldist(vis.flowers)
-#' coldist2mat(cd.flowers)[['dS']]
-#' coldist2mat(cd.flowers)[['dL']]
-#' }
-#'
-#' @author Rafael Maia \email{rm72@zips.uakron.edu}
+#' coldist2mat(cd.flowers)[["dS"]]
+#' coldist2mat(cd.flowers)[["dL"]]
+#' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
 #' @export
 #'
 #' @keywords internal
 #'
 #' @references Maia, R., White, T. E., (2018) Comparing colors using visual models.
-#'  Behavioral Ecology, ary017 doi: 10.1093/beheco/ary017.
+#'  Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
 
 coldist2mat <- function(coldistres) {
   cdrep <- as.matrix(rbind(coldistres[, c(1, 2, 3)], coldistres[, c(2, 1, 3)]))

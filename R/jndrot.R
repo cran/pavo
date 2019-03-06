@@ -5,30 +5,13 @@
 #' @param jnd2xyzres (required) the output from a \code{jnd2xyz} call.
 #' @param center should the vectors for rotation be centered in the achromatic
 #' center ("achro") or the data centroid ("mean", the default)?
-#' @param ref1 the cone to be used as a the first reference. May be NULL
-#' (for no first rotation in the 3-dimensional case) or must match name
-#' in the original data that was used for \code{coldist}. Defaults to 'l'.
-# " (only used if data has 2 or 3 dimensions)
-#' @param ref2 the cone to be used as a the second reference.May be NULL
-#' (for no first rotation in the 3-dimensional case) or must match name
-#' in the original data that was used for \code{coldist}. Defaults to 'u'.
-#' (only used if data has 3 dimensions).
-#' @param axis1 A vector of length 3 composed of 0's and 1's, with
-#' 1's representing the axes (x,y,z) to rotate around. Defaults to c(1,1,0), such
-#' that the rotation aligns with the xy plane (only used if data has 2 or 3 dimensions).
-#' Ignored if \code{ref1} is NULL (in 3-dimensional case only)
-#' @param axis2 A vector of length 3 composed of 0's and 1's, with
-#' 1's representing the axes (x,y,z) to rotate around. Defaults to c(0,0,1), such
-#' that the rotation aligns with the z axis (only used if data has 3 dimensions).
-#' Ignored if \code{ref2} is NULL (in 3-dimensional case only)
-#'
-#' @examples \dontrun{
+#' @inheritParams jnd2xyz
+
+#' @examples
 #' data(flowers)
 #' vis.flowers <- vismodel(flowers)
 #' cd.flowers <- coldist(vis.flowers)
 #' jndrot(jnd2xyz(cd.flowers))
-#' }
-#'
 #' @author Rafael Maia \email{rm72@zips.uakron.edu}
 #'
 #' @export
@@ -43,17 +26,16 @@ jndrot <- function(jnd2xyzres, center = c("mean", "achro"), ref1 = "l", ref2 = "
   if (!is.null(ref1) && !paste0("jnd2xyzrrf.", ref1) %in% rownames(attr(jnd2xyzres, "resref"))) {
     stop('"ref1" does not match the name of a photoreceptor; must be one of: ',
       paste0(gsub("jnd2xyzrrf.", "", rownames(attr(jnd2xyzres, "resref")))
-      [-c(1, length(rownames(attr(jnd2xyzres, "resref"))))], collapse = ", ")
-      ,
+      [-c(1, length(rownames(attr(jnd2xyzres, "resref"))))], collapse = ", "),
       call. = FALSE
     )
   }
 
-  if (!is.null(ref2) && all(c("x", "y", "z") %in% colnames(jnd2xyzres)) && !paste0("jnd2xyzrrf.", ref2) %in% rownames(attr(jnd2xyzres, "resref"))) {
+  if (!is.null(ref2) && all(c("x", "y", "z") %in% colnames(jnd2xyzres)) &&
+    !paste0("jnd2xyzrrf.", ref2) %in% rownames(attr(jnd2xyzres, "resref"))) {
     stop('"ref2" does not match the name of a photoreceptor; must be one of: ',
       paste0(gsub("jnd2xyzrrf.", "", rownames(attr(jnd2xyzres, "resref")))
-      [-c(1, length(rownames(attr(jnd2xyzres, "resref"))))], collapse = ", ")
-      ,
+      [-c(1, length(rownames(attr(jnd2xyzres, "resref"))))], collapse = ", "),
       call. = FALSE
     )
   }

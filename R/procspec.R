@@ -39,19 +39,17 @@
 #'
 #' @author Chad Eliason \email{cme16@@zips.uakron.edu}
 #'
-#' @examples \dontrun{
+#' @examples
 #' data(teal)
 #' plot(teal, select = 10)
-#'
+#' 
 #' # Smooth data to remove noise
-#' teal.sm <- procspec(teal, opt = 'smooth', span = 0.25)
+#' teal.sm <- procspec(teal, opt = "smooth", span = 0.25)
 #' plot(teal.sm, select = 10)
-#'
+#' 
 #' # Normalize to max of unity
-#' teal.max <- procspec(teal, opt = c('max'), span = 0.25)
+#' teal.max <- procspec(teal, opt = c("max"))
 #' plot(teal.max, select = 10)
-#' }
-#'
 #' @seealso \code{\link{loess.smooth}}, \code{\link{plotsmooth}}
 #'
 #' @references Cuthill, I., Bennett, A. T. D., Partridge, J. & Maier, E. 1999.
@@ -74,7 +72,7 @@ procspec <- function(rspecdata, opt = c(
 
   fixneg <- match.arg(fixneg)
 
-  applied <- "processing options applied:\n"
+  applied <- "processing options applied:"
 
   if (any(opt == "none")) {
     opt <- "none" # remove other opt arguments (so they are not called further on, but still allowing for fixneg to work)
@@ -92,59 +90,53 @@ procspec <- function(rspecdata, opt = c(
   } else {
     warning("No wavelengths supplied; using arbitrary values")
     rspecdata <- as.data.frame(rspecdata)
-    wl <- 1:nrow(rspecdata)
+    wl <- seq_len(nrow(rspecdata))
   }
 
   nam <- names(rspecdata)
 
   if (any(opt == "smooth")) {
-    rspecdata <- sapply(1:ncol(rspecdata), function(z) {
+    rspecdata <- vapply(seq_len(ncol(rspecdata)), function(z) {
       loess.smooth(
         x = wl,
         y = as.data.frame(rspecdata[, z]), span = span, degree = 2,
         family = "gaussian", evaluation = length(wl)
       )$y
-    })
-    applied <- c(applied, paste("smoothing spectra with a span of", span, "\n"))
+    }, numeric(nrow(rspecdata)))
+    applied <- c(applied, paste("smoothing spectra with a span of", span))
   }
 
+  mins <- apply(rspecdata, 2, min)
+  maxs <- apply(rspecdata, 2, max)
+
   if (fixneg == "addmin") {
-    adm <- function(x) {
-      if (min(x) < 0) {
-        x + abs(min(x))
-      } else {
-        x
-      }
-    }
-    tempspc <- data.frame(sapply(1:ncol(rspecdata), function(z) adm(rspecdata[, z])))
-    names(tempspc) <- names(rspecdata)
-    rspecdata <- round(tempspc, 6)
-    applied <- c(applied, "Negative value correction: added min to all reflectance\n")
+    rspecdata <- t(t(rspecdata) + abs(pmin(0, mins)))
+    applied <- c(applied, "Negative value correction: added min to all reflectance")
   }
 
   if (fixneg == "zero") {
-    rspecdata[rspecdata < 0 ] <- 0
-    applied <- c(applied, "Negative value correction: converted negative values to zero\n")
+    rspecdata[rspecdata < 0] <- 0
+    applied <- c(applied, "Negative value correction: converted negative values to zero")
   }
 
   if (any(opt == "minimum")) {
-    rspecdata <- sapply(1:ncol(rspecdata), function(z) rspecdata[, z] - min(rspecdata[, z]))
-    applied <- c(applied, "Scaling spectra to a minimum value of zero\n")
+    rspecdata <- t(t(rspecdata) - mins)
+    applied <- c(applied, "Scaling spectra to a minimum value of zero")
   }
 
   if (any(opt == "maximum")) {
-    rspecdata <- sapply(1:ncol(rspecdata), function(z) rspecdata[, z] / max(rspecdata[, z]))
-    applied <- c(applied, "Scaling spectra to a maximum value of 1\n")
+    rspecdata <- t(t(rspecdata) / maxs)
+    applied <- c(applied, "Scaling spectra to a maximum value of 1")
   }
 
   if (any(opt == "sum")) {
-    rspecdata <- sapply(1:ncol(rspecdata), function(z) rspecdata[, z] / sum(rspecdata[, z]))
-    applied <- c(applied, "Scaling spectra to a total area of 1\n")
+    rspecdata <- t(t(rspecdata) / colSums(rspecdata))
+    applied <- c(applied, "Scaling spectra to a total area of 1")
   }
 
   if (any(opt == "center")) {
-    rspecdata <- sapply(1:ncol(rspecdata), function(z) rspecdata[, z] - mean(rspecdata[, z]))
-    applied <- c(applied, "Centering spectra to a mean of zero\n")
+    rspecdata <- t(t(rspecdata) - colMeans(rspecdata))
+    applied <- c(applied, "Centering spectra to a mean of zero")
   }
 
   # Calculate medians according to # of bins specified for use in PCA
@@ -154,9 +146,10 @@ procspec <- function(rspecdata, opt = c(
     wl_bin <- seq(min(wl), by = bw, length.out = bins)
     wl_ind <- match(wl_bin, wl)
     rspecdata <- as.data.frame(rspecdata)
-    rspecdata <- sapply(1:length(wl_ind), function(z)
-      apply(rspecdata[wl_ind[z]:(wl_ind[z] + bw), , drop = FALSE], 2, median, na.rm = TRUE),
-    simplify = FALSE
+    rspecdata <- vapply(
+      seq_along(wl_ind), function(z)
+        apply(rspecdata[wl_ind[z]:(wl_ind[z] + bw), , drop = FALSE], 2, median, na.rm = TRUE),
+      numeric(ncol(rspecdata))
     )
 
     rspecdata <- data.frame(matrix(unlist(rspecdata), nrow = bins, byrow = TRUE))
@@ -169,7 +162,7 @@ procspec <- function(rspecdata, opt = c(
   names(rspecdata) <- c("wl", nam)
   class(rspecdata) <- c("rspec", "data.frame")
 
-  applied <- c(applied, "\n")
+  applied <- paste(applied, collapse = "\n")
   message(applied)
 
   rspecdata

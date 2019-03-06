@@ -13,17 +13,14 @@ segplot(segdata, labels = TRUE, lab.cex = 0.9, out.lwd = 1,
 or \code{segspace} function, containing values for 'LM' and 'MS'
 as columns (labeled as such).}
 
-\item{labels}{plot category labels inside? Defaults to \code{TRUE}.}
+\item{labels}{plot verticy labels? Defaults to \code{TRUE}.}
 
-\item{lab.cex}{character expansion factor for category labels when \code{labels = TRUE}).}
+\item{tick.loc}{a numeric vector specifying the location of tick marks on x & y axes.}
 
-\item{out.lwd, out.lcol, out.lty}{graphical parameters for plot outline.}
+\item{margins}{margins for the plot.}
 
-\item{tick.loc}{a numeric vector specifying the location of tick marks on x & y axes. (defaults to c(-1, -0.5, 0.5, 1))}
-
-\item{margins}{margins for the plot. (defaults to c(1, 1, 2, 2))}
-
-\item{square}{square plotting area? (defaults to \code{TRUE})}
+\item{square}{logical. Should the aspect ratio of the plot be held to 1:1?
+(defaults to \code{TRUE}).}
 
 \item{...}{additional graphical options. See \code{\link{par}}.}
 }
@@ -31,13 +28,10 @@ as columns (labeled as such).}
 Produces a plot based on Endler's (1990) segment analysis.
 }
 \examples{
-\dontrun{
 data(flowers)
-vis.flowers <- vismodel(flowers, visual = 'segment', achromatic = 'all')
-seg.flowers <- colspace(vis.flowers, space = 'segment')
+vis.flowers <- vismodel(flowers, visual = "segment", achromatic = "all")
+seg.flowers <- colspace(vis.flowers, space = "segment")
 plot(seg.flowers)
-}
-
 }
 \references{
 Endler, J. A. (1990) On the measurement and classification of

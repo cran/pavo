@@ -1,4 +1,3 @@
-library(pavo)
 context("processing")
 
 test_that("Conversion to rspec", {
@@ -95,15 +94,17 @@ test_that("Aggregation", {
   tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 
   # Subset all 'crown' patches (C in file names)
-  expect_equal(digest::sha1(subset(vis.sicalis, "C"), digits = 4), "fac9de4d69bf66f262dc09dd05b9d274266fb398")
+  expect_equal(digest::sha1(subset(vis.sicalis, "C"), digits = 4), "e42aa1c3abe2aca9114b03744e4f590004c8068a")
   expect_equal(digest::sha1(subset(sicalis, "T", invert = TRUE), digits = 4), "8cf8078dd22a0d7be9aebed447ce9122ef36f72f")
+  
+  expect_error(aggspec(teal, by = 7), 'by not a multiple')
 })
 
 test_that("Convert", {
   # Flux/irrad
   illum <- sensdata(illum = "forestshade")
-  expect_equal(round(sum(irrad2flux(illum)[2]), 3), 6.618)
-  expect_equal(round(sum(flux2irrad(illum)[2]), 3), 3174.87)
+  expect_equal(sum(irrad2flux(illum)[2]), 6.619, tol = 10e-4)
+  expect_equal(sum(flux2irrad(illum)[2]), 3174.328, tol = 10e-4)
 
   # Errors
   class(illum) <- "data.frame"

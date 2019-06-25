@@ -1,18 +1,17 @@
 #' Convert data to an rimg object
 #'
-#' Converts an array containing RGB image data data to an \code{rimg}
-#' object.
+#' Converts an array of RGB values, a `cimg` object, or a `magick-image` object,
+#' to an `rimg` object.
 #'
 #' @param object (required) a three-dimensional array containing RGB values.
 #' @param name the name(s) of the image(s).
 #'
-#' @return an object of class \code{rimg} for use in further \code{pavo}
-#' functions
+#' @return an object of class `rimg` for use in further `pavo` functions
 #'
-#' @export as.rimg is.rimg
+#' @export
 #'
 #' @examples
-#' 
+#'
 #' # Generate some fake image data
 #' fake <- array(c(
 #'   as.matrix(rep(c(0.2, 0.4, 0.6), each = 250)),
@@ -21,19 +20,28 @@
 #' ),
 #' dim = c(750, 750, 3)
 #' )
-#' 
+#'
 #' # Inspect it
 #' head(fake)
-#' 
+#'
 #' # Determine if is rimg object
 #' is.rimg(fake)
-#' 
+#'
 #' # Convert to rimg object and check again
 #' fake2 <- as.rimg(fake)
 #' is.rimg(fake2)
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
-
+#' @author Hugo Gruson \email{hugo.gruson+R@@normalesup.org}
+#'
 as.rimg <- function(object, name = "img") {
+  UseMethod("as.rimg")
+}
+
+#' @rdname as.rimg
+#'
+#' @export
+#'
+as.rimg.default <- function(object, name = "img") {
   if (!inherits(object, "rimg")) { # Not already 'rimg'
 
     attrgiver <- function(x, name2 = name) {
@@ -119,17 +127,19 @@ as.rimg <- function(object, name = "img") {
       for (i in seq_along(object2)) attr(object2[[i]], "k") <- length(table(object2[[i]])) # kcols
       for (i in seq_along(object2)) attr(object2[[i]], "class") <- c("rimg", "matrix") # class
       for (i in seq_along(object2)) attr(object2[[i]], "colnames") <- data.frame(name = seq_along(table(object2[[i]]))) # colour-category names (in progress)
-      for (i in seq_along(object2)) attr(object2[[i]], "classRGB") <- data.frame(
+      for (i in seq_along(object2)) {
+        attr(object2[[i]], "classRGB") <- data.frame(
           R = rep(NA, length(table(object2[[i]]))),
           G = rep(NA, length(table(object2[[i]]))),
           B = rep(NA, length(table(object2[[i]])))
         )
+      }
       # The list itself needs attributes
       class(object2) <- c("rimg", "list")
       attr(object2, "state") <- "colclass"
     }
     # Output
-    if (!inherits(object, "list")) {
+    if (!inherits(object, "list") || length(object) == 1) {
       object2[[1]]
     } else {
       object2
@@ -141,39 +151,58 @@ as.rimg <- function(object, name = "img") {
 }
 
 #' @rdname as.rimg
-#' @return a logical value indicating whether the object is of class \code{rimg}
+#'
+#' @export
+as.rimg.cimg <- function(object, name = "img") {
+  as.rimg.default(drop(as.array(object)), name = name)
+}
+
+#' @importFrom magick image_flop image_rotate image_data
+#'
+#' @export
+#'
+#' @noRd
+`as.rimg.magick-image` <- function(object, name = "img") {
+  object <- image_rotate(object, 90)
+  object <- image_flop(object)
+  suppressMessages(as.rimg.default(lapply(object, function(img) as.integer(image_data(img))), name = name))
+}
+
+#' @rdname as.rimg
+#'
+#' @export
+#'
+#' @return a logical value indicating whether the object is of class `rimg`
 is.rimg <- function(object) {
   inherits(object, "rimg")
 }
 
-#' Convert images between class rimg and cimg
+#' Convert images between class rimg and cimg or magick-image
 #'
-#' Conveniently convert single objects of class \code{rimg} and \code{cimg} (from the
-#' package \code{imager}, which contains a suite of useful image-processing
-#' capabilities).
+#' Conveniently convert single objects of class `rimg` to class `cimg` (from the
+#' package `imager`) or `magick-image` (from the package `magick`), both of which
+#' contains a suite of useful image-processing capabilities.
 #'
-#' @param image an object of class \code{rimg} or \code{cimg}.
-#' @param name the name(s) of the image(s).
+#' @param image an object of class `rimg`
+#' @inheritParams as.rimg
 #'
 #' @return an image of the specified class
 #'
 #' @note Attributes (e.g. scales, color-classes) will not be preserved following
-#' conversion from class \code{rimg}, so it's best to use early in the analysis workflow.
+#' conversion from class `rimg`, so it's best to use early in the analysis workflow.
 #'
 #' @examples
-#' \dontrun{
 #' papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
-#' 
+#'
 #' # From class rimg to cimg
 #' papilio_cimg <- rimg2cimg(papilio)
 #' class(papilio_cimg)
-#' 
-#' # From class cimg to rimg
-#' papilio_rimg <- cimg2rimg(papilio_cimg)
-#' class(papilio_rimg)
-#' }
-#' 
+#'
+#' # From class rimg to magick-image
+#' papilio_magick <- rimg2magick(papilio)
+#' class(papilio_magick)
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
+#' @author Hugo Gruson \email{hugo.gruson+R@@normalesup.org}
 #' @name img_conversion
 #'
 NULL
@@ -181,8 +210,6 @@ NULL
 #' @rdname img_conversion
 #'
 #' @export
-#'
-#' @author Thomas E. White \email{thomas.white026@@gmail.com}
 rimg2cimg <- function(image) {
   ## Check for imager
   if (!requireNamespace("imager", quietly = TRUE)) {
@@ -196,10 +223,15 @@ rimg2cimg <- function(image) {
 
 #' @rdname img_conversion
 #'
-#' @export
+#' @importFrom magick image_read image_flop image_rotate
 #'
-#' @author Thomas E. White \email{thomas.white026@@gmail.com}
-cimg2rimg <- function(image, name = "img") {
-  image <- as.rimg(drop(as.array(image)), name = name)
-  image
+#' @export
+rimg2magick <- function(image) {
+  if (inherits(image, "list")) {
+    output <- do.call(c, lapply(image, image_read))
+  } else {
+    output <- image_read(image)
+  }
+  output <- image_rotate(output, 90)
+  image_flop(output)
 }

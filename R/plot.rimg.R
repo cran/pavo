@@ -5,11 +5,11 @@
 #' one by one.
 #'
 #' @param x (required) an image of class rimg, or list thereof.
-#' @param axes should axes be drawn? (defaults to \code{TRUE})
+#' @param axes should axes be drawn? (defaults to `TRUE`)
 #' @param col optional vector of colours when plotting colour-classified images.
 #' Defaults to the mean RGB values of the k-means centres (i.e. the average 'original'
 #' colours).
-#' @param ... additional graphical parameters. Also see \code{\link{par}}.
+#' @param ... additional graphical parameters. Also see [par()].
 #'
 #' @return an image plot.
 #'
@@ -21,14 +21,14 @@
 #' plot(papilio)
 #' papilio_class <- classify(papilio, kcols = 4)
 #' plot(papilio_class)
-#' 
+#'
 #' # Multiple images
 #' snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
 #' plot(snakes)
 #' snakes_class <- classify(snakes, kcols = 3)
 #' plot(snakes_class)
 #' }
-#' 
+#'
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
 
 plot.rimg <- function(x, axes = TRUE, col = NULL, ...) {
@@ -106,4 +106,24 @@ defaultrasterImageplot <- function(imagedata, axes, col, ...) {
   }
   title(arg$main, xlab = arg$xlab, ylab = arg$ylab)
   rasterImage(imagedata2, 1, nrow(imagedata2), ncol(imagedata2), 1)
+}
+
+## Rotate matrices 90-degrees
+rot90 <- function(x) {
+  permVec <- c(2, 1, 3:length(dim(x)))
+  rotA <- aperm(x, permVec)
+  rotA <- rotA[dim(x)[2]:1, , ]
+  rotA
+}
+
+## Mirror matrices about x axis
+mirrorx <- function(x) {
+  if (length(dim(x)) == 3) {
+    for (i in seq_len(dim(x)[3])) {
+      x[, , i] <- x[, , i][, rev(seq_len(ncol(x[, , i])))]
+    }
+  } else {
+    x <- x[, rev(seq_len(ncol(x)))]
+  }
+  x
 }

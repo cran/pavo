@@ -5,6 +5,7 @@ options(
    warnPartialMatchArgs = FALSE,
    warnPartialMatchAttr = FALSE
 )
+knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 
 ## ---- warning=FALSE, results='hide', message=FALSE-----------------------
 # Load the package, and set a global random-number seed for the reproducible generation of fake data later on.

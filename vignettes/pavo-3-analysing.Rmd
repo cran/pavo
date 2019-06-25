@@ -1,5 +1,5 @@
 ---
-title: "Analysing Data"
+title: "(3) Analysing Data"
 author: "Rafael Maia, Thomas White, Hugo Gruson, Pierre-Paul Bitton, Chad Eliason"
 date: "`r Sys.Date()`"
 output:
@@ -36,6 +36,7 @@ options(
    warnPartialMatchArgs = FALSE,
    warnPartialMatchAttr = FALSE
 )
+knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 ```
 
 [pavo_repo]: https://github.com/rmaia/pavo

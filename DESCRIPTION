@@ -1,9 +1,9 @@
 Package: pavo
-Description: A cohesive framework for parsing, analyzing and organizing color
+Description: A cohesive framework for parsing, analyzing and organizing colour
     from spectral data.
 Title: Perceptual Analysis, Visualization and Organization of Spectral
-        Color Data in R
-Version: 2.1.0
+        Colour Data in R
+Version: 2.2.0
 License: GPL (>= 2)
 Encoding: UTF-8
 Authors@R: c(person("Rafael", "Maia", role = c("aut", "cre"),
@@ -11,7 +11,7 @@ Authors@R: c(person("Rafael", "Maia", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0002-7563-9795")),
     person("Thomas", "White", role = "aut",
     email = "thomas.white026@gmail.com",
-    comment = c(ORCID = "0000-0001-8493-9450")),
+    comment = c(ORCID = "0000-0002-3976-1734")),
     person("Hugo", "Gruson", role = "aut",
     email = "hugo.gruson+R@normalesup.org",
     comment = c(ORCID = "0000-0002-4094-1476")),
@@ -27,19 +27,20 @@ Maintainer: Rafael Maia <rm72@zips.uakron.edu>
 URL: http://rafaelmaia.net/pavo/, https://github.com/rmaia/pavo/
 BugReports: https://github.com/rmaia/pavo/issues
 Depends: R(>= 3.2.0)
-Imports: geometry, pbmcapply, plot3D, readbitmap, rcdd, sp, viridisLite
-Suggests: digest, imager, knitr, mapproj, rgl, rmarkdown, spelling,
-        testthat, NbClust, xml2
+Imports: geometry, pbmcapply, plot3D, rcdd, sp, magick, cluster,
+        viridisLite
+Suggests: digest, imager, knitr, mapproj, rgl, rmarkdown, testthat,
+        NbClust, xml2
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Language: en-GB
 NeedsCompilation: no
-Packaged: 2019-03-06 00:06:50 UTC; rafaelmaia
+Packaged: 2019-06-25 03:31:24 UTC; rafaelmaia
 Author: Rafael Maia [aut, cre] (<https://orcid.org/0000-0002-7563-9795>),
-  Thomas White [aut] (<https://orcid.org/0000-0001-8493-9450>),
+  Thomas White [aut] (<https://orcid.org/0000-0002-3976-1734>),
   Hugo Gruson [aut] (<https://orcid.org/0000-0002-4094-1476>),
   John Endler [aut],
   Chad Eliason [aut],
   Pierre-Paul Bitton [aut] (<https://orcid.org/0000-0001-5984-2331>)
 Repository: CRAN
-Date/Publication: 2019-03-06 18:00:03 UTC
+Date/Publication: 2019-06-25 05:20:03 UTC

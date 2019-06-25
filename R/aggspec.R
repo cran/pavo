@@ -3,20 +3,12 @@
 #' Combines spectra (by taking the average, for example) according to
 #' an index or a vector of identities.
 #'
-#' @param rspecdata (required) data frame, possibly of class \code{rspec}
-#' containing the spectra to be manipulated. If it contains a wavelength column
-#' named "wl", that column will be ignored.
-#' @param by (required) either a single value specifying the range of spectra within
-#' the data frame to be combined (for example, \code{by} = 3 indicates the function
-#' will be applied to groups of 3 consecutive columns in the spectra data frame);
-#' a vector containing identifications for the columns in the spectra data frame
-#' (in which case the function will be applied to each group of spectra sharing the
-#' same identification); or a list of vectors, e.g., \code{by = list(sex, species)}.
-#' @param FUN the function to be applied to the groups of spectra. (defaults to \code{\link{mean}})
-#' @param trim logical. if \code{TRUE} (default), the function will try to identify and
+#' @inheritParams aggplot
+#' @param FUN the function to be applied to the groups of spectra. (defaults to [mean()])
+#' @param trim logical. if `TRUE` (default), the function will try to identify and
 #' remove numbers at the end of the names of the columns in the new rspec object.
 #'
-#' @return A data frame of class \code{rspec} containing the spectra after applying the aggregating function.
+#' @return A data frame of class `rspec` containing the spectra after applying the aggregating function.
 #'
 #' @export
 #'
@@ -24,23 +16,22 @@
 #'
 #' @examples
 #' data(teal)
-#' 
+#'
 #' # Average every two spectra
 #' teal.sset1 <- aggspec(teal, by = 2)
 #' plot(teal.sset1)
-#' 
+#'
 #' # Create factor and average spectra by levels 'a' and 'b'
 #' ind <- rep(c("a", "b"), times = 6)
 #' teal.sset2 <- aggspec(teal, by = ind)
-#' 
+#'
 #' plot(teal.sset2)
 #' @references Montgomerie R (2006) Analyzing colors. In: Hill G, McGraw K (eds)
 #' Bird coloration. Harvard University Press, Cambridge, pp 90-147.
 
 aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
-
-  # BEGIN RM EDIT
-  # check: user may have removed 'wl' function already.
+  
+  # Check: user may have removed 'wl' function already.
   # (data.frame doesn't allow duplicate names anymore, so this should work)
 
   wl_index <- which(names(rspecdata) == "wl")
@@ -66,15 +57,12 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
     }
   }
 
-  # BEGIN RM EDIT 2
-  # check if the by argument has a 'wl' entry (e.g. if names were obtained through
+  # Check if the by argument has a 'wl' entry (e.g. if names were obtained through
   # regex conditions on the original spec names) and remove it
 
   if (length(which(by == "wl")) != 0) {
     by <- by[-which(by == "wl")]
   }
-
-  # END RM EDIT 2
 
   # Handle when 'by' is a list of factors
   if (is.list(by)) {
@@ -95,16 +83,13 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
   # retain original 'by' values
   by0 <- by
 
-  # BEGIN RM EDIT 1
   # Allow for means of every "by" data, if "by" is a single number
   # i.e. if by=3, average every 3 consecutive data of "data"
   if (length(by) == 1) {
     by0 <- names(y)[seq(1, length(names(y)), by = by)]
     by <- rep(seq_len(length(y) / by), each = by)
   }
-  # END RM EDIT 1
 
-  # BEGIN RM EDIT 3
   # check: does data have the same number of columns as the by vector?
 
   if (dim(y)[2] != length(by)) {
@@ -114,8 +99,6 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
       dQuote(deparse(substitute(data)))
     )
   }
-
-  # END RM EDIT 3
 
   # Add ability to aggregate based on multiple vectors (given a list as input)
   # TODO: add that list can be an input in roxygen doc

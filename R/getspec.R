@@ -14,15 +14,15 @@
 #' (defaults to ".").
 #' @param sep column delimiting characters to be considered in addition to the
 #' default (which are: tab, space, and ";")
-#' @param subdir should subdirectories within the \code{where} folder be
-#' included in the search? (defaults to \code{FALSE}).
+#' @param subdir should subdirectories within the `where` folder be
+#' included in the search? (defaults to `FALSE`).
 #' @param subdir.names should subdirectory path be included in the name of the
-#' spectra? (defaults to \code{FALSE}).
+#' spectra? (defaults to `FALSE`).
 #' @param cores Number of cores to be used. If greater than 1, import will use
 #'  parallel processing (not available in Windows).
 #' @param ignore.case Logical. Should the extension search be case insensitive?
-#' (defaults to TRUE)
-#' @return A data frame, of class \code{rspec}, containing individual imported
+#' (defaults to `TRUE``)
+#' @return A data frame, of class `rspec`, containing individual imported
 #' spectral files as columns.
 #' Reflectance values are interpolated to the nearest wavelength integer.
 #'
@@ -31,8 +31,8 @@
 #' @importFrom pbmcapply pbmclapply
 #'
 #' @examples
-#' getspec(system.file("testdata", package = "pavo"), lim = c(400, 900))
-#' getspec(system.file("testdata", package = "pavo"), ext = "ttt")
+#' rspecdata <- getspec(system.file("testdata", package = "pavo"), ext = "ttt", lim = c(400, 700))
+#' head(rspecdata)
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @author Hugo Gruson \email{hugo.gruson+R@@normalesup.org}
 #'
@@ -114,6 +114,7 @@ getspec <- function(where = getwd(), ext = "txt", lim = c(300, 700), decimal = "
       # function.
 
       tempframe <- parse_procspec(ff)
+      
     } else if (grepl("\\.(ABS|TRM)$", ff, ignore.case = ignore.case)) {
       tempframe <- parse_avantes(ff)
     } else {
@@ -125,11 +126,20 @@ getspec <- function(where = getwd(), ext = "txt", lim = c(300, 700), decimal = "
       )
 
       # rough fix for 'JazIrrad' files that have a stram of calibration data at the end
-      if (any(grepl("Begin Calibration Data", raw))) {
+      if (grepl("\\.JazIrrad$", ff, ignore.case = ignore.case) && any(grepl("Begin Calibration Data", raw))) {
         raw <- raw[1:grep("Begin Calibration Data", raw) - 1]
       }
 
       # ToDo we can actually use this raw string to import metadata if we want
+      
+      # Strip badly encoded characters
+      raw <- sapply(raw, function(line) {
+        # Convert non-ASCII character to ""
+        line <- iconv(line, to = "ASCII", sub = "")
+        # Remove the extra malformed character
+        line <- gsub("\\\001", "", line)
+        return(line)
+      }, USE.NAMES = FALSE)
 
       # substitute separators for a single value to be used in split
       raw <- gsub(seps, ";", raw)

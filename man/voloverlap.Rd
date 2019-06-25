@@ -2,14 +2,14 @@
 % Please edit documentation in R/voloverlap.R
 \name{voloverlap}
 \alias{voloverlap}
-\title{Color volume overlap}
+\title{Colour volume overlap}
 \usage{
 voloverlap(tcsres1, tcsres2, plot = FALSE, interactive = FALSE,
   col = c("blue", "red", "darkgrey"), fill = FALSE, new = TRUE,
   montecarlo = FALSE, nsamp = 1000, psize = 0.001, lwd = 1, ...)
 }
 \arguments{
-\item{tcsres1, tcsres2}{(required) data frame, possibly a result from the \code{colspace}
+\item{tcsres1, tcsres2}{(required) data frame, possibly a result from the \code{\link[=colspace]{colspace()}}
 function, containing
 values for the 'x', 'y' and 'z' coordinates as columns (labeled as such)}
 
@@ -18,7 +18,7 @@ values for the 'x', 'y' and 'z' coordinates as columns (labeled as such)}
 \item{interactive}{logical. If \code{TRUE}, uses the rgl engine for interactive plotting;
 if \code{FALSE} then a static plot is generated.}
 
-\item{col}{a vector of length 3 with the colors for (in order) the first volume,
+\item{col}{a vector of length 3 with the colours for (in order) the first volume,
 the second volume, and the overlap.}
 
 \item{fill}{logical. should the two volumes be filled in the plot? (defaults to \code{FALSE})}
@@ -36,31 +36,31 @@ used in the Monte Carlo simulation.}
 
 \item{lwd}{if \code{plot = TRUE}, sets the line width for volume grids.}
 
-\item{...}{additional arguments passed to the plot. See \code{\link{vol}}}
+\item{...}{additional arguments passed to the plot. See \code{\link[=vol]{vol()}}}
 }
 \value{
 Calculates the overlap between the volumes defined by two set of points in
-colorspace. The volume from the overlap is then given relative to:
+colourspace. The volume from the overlap is then given relative to:
 \itemize{
-	\item \code{vsmallest} the volume of the overlap divided by the smallest of that defined
-by the the two input sets of color points. Thus, if one of the volumes is entirely
+\item \code{vsmallest} the volume of the overlap divided by the smallest of that defined
+by the the two input sets of colour points. Thus, if one of the volumes is entirely
 contained within the other, this overlap will be \code{vsmallest = 1}.
- \item \code{vboth} the volume of the overlap divided by the combined volume of both
-input sets of color points.
+\item \code{vboth} the volume of the overlap divided by the combined volume of both
+input sets of colour points.
 }
 
 The Monte Carlo solution is available mostly for legacy and benchmarking, and is not recommended
 (see notes). If used, the output will be different:
 \itemize{
-	\item \code{s_in1, s_in2} the number of sampled points that fall within each of the volumes
+\item \code{s_in1, s_in2} the number of sampled points that fall within each of the volumes
 individually.
-	\item \code{s_inboth} the number of sampled points that fall within both volumes.
-	\item \code{s_ineither} the number of points that fall within either of the volumes.
-	\item \code{psmallest} the proportion of points that fall within both volumes divided by the
- number of points that fall within the smallest volume.
-	\item \code{pboth} the proportion of points that fall within both volumes divided by the total
- number of points that fall within both volumes.
-	}
+\item \code{s_inboth} the number of sampled points that fall within both volumes.
+\item \code{s_ineither} the number of points that fall within either of the volumes.
+\item \code{psmallest} the proportion of points that fall within both volumes divided by the
+number of points that fall within the smallest volume.
+\item \code{pboth} the proportion of points that fall within both volumes divided by the total
+number of points that fall within both volumes.
+}
 
 If the Monte Carlo solution is used, a number of points much greater than the default should be
 considered (Stoddard & Stevens(2011) use around 750,000 points, but more or fewer might be required
@@ -73,7 +73,7 @@ space.
 \note{
 Stoddard & Stevens (2011) originally obtained the volume overlap through Monte Carlo
 simulations of points within the range of the volumes, and obtaining the frequency of
-simulated values that fall inside the volumes defined by both sets of color points.
+simulated values that fall inside the volumes defined by both sets of colour points.
 
 Here we present an exact solution based on finding common vertices to both volumes
 and calculating its volume. However, we also the Monte Carlo solution is available through
@@ -111,7 +111,7 @@ multidimensionality of the niche reveals functional diversity changes in benthic
 marine biotas across geological time. Ecology Letters, 14(6), 561-568.
 
 Maia, R., White, T. E., (2018) Comparing colors using visual models.
- Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
+Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}, with code from Sebastien Villeger

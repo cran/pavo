@@ -5,6 +5,7 @@ options(
    warnPartialMatchArgs = FALSE,
    warnPartialMatchAttr = FALSE
 )
+knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 
 ## ---- warning=FALSE, results='hide', message=FALSE-----------------------
 # Load the package, and set a global random-number seed for the reproducible generation of fake data later on.
@@ -47,12 +48,12 @@ head(fakedat.new)
 ## ------------------------------------------------------------------------
 head(as.rspec(fakedat, whichwl = 'wavelength'))
 
-## ---- fig.height=3, fig.width=4------------------------------------------
+## ---- fig.height=3, fig.width=4, fig=TRUE--------------------------------
 fakedat.new2 <- as.rspec(fakedat, lim = c(300, 500))
 
 plot(refl1 ~ wl, type = "l", data = fakedat.new2)
 
-## ---- fig.height=3, fig.width=4------------------------------------------
+## ---- fig.height=3, fig.width=4, fig = TRUE------------------------------
 fakedat.new2 <- as.rspec(fakedat, lim = c(300, 1000))
 
 plot(fakedat.new2[, 2] ~ fakedat.new2[, 1], type = "l")

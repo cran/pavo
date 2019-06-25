@@ -1,5 +1,5 @@
 ---
-title: "Importing and Processing Data"
+title: "(2) Importing, Processing, and Visualising Data"
 author: "Rafael Maia, Thomas White, Hugo Gruson, John Endler, Pierre-Paul Bitton, Chad Eliason"
 date: "`r Sys.Date()`"
 output:
@@ -36,6 +36,7 @@ options(
    warnPartialMatchArgs = FALSE,
    warnPartialMatchAttr = FALSE
 )
+knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 ```
 
 [pavo_repo]: https://github.com/rmaia/pavo
@@ -120,7 +121,7 @@ head(as.rspec(fakedat, whichwl = 'wavelength'))
 
 Finally, the `lim` argument allows you to specify the range of wavelengths contained in the input dataset. This is useful either in the case that the dataset doesn't contain this information (and hence you cannot specify the column with `whichwl` or automatically find the column with `as.rspec()`). Additionally, it may be useful to focus on a subset of wavelengths. In our example, the wavelengths ranged from 300 to 700 nm, however you could also specify a restricted range of wavelengths with `lim`:
 
-```{r, fig.height=3, fig.width=4}
+```{r, fig.height=3, fig.width=4, fig=TRUE}
 fakedat.new2 <- as.rspec(fakedat, lim = c(300, 500))
 
 plot(refl1 ~ wl, type = "l", data = fakedat.new2)
@@ -128,7 +129,7 @@ plot(refl1 ~ wl, type = "l", data = fakedat.new2)
 
 We want to stress that it is important to check the actual wavelengths contained in the data before setting this argument (`as.rspec()` will warn you when wavelengths in the data are not present in the range specified with `lim`), otherwise `as.rspec()` will assume that wavelengths exist when in fact they may not. For example, if we set `lim = c(300, 1000)` and plot the results, the reflectance values between 700 and 1000 nm are set to be equal since there is no information at these wavelengths in the original dataset:
 
-```{r, fig.height=3, fig.width=4}
+```{r, fig.height=3, fig.width=4, fig = TRUE}
 fakedat.new2 <- as.rspec(fakedat, lim = c(300, 1000))
 
 plot(fakedat.new2[, 2] ~ fakedat.new2[, 1], type = "l")
@@ -199,7 +200,7 @@ spp <- gsub('\\.[0-9].*$', '', names(mspecs))[-1]
 table(spp)
 ```
 
-Instead, we are going to use the `spp` vector we created to tell the `aggspec()` function how to average the spectra in `mspec`:
+Instead, we are going to use the `spp` vector we created to tell the `aggspec()` function how to average the spectra in `mspecs`:
 
 ```{r, label=exploresppmeans, fig=TRUE, include=TRUE, fig.width=5, fig.height=3.5, fig.cap="Result from `explorespec` for species means"}
 sppspec <- aggspec(mspecs, by = spp, FUN = mean)
@@ -462,7 +463,7 @@ The `summary` function offers some summary information about images or lists of 
 
 ## Overview
 
-Images often require some post-capture processing, depending on the intended use, and `pavo` offers some useful options via `procimg()`. The functionality of `procimg()` is currently limited to only that which is closely relevant to the analyses currently implemented, as we assume any major processing and quality-checking (e.g. image rotation and colour correction) is undertaken by the user beforehand. However, should users with to keep their image processing within the R ecosystem, there now exist several excellent image-processing packages such as `imager` and `magick`, which `pavo` can seamlessly work with. Indeed, the functions `rimg2cimg()` and `cimg2rimg()` convert images from `pavo` preferred structure to that used by `imager` (and vice-versa), which simplifies the transitions between these packages.
+Images often require some post-capture processing, depending on the intended use, and `pavo` offers some useful options via `procimg()`. The functionality of `procimg()` is currently limited to only that which is closely relevant to the analyses currently implemented, as we assume any major processing and quality-checking (e.g. image rotation and colour correction) is undertaken by the user beforehand. However, should users with to keep their image processing within the R ecosystem, there now exist several excellent image-processing packages such as `imager` and `magick`, which `pavo` can seamlessly work with. Indeed, the functions `rimg2cimg()` and `rimg2magick()` convert images from `pavo` preferred structure to that used by `imager` (with the reverse simply achieved via `as.rimg()`), which simplifies the transitions between these packages.
 
 ## Setting Scales and Defining Objects
 
@@ -480,7 +481,7 @@ Distinguishing a focal object from its background is important in cases where we
 butterflies <- procimg(butterflies, outline = TRUE, iterations = 1)
 ```
 
-All of these options can be simultaneously specified in a single call to `procimg()`, and the `pavo 2.0` publication offers a useful example of such processing, since the more involved features are difficult illustrate to here due to their interactive nature.
+All of these options can be simultaneously specified in a single call to `procimg()`, and the `pavo 2.0` publication offers a useful example of such processing, since the more involved features are difficult to illustrate here due to their interactive nature.
 
 # References
 

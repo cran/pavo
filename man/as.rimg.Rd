@@ -2,10 +2,16 @@
 % Please edit documentation in R/as.rimg.R
 \name{as.rimg}
 \alias{as.rimg}
+\alias{as.rimg.default}
+\alias{as.rimg.cimg}
 \alias{is.rimg}
 \title{Convert data to an rimg object}
 \usage{
 as.rimg(object, name = "img")
+
+\method{as.rimg}{default}(object, name = "img")
+
+\method{as.rimg}{cimg}(object, name = "img")
 
 is.rimg(object)
 }
@@ -15,14 +21,13 @@ is.rimg(object)
 \item{name}{the name(s) of the image(s).}
 }
 \value{
-an object of class \code{rimg} for use in further \code{pavo}
-functions
+an object of class \code{rimg} for use in further \code{pavo} functions
 
 a logical value indicating whether the object is of class \code{rimg}
 }
 \description{
-Converts an array containing RGB image data data to an \code{rimg}
-object.
+Converts an array of RGB values, a \code{cimg} object, or a \code{magick-image} object,
+to an \code{rimg} object.
 }
 \examples{
 
@@ -47,4 +52,6 @@ is.rimg(fake2)
 }
 \author{
 Thomas E. White \email{thomas.white026@gmail.com}
+
+Hugo Gruson \email{hugo.gruson+R@normalesup.org}
 }

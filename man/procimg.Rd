@@ -10,11 +10,10 @@ procimg(image, resize = NULL, rotate = NULL, scaledist = NULL,
 }
 \arguments{
 \item{image}{(required) image data. Either a single image array, or a number of images
-stored in a list. Preferably the result of \code{\link{getimg}}.}
+stored in a list. Preferably the result of \code{\link[=getimg]{getimg()}}.}
 
-\item{resize}{an integer specifying the scaling factor for linearly
-resizing images, if so desired. E.g. 0.5 to half the size of an image, or 2 to
-double it.}
+\item{resize}{an integer specifying a percentage for resizing images, if so desired.
+E.g. 50 to half the size of an image, 200 to double it.}
 
 \item{rotate}{an integer specifying the angle of image rotation, in degrees. Images
 are rotated around the centre, and linearly interpolated.}
@@ -44,7 +43,7 @@ Defaults to \code{1}.}
 
 \item{plotnew}{should plots be opened in a new window? Defaults to \code{FALSE}.}
 
-\item{...}{additional graphical parameters. Also see \code{\link{par}}.}
+\item{...}{additional graphical parameters. Also see \code{\link[=par]{par()}}.}
 }
 \value{
 an image, or list of images, for use in further
@@ -61,7 +60,7 @@ papilio <- procimg(papilio, scaledist = 10)
 
 # Assign individual scales to each image, after slightly reducing their size.
 snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
-snakes <- procimg(snakes, scaledist = c(10, 14), resize = 0.95)
+snakes <- procimg(snakes, scaledist = c(10, 14), resize = 90)
 }
 
 }

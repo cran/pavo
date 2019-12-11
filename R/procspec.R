@@ -9,7 +9,7 @@
 #' * `"smooth"` applies LOESS smoothing to each spectrum using [loess.smooth()].
 #' Optimal smoothing parameter can be assessed by using [plotsmooth()].
 #' * `"minimum"` subtracts the minimum from each individual spectra.
-#' * `"maxmimum"` divides each spectrum by its maximum value.
+#' * `"maximum"` divides each spectrum by its maximum value.
 #' * `"sum"` divides each spectrum by summed values.
 #' * `"bin"` bins each spectrum into the specified number of bins. `bins`
 #' argument must be set.
@@ -73,27 +73,19 @@ procspec <- function(rspecdata, opt = c(
     }
   }
 
-  wl_index <- which(names(rspecdata) == "wl")
-
-  if (length(wl_index > 0)) {
-    wl <- rspecdata[, wl_index]
-    rspecdata <- as.data.frame(rspecdata[-wl_index])
-  } else {
-    warning("No wavelengths supplied; using arbitrary values")
-    rspecdata <- as.data.frame(rspecdata)
-    wl <- seq_len(nrow(rspecdata))
-  }
+  wl <- isolate_wl(rspecdata, keep = "wl")
+  rspecdata <- isolate_wl(rspecdata, keep = "spec")
 
   nam <- names(rspecdata)
 
   if (any(opt == "smooth")) {
-    rspecdata <- vapply(seq_len(ncol(rspecdata)), function(z) {
+    rspecdata <- apply(rspecdata, 2, function(z) {
       loess.smooth(
         x = wl,
-        y = as.data.frame(rspecdata[, z]), span = span, degree = 2,
+        y = z, span = span, degree = 2,
         family = "gaussian", evaluation = length(wl)
       )$y
-    }, numeric(nrow(rspecdata)))
+    })
     applied <- c(applied, paste("smoothing spectra with a span of", span))
   }
 
@@ -134,22 +126,16 @@ procspec <- function(rspecdata, opt = c(
   # Method follows Cuthill et al. (1999)
   if (any(opt == "bin")) {
     bw <- floor(length(wl) / (bins - 1))
-    wl_bin <- seq(min(wl), by = bw, length.out = bins)
-    wl_ind <- match(wl_bin, wl)
-    rspecdata <- as.data.frame(rspecdata)
-    rspecdata <- vapply(
-      seq_along(wl_ind), function(z)
-        apply(rspecdata[wl_ind[z]:(wl_ind[z] + bw), , drop = FALSE], 2, median, na.rm = TRUE),
-      numeric(ncol(rspecdata))
-    )
-
-    rspecdata <- data.frame(matrix(unlist(rspecdata), nrow = bins, byrow = TRUE))
-    rspecdata <- as.data.frame(cbind(wl_bin, rspecdata))
-    applied <- c(applied, paste("binned spectra to ", bw, "-nm intervals\n", sep = ""))
+    wl_bin <- wl_bin <- seq(min(wl), by = bw, length.out = bins)
+    rspecdata <- by(rspecdata, findInterval(wl, wl_bin), function(x) apply(x, 2, median))
+    rspecdata <- do.call(rbind, rspecdata)
+    rspecdata <- cbind(wl_bin, rspecdata)
+    applied <- c(applied, paste0("binned spectra to ", bw, "-nm intervals"))
   } else {
-    rspecdata <- as.data.frame(cbind(wl, rspecdata))
+    rspecdata <- cbind(wl, rspecdata)
   }
 
+  rspecdata <- as.data.frame(rspecdata)
   names(rspecdata) <- c("wl", nam)
   class(rspecdata) <- c("rspec", "data.frame")
 

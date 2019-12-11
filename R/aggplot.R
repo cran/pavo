@@ -1,21 +1,22 @@
 #' Plot aggregated reflectance spectra
 #'
-#' Combines and plots spectra (by taking the average and the standard deviation, for example)
-#' according to an index or a vector of identities.
+#' Combines and plots spectra (by taking the average and the standard deviation,
+#' for example) according to an index or a vector of identities.
 #'
 #' @param rspecdata (required) a data frame, possibly of class `rspec`, which
-#' contains a column containing a wavelength range, named 'wl', and spectra data in
-#' remaining columns.
-#' @param by (required) either a single value specifying the range of spectra within
-#' the data frame to be combined (for example, `by` = 3 indicates the function
-#' will be applied to groups of 3 consecutive columns in the spectra data frame);
-#' a vector containing identifications for the columns in the spectra data frame
-#' (in which case the function will be applied to each group of spectra sharing the
-#' same identification); or a list of vectors, e.g., `by = list(sex, species)`.
-#' @param FUN.center the function to be applied to the groups of spectra, calculating a
-#' measure of central tendency (defaults to [base::mean()]).
-#' @param FUN.error the function to be applied to the groups of spectra, calculating a
-#' measure of variation (defaults to [stats::sd()]).
+#'   contains a column containing a wavelength range, named 'wl', and spectra
+#'   data in remaining columns.
+#' @param by (required) either a single value specifying the range of spectra
+#'   within the data frame to be combined (for example, `by` = 3 indicates the
+#'   function will be applied to groups of 3 consecutive columns in the spectra
+#'   data frame); a vector containing identifications for the columns in the
+#'   spectra data frame (in which case the function will be applied to each
+#'   group of spectra sharing the same identification); or a list of vectors,
+#'   e.g., `by = list(sex, species)`.
+#' @param FUN.center the function to be applied to the groups of spectra,
+#'   calculating a measure of central tendency (defaults to [base::mean()]).
+#' @param FUN.error the function to be applied to the groups of spectra,
+#'   calculating a measure of variation (defaults to [stats::sd()]).
 #' @param lcol colour of plotted lines indicating central tendency.
 #' @param shadecol colour of shaded areas indicating variance measure.
 #' @param alpha transparency of the shaded areas.
@@ -56,39 +57,32 @@ aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
   errplotspecs <- aggspec(rspecdata, by = by, FUN = FUN.error)
 
   if (anyNA(errplotspecs[, -1])) {
-    stop("Could not calculate errors. Do any groups have n = 1?", call. = FALSE)
+    warning("Could not calculate errors. Do any groups have n = 1?",
+      call. = FALSE
+    )
   }
 
   # make wavelength vector
-  wl_index <- which(names(rspecdata) == "wl")
-  wl_index_cnt <- which(names(cntplotspecs) == "wl")
-  wl_index_err <- which(names(errplotspecs) == "wl")
+  wl <- isolate_wl(rspecdata, keep = "wl")
 
-  if (length(wl_index) > 0) {
-    wl <- rspecdata[, wl_index, drop = TRUE]
-    cntplotspecs <- as.data.frame(cntplotspecs[, -wl_index_cnt])
-    errplotspecs <- as.data.frame(errplotspecs[, -wl_index_err])
-  } else {
-    wl <- seq_len(nrow(rspecdata))
-    warning("No wavelengths provided; using arbitrary index values")
-  }
-
-  indexsub <- seq_along(cntplotspecs)
+  cntplotspecs <- isolate_wl(cntplotspecs, keep = "spec")
+  errplotspecs <- isolate_wl(errplotspecs, keep = "spec")
 
   if (as.integer(dim(errplotspecs)[1] / 2) == as.integer(dim(cntplotspecs)[1]) &&
     as.integer(dim(errplotspecs)[1] %% 2) == 0) {
-    polygon_data <- vapply(indexsub, function(x)
-      c(
-        errplotspecs[seq(dim(errplotspecs)[1]) %% 2 == 1, x],
-        rev(errplotspecs[seq(dim(errplotspecs)[1]) %% 2 == 0, x])
-      ), numeric(nrow(errplotspecs)))
+    # When FUN.error returns length 2 output for each spectrum (e.g. quantiles)
+    lower <- errplotspecs[seq(nrow(errplotspecs)) %% 2 == 0, ]
+    upper <- errplotspecs[seq(nrow(errplotspecs)) %% 2 == 1, ]
   } else {
-    polygon_data <- vapply(
-      indexsub, function(x)
-        c(cntplotspecs[, x] + errplotspecs[, x], rev(cntplotspecs[, x] - errplotspecs[, x])),
-      numeric(nrow(errplotspecs) * 2)
-    )
+    lower <- cntplotspecs - errplotspecs
+    upper <- cntplotspecs + errplotspecs
   }
+
+  polygon_data <- rbind(
+    upper,
+    lower[rev(seq(nrow(lower))), , drop = FALSE]
+  )
+
 
   polygon_wl <- c(wl, rev(wl))
 
@@ -105,7 +99,7 @@ aggplot <- function(rspecdata, by = NULL, FUN.center = mean, FUN.error = sd,
     arg$xlim <- range(wl)
   }
   if (is.null(arg$ylim)) {
-    arg$ylim <- range(polygon_data)
+    arg$ylim <- range(polygon_data, cntplotspecs, na.rm = TRUE)
   }
 
   # line width

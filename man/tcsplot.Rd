@@ -6,20 +6,39 @@
 \alias{tcsvol}
 \title{Interactive plot of a tetrahedral colourspace}
 \usage{
-tcsplot(tcsdata, size = 0.02, alpha = 1, col = "black",
-  vertexsize = 0.02, achro = TRUE, achrosize = 0.01,
-  achrocol = "grey", lwd = 1, lcol = "lightgrey", new = FALSE,
-  hspin = FALSE, vspin = FALSE, floor = TRUE)
+tcsplot(
+  tcsdata,
+  size = 0.02,
+  alpha = 1,
+  col = "black",
+  vertexsize = 0.02,
+  achro = TRUE,
+  achrosize = 0.01,
+  achrocol = "grey",
+  lwd = 1,
+  lcol = "lightgrey",
+  new = FALSE,
+  hspin = FALSE,
+  vspin = FALSE,
+  floor = TRUE
+)
 
 tcspoints(tcsdata, size = 0.02, col = "black", alpha = 1)
 
-tcsvol(tcsdata, col = "black", alpha = 0.2, grid.alpha = 1,
-  grid = TRUE, fill = TRUE, lwd = 1)
+tcsvol(
+  tcsdata,
+  col = "black",
+  alpha = 0.2,
+  grid.alpha = 1,
+  grid = TRUE,
+  fill = TRUE,
+  lwd = 1
+)
 }
 \arguments{
-\item{tcsdata}{(required) a data frame, possibly a result from the \code{\link[=colspace]{colspace()}}
-or \code{\link[=tcspace]{tcspace()}} function, containing values for the 'x', 'y' and 'z'
-coordinates as columns (labeled as such).}
+\item{tcsdata}{(required) a data frame, possibly a result from the
+\code{\link[=colspace]{colspace()}} or \code{\link[=tcspace]{tcspace()}} function, containing values for the 'x', 'y'
+and 'z' coordinates as columns (labeled as such).}
 
 \item{size}{size of the points in the plot (defaults to 0.02)}
 
@@ -31,9 +50,11 @@ coordinates as columns (labeled as such).}
 
 \item{achro}{should a point be plotted at the origin (defaults to \code{TRUE})?}
 
-\item{achrosize}{size of the point at the origin when \code{achro = TRUE} (defaults to \code{0.8}).}
+\item{achrosize}{size of the point at the origin when \code{achro = TRUE}
+(defaults to \code{0.8}).}
 
-\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to \code{'grey'}).}
+\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to
+\code{'grey'}).}
 
 \item{lwd, lcol}{graphical parameters for the edges of the tetrahedron.}
 

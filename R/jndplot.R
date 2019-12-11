@@ -3,35 +3,38 @@
 #' Plot options for [`jnd2xyz`] objects.
 #'
 #' @param x (required) the output from a [jnd2xyz()] call.
-#' @param arrow If and how arrows indicating receptor vectors should be
-#' drawn. Options are `"relative"` (default), `"absolute"` or
-#' `"none"`. See description.
+#' @param arrow If and how arrows indicating receptor vectors should be drawn.
+#'   Options are `"relative"` (default), `"absolute"` or `"none"`. See
+#'   description.
 #' @param achro Logical. Should the achromatic variable be plotted as a
-#' dimension? (only available for dichromats and trichromats, defaults to `FALSE`).
+#'   dimension? (only available for dichromats and trichromats, defaults to
+#'   `FALSE`).
 #' @param arrow.labels Logical. Should labels be plotted for receptor arrows?
-#' (defaults to `TRUE`)
+#'   (defaults to `TRUE`)
 #' @param arrow.col color of the arrows and labels.
 #' @param arrow.p scaling factor for arrows.
-#' @param margin accepts either `"recommended"`, where the function will choose margin
-#' attributes, or a numerical vector of the form `c(bottom, left, top, right)`
-#' which gives the number of lines of margin to be specified on the four sides of the plot.
-#' (Default varies depending on plot dimensionality).
-#' @param ... additional parameters to be passed to [plot()], [arrows()]
-#' and [graphics::persp()] (for 3D plots).
+#' @param margin accepts either `"recommended"`, where the function will choose
+#'   margin attributes, or a numerical vector of the form `c(bottom, left, top,
+#'   right)` which gives the number of lines of margin to be specified on the
+#'   four sides of the plot. (Default varies depending on plot dimensionality).
+#' @param ... additional parameters to be passed to [plot()], [arrows()] and
+#'   [graphics::persp()] (for 3D plots).
 #' @inheritParams triplot
 #'
 #' @return Creates a plot, details of the plot depend on the input data.
+#'
 #' @note the `arrow` argument accepts three options:
-#' * `"relative"`: With this option, arrows will be made relative to the data. Arrows
-#' will be centered on the data centroid, and will have an arbitrary length of half the
-#' average pairwise distance between points, which can be scaled with the `arrow.p`
-#' argument.
-#' * `"absolute"`: With this option, arrows will be made to reflect the visual system
-#' underlying the data. Arrows will be centered on the achromatic point in colourspace, and
-#' will have length equal to the distance to a monochromatic point (i.e. a colour that
-#' stimulates approximately 99.9% of that receptor alone). Arrows can still be scaled using
-#' the `arrow.p` argument, in which case they cannot be interpreted as described.
-#' * `"none"`: no arrows will be included.
+#'   * `"relative"`: With this option, arrows will be made relative to the data.
+#'   Arrows will be centered on the data centroid, and will have an arbitrary
+#'   length of half the average pairwise distance between points, which can be
+#'   scaled with the `arrow.p` argument.
+#'   * `"absolute"`: With this option, arrows will be made to reflect the visual
+#'   system underlying the data. Arrows will be centered on the achromatic point
+#'   in colourspace, and will have length equal to the distance to a
+#'   monochromatic point (i.e. a colour that stimulates approximately 99.9% of
+#'   that receptor alone). Arrows can still be scaled using the `arrow.p`
+#'   argument, in which case they cannot be interpreted as described.
+#'   * `"none"`: no arrows will be included.
 #'
 #' @export
 #'
@@ -47,8 +50,8 @@
 #' plot(propxyz)
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
-#' @references Pike, T.W. (2012). Preserving perceptual distances in chromaticity diagrams.
-#' Behavioral Ecology, 23, 723-728.
+#' @references Pike, T.W. (2012). Preserving perceptual distances in
+#'   chromaticity diagrams. Behavioral Ecology, 23, 723-728.
 
 
 jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
@@ -69,12 +72,12 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
   arg <- list(...)
 
   if (achro) {
-    plotdims <- as.character(round(sum(c("x", "y", "z", "lum") %in% colnames(x))))
+    plotdims <- sum(c("x", "y", "z", "lum") %in% colnames(x))
   } else {
-    plotdims <- as.character(round(sum(c("x", "y", "z") %in% colnames(x))))
+    plotdims <- sum(c("x", "y", "z") %in% colnames(x))
   }
 
-  if (plotdims == "4") {
+  if (plotdims == 4) {
     stop('cannot use "achro=TRUE" when chromatic space is three-dimensional.')
   }
 
@@ -88,7 +91,7 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
 
 
   # 1 DIMENSION
-  if (plotdims == "1") {
+  if (plotdims == 1) {
     if (!is.null(margin)) {
       if (margin == "recommended") {
         par(mar = c(5.1, 2.1, 4.1, 2.1))
@@ -173,7 +176,7 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
   }
 
   # 2 DIMENSIONS
-  if (plotdims == "2") {
+  if (plotdims == 2) {
     if (!is.null(margin)) {
       if (margin == "recommended") {
         par(mar = c(5.1, 4.1, 4.1, 2.1))
@@ -320,18 +323,7 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
           lbl <- c("S", "M", "L")
         }
 
-        text(lbl[1],
-          x = labelpos[1, colstouse[1]], y = labelpos[1, colstouse[2]], xpd = TRUE,
-          cex = labels.cex, col = arrow.col
-        )
-        text(lbl[2],
-          x = labelpos[2, colstouse[1]], y = labelpos[2, colstouse[2]], xpd = TRUE,
-          cex = labels.cex, col = arrow.col
-        )
-        text(lbl[3],
-          x = labelpos[3, colstouse[1]], y = labelpos[3, colstouse[2]], xpd = TRUE,
-          cex = labels.cex, col = arrow.col
-        )
+        text(labelpos, lbl, xpd = TRUE, cex = labels.cex, col = arrow.col)
       }
     }
 
@@ -349,7 +341,7 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
 
 
   # 3 DIMENSIONS
-  if (plotdims == "3") {
+  if (plotdims == 3) {
     if (!is.null(margin)) {
       if (margin == "recommended") {
         par(mar = c(1, 2, 0, 1) + 0.1)
@@ -526,12 +518,7 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
 
         lpos <- trans3d(labelpos[, 1], labelpos[, 2], labelpos[, 3], P)
 
-        for (i in seq_len(4)) {
-          text(lbl[i],
-            x = lpos$x[i], y = lpos$y[i], xpd = TRUE,
-            cex = labels.cex, col = arrow.col
-          )
-        }
+        text(lpos, lbl, xpd = TRUE, cex = labels.cex, col = arrow.col)
       }
     }
 

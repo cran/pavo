@@ -1,3 +1,33 @@
+# pavo 2.3.0
+
+## NEW FEATURES AND SIGNIFICANT CHANGES
+
+* `plot.rspec()` now adds a linear spectrum alongside the x-axis to show the 
+hues corresponding to each wavelength (controlled by the `wl.guide` boolean 
+argument).
+* `cieplot()` (and therefore `plot.colspace()` for CIEXYZ model) now adds the 
+background of the CIEXYZ colour space by default. This can be turned off by
+switching the `ciebg` argument to `FALSE`.
+* `voloverlap()` uses a different algorithm to determine volume overlaps, which 
+means:
+  - computation is now much more efficient
+  - `voloverlap()` now works for `trispace()` objects as well
+  - accordingly, first two arguments of `voloverlap()` has been renamed `colsp1`
+  and `colsp2` instead of `tcsres1` and `tcsres2`
+  - slow and possibly inaccurate `montecarlo` option has been deprecated
+
+## MINOR FEATURES AND BUG FIXES
+
+* errors during argument checks in `vismodel()` now have more explicit messages.
+* all `pavo` functions (excepted `vismodel()` and `spec2rgb()`) now work with
+sub-nm precision, for `rspec` objects with non-integer wavelengths.
+* `summary.colspace()` no longer fails for tcs objects with only one row.
+* `vismodel()` now works for monochromats as well.
+* `procspec(opt = "bin")` no longer counts bin edges twice (once in each consecutive bin). This will cause changes in the bin stops compared to earlier versions of this function.
+* `coc()` and `categorical()` spaces now return Weber luminance contrast by default when passed through `coldist()`, rather than nothing (as per the original publications). 
+* `coldist()` can now take multiple values for `weber`, when Weber fractions are known for all receptor classes
+* `summary.rspec()` no longer errors for a single spectrum when the wavelength range does not contain 450-700nm
+
 # pavo 2.2.0
 
 ## NEW FEATURES AND SIGNIFICANT CHANGES
@@ -17,7 +47,7 @@
 * fixed a bug where `colspace(space = segment)` would return both a `B` and (redundant) `lum` column
 * fixed a bug where the rod sensitivity of _Canis familiaris_ was inaccessible through `vismodel()`
 * fixed an issue in `getspec()` where badly encoded characters in some spectral files would cause failure
-* fixed a bug where `coldist()` would attempt to estimate receptor-noise weigted distances rather than cie-distances for `cielch` model results
+* fixed a bug where `coldist()` would attempt to estimate receptor-noise weighted distances rather than cie-distances for `cielch` model results
 
 # pavo 2.1.0
 

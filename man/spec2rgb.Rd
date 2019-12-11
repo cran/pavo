@@ -8,8 +8,8 @@ spec2rgb(rspecdata, alpha = 1)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly of class \code{rspec}, which
-contains a column containing a wavelength range, named 'wl', and spectra data in
-remaining columns.}
+contains a column containing a wavelength range, named 'wl', and spectra
+data in remaining columns.}
 
 \item{alpha}{alpha value to use for colours (defaults to 1, opaque).}
 }
@@ -25,7 +25,7 @@ data(teal)
 spec2rgb(teal)
 
 # Plot data using estimated perceived colour
-plot(teal, col = spec2rgb(teal), type = "o")
+plot(teal, col = spec2rgb(teal), type = "overlay")
 }
 \references{
 CIE(1932). Commission Internationale de l'Eclairage Proceedings, 1931. Cambridge: Cambridge University Press.

@@ -4,23 +4,36 @@
 \alias{diplot}
 \title{Plot a dichromat segment}
 \usage{
-diplot(didata, labels = TRUE, achro = TRUE, achrocol = "grey",
-  achrosize = 0.8, labels.cex = 1, out.lwd = 1, out.lcol = "black",
-  out.lty = 1, margins = c(1, 1, 2, 2), square = TRUE, ...)
+diplot(
+  didata,
+  labels = TRUE,
+  achro = TRUE,
+  achrocol = "grey",
+  achrosize = 0.8,
+  labels.cex = 1,
+  out.lwd = 1,
+  out.lcol = "black",
+  out.lty = 1,
+  margins = c(1, 1, 2, 2),
+  square = TRUE,
+  ...
+)
 }
 \arguments{
-\item{didata}{(required) a data frame, possibly a result from the \code{\link[=colspace]{colspace()}}
-or \code{\link[=dispace]{dispace()}}
-function, containing values for the 'x' coordinates as a column (labeled as such).}
+\item{didata}{(required) a data frame, possibly a result from the
+\code{\link[=colspace]{colspace()}} or \code{\link[=dispace]{dispace()}} function, containing values for the 'x'
+coordinates as a column (labeled as such).}
 
 \item{labels}{logical. Should the name of each cone be printed next to the
 corresponding vertex?}
 
 \item{achro}{should a point be plotted at the origin (defaults to \code{TRUE})?}
 
-\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to \code{'grey'}).}
+\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to
+\code{'grey'}).}
 
-\item{achrosize}{size of the point at the origin when \code{achro = TRUE} (defaults to \code{0.8}).}
+\item{achrosize}{size of the point at the origin when \code{achro = TRUE}
+(defaults to \code{0.8}).}
 
 \item{labels.cex}{size of the arrow labels.}
 

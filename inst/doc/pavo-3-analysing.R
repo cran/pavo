@@ -1,9 +1,9 @@
 ## ----include = FALSE-----------------------------------------------------
 # Do not use partial matching
 options(
-   warnPartialMatchDollar = FALSE,
-   warnPartialMatchArgs = FALSE,
-   warnPartialMatchAttr = FALSE
+   warnPartialMatchDollar = TRUE,
+   warnPartialMatchArgs = TRUE,
+   warnPartialMatchAttr = TRUE
 )
 knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 
@@ -69,15 +69,18 @@ vismod1
 ## ------------------------------------------------------------------------
 summary(vismod1)
 
-## ---- fig=TRUE, include=TRUE, results = 'hide', fig.width=6, fig.height=5, fig.cap="Plots of species mean reflectance curves with corresponding relative usml cone stimulations (insets)."----
+## ---- fig=TRUE, include=TRUE, results = 'hide', fig.width=8.5, fig.height=5, fig.cap="Plots of species mean reflectance curves with corresponding relative usml cone stimulations (insets)."----
 par(mfrow = c(2, 6), oma = c(3, 3, 0, 0))
-layout(rbind(c(2, 1, 4, 3, 6, 5), c(1, 1, 3, 3, 5, 5), c(8, 7, 10, 9, 12, 11), c(7, 7, 9, 9, 11, 11)))
+layout(rbind(c(2, 1, 4 , 3, 6 , 5),
+             c(1, 1, 3 , 3, 5 , 5), 
+             c(8, 7, 10, 9, 12, 11),
+             c(7, 7, 9 , 9, 11, 11)))
 
 sppspecol <- spec2rgb(sppspec)
 
-for (i in 2:7) {
+for (i in 1:6) {
   par(mar = c(2, 2, 2, 2))
-  plot(sppspec, select = i, col = sppspecol, lwd = 3, ylim = c(0, 100))
+  plot(sppspec, select = i+1, col = sppspecol, lwd = 3, ylim = c(0, 100))
   par(mar = c(4.1, 2.5, 2.5, 2))
   barplot(as.matrix(vismod1[i, 1:4]), yaxt = "n", col = "black")
 }
@@ -93,20 +96,51 @@ plot(idealizeddichromat, col = spec2rgb(idealizeddichromat), ylab = "Absorbance"
 vismod.idi <- vismodel(sppspec, visual = idealizeddichromat, relative = FALSE)
 vismod.idi
 
-## ------------------------------------------------------------------------
+## ---- message = FALSE----------------------------------------------------
 coldist(vismod1,
   noise = "neural", achromatic = TRUE, n = c(1, 2, 2, 4),
   weber = 0.1, weber.achro = 0.1
 )
 coldist(vismod.idi, n = c(1, 2), weber = 0.1)
 
-## ------------------------------------------------------------------------
+## ---- message=FALSE------------------------------------------------------
 coldist(vismod1, subset = 'cardinal')
 
-## ------------------------------------------------------------------------
+## ---- message=FALSE------------------------------------------------------
 coldist(vismod1, subset = c('cardinal', 'jacana'))
 
-## ------------------------------------------------------------------------
+## ---- message=FALSE, warning=FALSE---------------------------------------
+
+# Load the data
+data(sicalis)
+
+# Construct a model using an avian viewer
+sicmod <- vismodel(sicalis, visual = 'avg.uv', relative = FALSE)
+
+# Create a grouping variable to group by body region,
+# informed by the spectral data names
+regions <- substr(rownames(sicmod), 6, 6)
+
+# Estimate bootstrapped colour-distances
+sicdist <- bootcoldist(sicmod, by = regions, n = c(1, 2, 2, 4), weber = 0.05)
+
+# Take a look at the resulting pairwise estimates 
+sicdist
+
+## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="The bootstrapped colour distances between the throat, chest, and breast regions of male Sicalis citrina."----
+plot(sicdist[, 1], 
+     ylim = c(0, 20), 
+     pch = 21, 
+     bg = 1, 
+     cex = 2, 
+     xaxt = 'n', 
+     xlab = 'Centroid comparison', 
+     ylab = 'Chromatic contrast (dS)')
+axis(1, at = 1:3, labels = rownames(sicdist))
+segments(1:3, sicdist[, 2], 1:3, sicdist[, 3], lwd = 2)  # Add CI's
+abline(h = 1, lty = 3, lwd = 2)  # Add a 'threshold' line at dS = 1
+
+## ---- message=FALSE------------------------------------------------------
 fakedata1 <- vapply(
   seq(100, 500, by = 20),
   function(x) rowSums(cbind(
@@ -137,7 +171,7 @@ fakedata2[, -1] <- fakedata2[, -1] / max(fakedata2[, -1]) * 100
 fakedata.c <- data.frame(wl = 300:700, fakedata1[, -1], fakedata2[, -1])
 fakedata.c <- as.rspec(fakedata.c)
 
-## ------------------------------------------------------------------------
+## ---- message=FALSE------------------------------------------------------
 # Visual model and colour distances
 fakedata.vm <- vismodel(fakedata.c, relative = FALSE, achromatic = 'all')
 fakedata.cd <- coldist(fakedata.vm,

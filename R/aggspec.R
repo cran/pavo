@@ -30,19 +30,11 @@
 #' Bird coloration. Harvard University Press, Cambridge, pp 90-147.
 
 aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
-  
+
   # Check: user may have removed 'wl' function already.
   # (data.frame doesn't allow duplicate names anymore, so this should work)
-
-  wl_index <- which(names(rspecdata) == "wl")
-
-  if (length(wl_index > 0)) {
-    wl <- rspecdata[, wl_index]
-    y <- rspecdata[, -wl_index, drop = FALSE]
-  } else {
-    y <- rspecdata
-    wl <- 300:700
-  }
+  wl <- isolate_wl(rspecdata, keep = "wl")
+  y <- isolate_wl(rspecdata, keep = "spec")
 
   if (is.null(by)) {
     dat <- apply(y, 1, FUN)
@@ -101,15 +93,8 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
   }
 
   # Add ability to aggregate based on multiple vectors (given a list as input)
-  # TODO: add that list can be an input in roxygen doc
 
   by <- factor(by) # is this necessary?
-
-  # check if '...' is in argument list of specified FUN
-  # if not, add it. otherwise aggplot() options (like lty, lwd) will cause errors
-  if (!is.name(formals(FUN)$...)) {
-    formals(FUN) <- c(formals(FUN), alist(... = ))
-  }
 
   dat <- sapply(unique(by), function(z) {
     apply(y[which(by == z)], 1, FUN)
@@ -118,7 +103,7 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
   colnames(dat) <- unique(by0)
 
   if (trim) {
-    colnames(dat) <- gsub("[\\. | \\_ | \\-][0-9]*$", "", colnames(dat))
+    colnames(dat) <- gsub("[._-][0-9]*$", "", colnames(dat))
   }
 
   res <- data.frame(cbind(wl = wl, dat))

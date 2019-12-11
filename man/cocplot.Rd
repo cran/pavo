@@ -4,27 +4,39 @@
 \alias{cocplot}
 \title{Plot the colour opponent coding diagram}
 \usage{
-cocplot(cocdata, labels = TRUE, labels.cex = 0.9, tick.loc = c(-12,
-  -9, -6, -3, 3, 6, 9, 12), achro = FALSE, achrosize = 0.8,
-  achrocol = "grey", margins = c(1, 1, 2, 2), square = TRUE, ...)
+cocplot(
+  cocdata,
+  labels = TRUE,
+  labels.cex = 0.9,
+  tick.loc = c(-12, -9, -6, -3, 3, 6, 9, 12),
+  achro = FALSE,
+  achrosize = 0.8,
+  achrocol = "grey",
+  margins = c(1, 1, 2, 2),
+  square = TRUE,
+  ...
+)
 }
 \arguments{
-\item{cocdata}{(required) a data frame, possibly a result from the \code{\link[=colspace]{colspace()}}
-or \code{\link[=categorical]{categorical()}} function, containing values for 'x' and 'y' coordinates
-as columns (labeled as such).}
+\item{cocdata}{(required) a data frame, possibly a result from the
+\code{\link[=colspace]{colspace()}} or \code{\link[=categorical]{categorical()}} function, containing values for 'x' and 'y'
+coordinates as columns (labeled as such).}
 
 \item{labels}{logical. Should the name of each cone be printed next to the
 corresponding vertex?}
 
 \item{labels.cex}{size of the arrow labels.}
 
-\item{tick.loc}{a numeric vector specifying the location of tick marks on x & y axes.}
+\item{tick.loc}{a numeric vector specifying the location of tick marks on x &
+y axes.}
 
 \item{achro}{should a point be plotted at the origin (defaults to \code{TRUE})?}
 
-\item{achrosize}{size of the point at the origin when \code{achro = TRUE} (defaults to \code{0.8}).}
+\item{achrosize}{size of the point at the origin when \code{achro = TRUE}
+(defaults to \code{0.8}).}
 
-\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to \code{'grey'}).}
+\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to
+\code{'grey'}).}
 
 \item{margins}{margins for the plot.}
 
@@ -34,7 +46,8 @@ corresponding vertex?}
 \item{...}{additional graphical options. See \code{\link[=par]{par()}}.}
 }
 \description{
-Produces a plot based on the colour opponent coding diagram of Backhaus (1991).
+Produces a plot based on the colour opponent coding diagram of Backhaus
+(1991).
 }
 \examples{
 data(flowers)

@@ -22,64 +22,28 @@
 #' @author Pierre-Paul Bitton \email{bittonp@@uwindsor.ca}
 
 plotsmooth <- function(rspecdata, minsmooth = 0.05, maxsmooth = 0.20,
-                       curves = 5, specnum = 0, ask = TRUE) {
+                       curves = 5, specnum = "ALL", ask = TRUE) {
   oPar <- par("mfrow", "ask", "mar", "oma")
   on.exit(par(oPar))
 
   curves <- curves + 1
 
-  titlenames <- names(rspecdata[, 2:dim(rspecdata)[2]])
+  wl <- isolate_wl(rspecdata, keep = "wl")
+  rspecdata2 <- isolate_wl(rspecdata, keep = "spec")
 
-  if (specnum == 1) {
-    titlenames <- titlenames [2]
-    rspecdata <- rspecdata[, seq_len(specnum + 1)]
+  # Remove spectra according to specnum
+  if (specnum != "ALL") {
+    rspecdata2 <- rspecdata2[, seq_len(specnum)]
   }
 
-  if (specnum > 1) {
-    rspecdata <- rspecdata[, seq_len(specnum + 1)]
-    titlenames <- titlenames[2:dim(rspecdata)[2]]
-  }
+  titlenames <- names(rspecdata2)
 
-  wl_index <- which(names(rspecdata) == "wl")
-  wl <- rspecdata[, wl_index]
+  nplots <- ncol(rspecdata2)
 
-  nplots <- ncol(rspecdata) - 1
+  span_values <- seq(minsmooth, maxsmooth, length.out = curves - 1)
 
-  plotdata <- matrix(nrow = dim(rspecdata)[1], ncol = nplots * curves)
-
-  legnames <- as.character(seq(minsmooth, maxsmooth, by = (maxsmooth - minsmooth) / (curves - 2)))
-  legnames <- sprintf("%.4s", legnames)
-  legnames <- paste("span = ", legnames, sep = "")
+  legnames <- sprintf("span = %.4s", span_values)
   legnames <- rev(c("raw", legnames))
-
-  # Creates the smooth data matrix
-
-  inc <- (maxsmooth - minsmooth) / (curves - 2)
-
-  for (i in seq_len(nplots)) {
-    plotdata[, ((i - 1) * curves) + 1] <- rspecdata[, i + 1]
-
-    plotdata[, ((i - 1) * curves) + 2] <-
-
-      loess.smooth(wl, rspecdata [, i + 1],
-        span = minsmooth,
-        evaluation = length(wl), degree = 2, family = "gaussian"
-      )$y + 5
-
-    plotdata[, ((i - 1) * curves) + curves] <-
-      loess.smooth(wl, rspecdata [, i + 1],
-        span = maxsmooth,
-        evaluation = length(wl), degree = 2, family = "gaussian"
-      )$y + ((curves - 1) * 5)
-
-    for (j in seq_len(curves - 3)) {
-      plotdata[, ((i - 1) * curves) + 2 + j] <-
-        loess.smooth(wl, rspecdata [, i + 1],
-          span = (minsmooth + (inc * j)),
-          evaluation = length(wl), degree = 2, family = "gaussian"
-        )$y + (10 + ((j - 1) * 5))
-    }
-  }
 
   # Sets plot parameters based on the number of curves on the plots
   par(mfrow = c(3, 4), ask = ask)
@@ -108,36 +72,35 @@ plotsmooth <- function(rspecdata, minsmooth = 0.05, maxsmooth = 0.20,
     par(ask = FALSE)
   }
 
-  # Plots all curves
-  # all below does not work yet
-
   par(mar = c(2, 2, 2, 2), oma = c(3, 3, 0, 0))
 
   col_list <- c(
     "#000000", "#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
     "#FF7F00", "#ffdd33", "#A65628", "#F781BF"
   )
+  cols <- col_list[seq_len(curves)]
 
+  # Creates the smooth data matrix
   for (i in seq_len(nplots)) {
-    bloc <- plotdata[, (((i - 1) * curves) + 1):(i * curves)]
-    cols <- col_list[1:curves]
+    yaxismax <- max(rspecdata2[, i]) + (curves - 1) * 5
 
-    yaxismin <- min(bloc)
-    yaxismax <- max(bloc)
-
-    plot(rspecdata[, 1], bloc[, 1], cex = 0.1, ylim = c(yaxismin, yaxismax + 5), xlab = "Wavelength (nm)", ylab = "% Reflectance")
-    legend(rspecdata[1, 1] - 20, yaxismax + 6, legend = legnames, text.col = rev(cols), cex = 0.7, bty = "n", xjust = 0)
+    plot(wl, rspecdata2[, i], cex = 0.1, ylim = c(0, yaxismax + 5), type = "l")
+    legend(wl[1] - 20, yaxismax + 6, legend = legnames, text.col = rev(cols), cex = 0.7, bty = "n", xjust = 0)
     title(titlenames[i])
+
+    for (j in seq_len(curves - 1)) {
+      lines(wl,
+        loess.smooth(wl, rspecdata2[, i],
+          span = span_values[j],
+          evaluation = length(wl), degree = 2, family = "gaussian"
+        )$y + (j * 5),
+        col = cols[j + 1]
+      )
+    }
 
     if (i %% numplots == 0) {
       mtext("Wavelength (nm)", side = 1, outer = TRUE, line = 1)
       mtext("Reflectance (%)", side = 2, outer = TRUE, line = 1)
-    }
-
-    nextplot <- 2
-    while (nextplot < ncol(bloc) + 1) {
-      lines(rspecdata[, 1], bloc[, nextplot], cex = 0.1, col = cols[nextplot])
-      nextplot <- nextplot + 1
     }
   }
 

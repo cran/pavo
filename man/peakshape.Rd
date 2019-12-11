@@ -4,16 +4,23 @@
 \alias{peakshape}
 \title{Peak shape descriptors}
 \usage{
-peakshape(rspecdata, select = NULL, lim = NULL, plot = TRUE,
-  ask = FALSE, absolute.min = FALSE, ...)
+peakshape(
+  rspecdata,
+  select = NULL,
+  lim = NULL,
+  plot = TRUE,
+  ask = FALSE,
+  absolute.min = FALSE,
+  ...
+)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly of class \code{rspec}, which
-contains a column containing a wavelength range, named 'wl', and spectra data in
-remaining columns.}
+contains a column containing a wavelength range, named 'wl', and spectra
+data in remaining columns.}
 
-\item{select}{specification of which spectra to plot. Can be a numeric vector or
-factor (e.g., \code{sex=='male'})}
+\item{select}{specification of which spectra to plot. Can be a numeric vector
+or factor (e.g., \code{sex=="male"})}
 
 \item{lim}{a vector specifying the wavelength range to analyze.}
 

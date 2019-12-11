@@ -68,8 +68,7 @@
 #' @export
 #'
 
-sensdata <- function(
-                     visual = c(
+sensdata <- function(visual = c(
                        "none", "all", "avg.uv", "avg.v", "bluetit", "ctenophorus", "star",
                        "pfowl", "apis", "canis", "cie2", "cie10", "musca", "habronattus", "rhinecanthus"
                      ),
@@ -85,7 +84,7 @@ sensdata <- function(
   bkg2 <- match.arg(bkg, several.ok = TRUE)
   trans2 <- match.arg(trans, several.ok = TRUE)
 
-  dat <- data.frame(wl = 300:700)
+  dat <- data.frame("wl" = 300:700)
 
   # Visual system
   if (!isTRUE("none" %in% visual2)) {
@@ -96,8 +95,7 @@ sensdata <- function(
         "ctenophorus"
       )
     }
-    sens <- as.data.frame(vissyst)
-    S <- as.data.frame(subset(sens, select = grepl(paste(visual2, collapse = "|"), names(sens))))
+    S <- vissyst[, grepl(paste(visual2, collapse = "|"), names(vissyst)), drop = FALSE]
     dat <- cbind(dat, S)
   }
 
@@ -106,8 +104,7 @@ sensdata <- function(
     if (isTRUE("all" %in% achro2)) {
       achro2 <- c("bt.dc", "ch.dc", "st.dc", "md.r1", "ra.dc", "cf.r")
     }
-    sens <- as.data.frame(vissyst)
-    achro <- as.data.frame(subset(sens, select = grepl(paste(achro2, collapse = "|"), names(sens))))
+    achro <- vissyst[, grepl(paste(achro2, collapse = "|"), names(vissyst)), drop = FALSE]
     dat <- cbind(dat, achro)
   }
 
@@ -116,8 +113,7 @@ sensdata <- function(
     if (isTRUE("all" %in% illum2)) {
       illum2 <- c("bluesky", "D65", "forestshade")
     }
-    bgil <- as.data.frame(bgandilum)
-    illum <- as.data.frame(subset(bgil, select = grepl(paste(illum2, collapse = "|"), names(bgil))))
+    illum <- bgandilum[, grepl(paste(illum2, collapse = "|"), names(bgandilum)), drop = FALSE]
     dat <- cbind(dat, illum)
   }
 
@@ -126,8 +122,7 @@ sensdata <- function(
     if (isTRUE("all" %in% bkg2)) {
       bkg2 <- "green"
     }
-    bgil <- as.data.frame(bgandilum)
-    bkg <- as.data.frame(subset(bgil, select = grepl(paste(bkg2, collapse = "|"), names(bgil))))
+    bkg <- bgandilum[, grepl(paste(bkg2, collapse = "|"), names(bgandilum)), drop = FALSE]
     dat <- cbind(dat, bkg)
   }
 
@@ -136,15 +131,15 @@ sensdata <- function(
     if (isTRUE("all" %in% trans2)) {
       trans2 <- c("bluetit", "blackbird")
     }
-    trdat <- as.data.frame(transmissiondata)
-    trans <- as.data.frame(subset(trdat, select = grepl(paste(trans2, collapse = "|"), names(trdat))))
+    trans <- transmissiondata[, grepl(paste(trans2, collapse = "|"), names(transmissiondata)), drop = FALSE]
     dat <- cbind(dat, trans)
   }
 
-  dat <- suppressMessages(as.rspec(dat))
+  class(dat) <- c("rspec", "data.frame")
 
-  if (plot == TRUE) {
+  if (plot) {
     plot(dat, ...)
+    invisible(dat)
   } else {
     dat
   }

@@ -32,9 +32,9 @@ explorespec <- function(rspecdata, by = NULL,
   oPar <- par("mar", "oma", "ask", "mfrow")
   on.exit(par(oPar))
 
-  wl_index <- which(names(rspecdata) == "wl")
-  wl <- rspecdata[, wl_index]
-  rspecdata <- rspecdata[, -wl_index, drop = FALSE]
+  wl <- isolate_wl(rspecdata, keep = "wl")
+  rspecdata <- isolate_wl(rspecdata, keep = "spec")
+
   leg2 <- names(rspecdata)
 
   scale <- match.arg(scale)
@@ -120,7 +120,7 @@ explorespec <- function(rspecdata, by = NULL,
   # Do the plotting
   for (i in seq_len(numby)) {
     if (numby == 1) {
-      bloc <- data.frame(rspecdata[i])
+      bloc <- data.frame(rspecdata[seq_len(by)])
     } else {
       # THIS IS WHAT I NEED TO FIX
       bloc <- rspecdata[, which(by == levels(by)[i])]

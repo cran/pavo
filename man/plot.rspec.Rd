@@ -4,35 +4,48 @@
 \alias{plot.rspec}
 \title{Plot spectra}
 \usage{
-\method{plot}{rspec}(x, select = NULL, type = c("overlay", "stack",
-  "heatmap"), varying = NULL, n = 100, labels.stack = NULL, ...)
+\method{plot}{rspec}(
+  x,
+  select = NULL,
+  type = c("overlay", "stack", "heatmap"),
+  varying = NULL,
+  n = 100,
+  labels.stack = NULL,
+  wl.guide = TRUE,
+  ...
+)
 }
 \arguments{
-\item{x}{(required) a data frame, possibly an object of class \code{rspec},
-with a column with wavelength data, named 'wl', and the remaining column containing
-spectra to plot.}
+\item{x}{(required) a data frame, possibly an object of class \code{rspec}, with a
+column with wavelength data, named 'wl', and the remaining column
+containing spectra to plot.}
 
-\item{select}{specification of which spectra to plot. Can be a numeric vector or
-factor (e.g., \code{sex=='male'})}
+\item{select}{specification of which spectra to plot. Can be a numeric vector
+or factor (e.g., \code{sex=="male"})}
 
 \item{type}{what type of plot should be drawn. Possibilities are:
 \itemize{
 \item \code{overlay} (default) for plotting multiple spectra in a single panel with
 a common y-axis.
 \item \code{stack} for plotting multiple spectra in a vertical arrangement.
-\item \code{heatmap} for plotting reflectance values by wavelength and a third variable
-(\code{varying}).
+\item \code{heatmap} for plotting reflectance values by wavelength and a third
+variable (\code{varying}).
 }}
 
-\item{varying}{a numeric vector giving values for y-axis in \code{type = heatmap}.}
+\item{varying}{a numeric vector giving values for y-axis in
+\code{type = "heatmap"}.}
 
-\item{n}{number of bins with which to interpolate colors and \code{varying} for the
-heatplot.}
+\item{n}{number of bins with which to interpolate colors and \code{varying} for
+the heatplot.}
 
-\item{labels.stack}{a vector of labels for the stacked spectra when using \code{type = stack}.
-Defaults to the numeric column ID's.}
+\item{labels.stack}{a vector of labels for the stacked spectra when using
+\code{type = "stack"}. Defaults to the numeric column ID's.}
 
-\item{...}{additional arguments passed to plot (or image for \code{"heatmap"}).}
+\item{wl.guide}{logical determining whether visible light spectrum should be
+added to the x-axis.}
+
+\item{...}{additional arguments passed to \code{\link[=plot]{plot()}} (or \code{\link[=image]{image()}} for
+\code{"heatmap"}).}
 }
 \description{
 Plots reflectance spectra in different arrangements.

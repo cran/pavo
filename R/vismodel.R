@@ -80,23 +80,29 @@
 #' @examples
 #' # Dichromat (dingo)
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, visual = "canis")
-#' di.flowers <- colspace(vis.flowers, space = "di")
+#' vis.dingo <- vismodel(flowers, visual = "canis")
+#' di.dingo <- colspace(vis.dingo, space = "di")
 #'
 #' # Trichromat (honeybee)
 #' data(flowers)
-#' vis.flowers <- vismodel(flowers, visual = "apis")
-#' tri.flowers <- colspace(vis.flowers, space = "tri")
+#' vis.bee <- vismodel(flowers, visual = "apis")
+#' tri.bee <- colspace(vis.bee, space = "tri")
 #'
 #' # Tetrachromat (blue tit)
 #' data(sicalis)
-#' vis.sicalis <- vismodel(sicalis, visual = "bluetit")
-#' tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
+#' vis.bluetit <- vismodel(sicalis, visual = "bluetit")
+#' tcs.bluetit <- colspace(vis.bluetit, space = "tcs")
 #'
 #' # Tetrachromat (starling), receptor-noise model
 #' data(sicalis)
 #' vis.star <- vismodel(sicalis, visual = "star", achromatic = "bt.dc", relative = FALSE)
 #' dist.star <- coldist(vis.star, achromatic = TRUE)
+#'
+#' # Custom trichromatic visual system
+#' custom <- sensmodel(c(330, 440, 550))
+#' names(custom) <- c("wl", "s", "m", "l")
+#' vis.custom <- vismodel(flowers, visual = custom)
+#' tri.custom <- colspace(vis.custom, space = "tri")
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
@@ -143,10 +149,8 @@ vismodel <- function(rspecdata,
                      vonkries = FALSE, scale = 1, relative = TRUE) {
 
   # remove & save colum with wavelengths
-
-  wl_index <- which(names(rspecdata) == "wl")
-  wl <- rspecdata[, wl_index]
-  y <- rspecdata[, -wl_index, drop = FALSE]
+  wl <- isolate_wl(rspecdata, keep = "wl")
+  y <- isolate_wl(rspecdata, keep = "spec")
 
   # Negative value check
   if (any(y < 0)) {
@@ -174,15 +178,22 @@ vismodel <- function(rspecdata,
     match.arg(bkg),
     error = function(e) "user-defined"
   )
-  if (is.null(bkg)) {
-    stop("chosen background is NULL")
+  if (is.null(bkg) & vonkries) {
+    stop(
+      "Chosen background is NULL. ",
+      "This argument is required with `vonkries = TRUE`."
+    )
   }
   tr2 <- tryCatch(
     match.arg(trans),
     error = function(e) "user-defined"
   )
   if (is.null(trans)) {
-    stop("chosen transmission is NULL")
+    stop(
+      "Chosen transmission is NULL. ",
+      "If you want to model a completely transparent medium or if this is ",
+      "already included in your `visual` argument, use `trans = 'ideal'`."
+    )
   }
 
   qcatch <- match.arg(qcatch)
@@ -199,8 +210,8 @@ vismodel <- function(rspecdata,
   }
 
   if (visual2 == "segment") {
-    if (vonkries || !relative || !identical(achromatic2, "all") || identical(qcatch, "Qi") ||
-      !identical(bg2, "ideal") || !identical(tr2, "ideal") || identical(illum2, "ideal")) {
+    if (vonkries || !relative || !identical(achromatic2, "all") || !identical(qcatch, "Qi") ||
+      !identical(bg2, "ideal") || !identical(tr2, "ideal") || !identical(illum2, "ideal")) {
       vonkries <- FALSE
       relative <- TRUE
       achromatic2 <- "all"
@@ -225,21 +236,18 @@ vismodel <- function(rspecdata,
 
     sens_wl <- wl
   } else if (visual2 == "user-defined") {
-    S <- visual[, names(visual) != "wl"]
-    sens_wl <- visual[, "wl"]
+    S <- isolate_wl(visual, keep = "spec")
+    sens_wl <- isolate_wl(visual, keep = "wl")
     fullS <- visual
   } else {
     visual <- match.arg(visual)
     S <- sens[, grep(visual, names(sens))]
     names(S) <- gsub(paste0(visual, "."), "", names(S))
-    sens_wl <- sens[, "wl"]
+    sens_wl <- isolate_wl(sens, keep = "wl")
   }
 
   # Save cone numer
-  ifelse(identical(visual2, "segment"),
-    conenumb <- "seg",
-    conenumb <- dim(S)[2]
-  )
+  conenumb <- ifelse(identical(visual2, "segment"), "seg", dim(S)[2])
 
   # Check if wavelength range matches
   if (!isTRUE(all.equal(wl, sens_wl, check.attributes = FALSE)) &
@@ -284,7 +292,7 @@ vismodel <- function(rspecdata,
   }
 
   if (tr2 != "ideal" & visual2 == "user-defined") {
-    if ("sensmod" %in% class(fullS)) {
+    if (inherits(fullS, "sensmod")) {
       if (attr(fullS, "om")) {
         warning(
           "The visual system being used appears to already incorporate ocular ",
@@ -357,18 +365,12 @@ vismodel <- function(rspecdata,
     crossprod(as.matrix(y), as.matrix(S * illum)) * B * K
   )
 
-  # In case rspecdata only has one spectrum
-  if (dim(Qi)[2] < 2) {
-    Qi <- data.frame(t(Qi))
-    rownames(Qi) <- names(y)
-  }
-
   names(Qi) <- names(S)
 
   # Achromatic contrast
 
   # Calculate lum
-  if (achromatic2 %in% c("bt.dc", "ch.dc", "st.dc", "md.r1", 'cf.r', "ra.dc", "ml", "l", "all", "user-defined")) {
+  if (achromatic2 %in% c("bt.dc", "ch.dc", "st.dc", "md.r1", "cf.r", "ra.dc", "ml", "l", "all", "user-defined")) {
     L <- switch(achromatic2,
       "bt.dc" = ,
       "ch.dc" = ,
@@ -383,13 +385,9 @@ vismodel <- function(rspecdata,
     )
     lum <- colSums(y * L * illum)
     Qi <- data.frame(cbind(Qi, lum))
-  }
-
-  if (achromatic2 == "segment") {
+  } else if (achromatic2 == "segment") {
     Qi <- data.frame(cbind(Qi, B))
-  }
-
-  if (achromatic2 == "none") {
+  } else if (achromatic2 == "none") {
     L <- NULL
     lum <- NULL
   }
@@ -418,14 +416,24 @@ vismodel <- function(rspecdata,
     Ei = Qi / (Qi + 1)
   )
 
-  # Convert to relative
-  if (relative) {
-    res[, !names(res) %in% "lum"] <- res[, !names(res) %in% "lum"] / rowSums(res[, !names(Qi) %in% "lum"])
+  # Negative qcatch check
+  if (any(res < 0)) {
+    warning(
+      length(res[res < 0]),
+      " negative quantum-catch value(s) returned, which may be unreliable. ",
+      "Consider whether the illuminant is properly scaled, and/or the appropriate",
+      " form of quantum catch is being calculated."
+    )
   }
 
   # Add NA lum column is lum not calculated
   if (achromatic2 == "none") {
     res$lum <- NA
+  }
+
+  # Convert to relative
+  if (relative) {
+    res[, !names(res) %in% "lum"] <- res[, !names(res) %in% "lum"] / rowSums(res[, !names(res) %in% "lum", drop = FALSE])
   }
 
   class(res) <- c("vismodel", "data.frame")

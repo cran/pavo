@@ -76,7 +76,6 @@ test_that("Procspec", {
 })
 
 test_that("Aggregation", {
-  library(digest)
   data(teal)
 
   ind <- rep(c("a", "b"), times = 6)
@@ -87,17 +86,12 @@ test_that("Aggregation", {
 
   teal1 <- teal[, c(1, 3:5)]
   teal2 <- teal[, c(1, 2, 6:12)]
-  expect_equal(digest::sha1(merge(teal1, teal2, by = "wl"), digits = 4), "a2072eee8242dbad1774712fa50cd53d6d8d8978")
 
   data(sicalis)
   vis.sicalis <- vismodel(sicalis)
   tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 
-  # Subset all 'crown' patches (C in file names)
-  expect_equal(digest::sha1(subset(vis.sicalis, "C"), digits = 4), "e42aa1c3abe2aca9114b03744e4f590004c8068a")
-  expect_equal(digest::sha1(subset(sicalis, "T", invert = TRUE), digits = 4), "8cf8078dd22a0d7be9aebed447ce9122ef36f72f")
-  
-  expect_error(aggspec(teal, by = 7), 'by not a multiple')
+  expect_error(aggspec(teal, by = 7), "by not a multiple")
 })
 
 test_that("Convert", {
@@ -105,11 +99,6 @@ test_that("Convert", {
   illum <- sensdata(illum = "forestshade")
   expect_equal(sum(irrad2flux(illum)[2]), 6.619, tol = 10e-4)
   expect_equal(sum(flux2irrad(illum)[2]), 3174.328, tol = 10e-4)
-
-  # Errors
-  class(illum) <- "data.frame"
-  expect_error(irrad2flux(illum), "rspec")
-  expect_error(flux2irrad(illum), "rspec")
 
   # RGB
   data(teal)

@@ -4,19 +4,29 @@
 \alias{segplot}
 \title{Plot the segment-analysis model}
 \usage{
-segplot(segdata, labels = TRUE, lab.cex = 0.9, out.lwd = 1,
-  out.lty = 1, out.lcol = "black", tick.loc = c(-1, -0.5, 0.5, 1),
-  margins = c(1, 1, 2, 2), square = TRUE, ...)
+segplot(
+  segdata,
+  labels = TRUE,
+  lab.cex = 0.9,
+  out.lwd = 1,
+  out.lty = 1,
+  out.lcol = "black",
+  tick.loc = c(-1, -0.5, 0.5, 1),
+  margins = c(1, 1, 2, 2),
+  square = TRUE,
+  ...
+)
 }
 \arguments{
-\item{segdata}{(required) a data frame, possibly a result from the \code{\link[=colspace]{colspace()}}
-or \code{\link[=segspace]{segspace()}} function, containing values for 'LM' and 'MS'
+\item{segdata}{(required) a data frame, possibly a result from the
+\code{\link[=colspace]{colspace()}} or \code{\link[=segspace]{segspace()}} function, containing values for 'LM' and 'MS'
 as columns (labeled as such).}
 
 \item{labels}{logical. Should the name of each cone be printed next to the
 corresponding vertex?}
 
-\item{tick.loc}{a numeric vector specifying the location of tick marks on x & y axes.}
+\item{tick.loc}{a numeric vector specifying the location of tick marks on x &
+y axes.}
 
 \item{margins}{margins for the plot.}
 
@@ -36,8 +46,8 @@ plot(seg.flowers)
 }
 \references{
 Endler, J. A. (1990) On the measurement and classification of
-color in studies of animal color patterns. Biological Journal of the Linnean
-Society, 41, 315-352.
+colour in studies of animal colour patterns. Biological Journal of the
+Linnean Society, 41, 315-352.
 }
 \author{
 Thomas White \email{thomas.white026@gmail.com}

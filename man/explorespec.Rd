@@ -4,13 +4,18 @@
 \alias{explorespec}
 \title{Plot spectral curves}
 \usage{
-explorespec(rspecdata, by = NULL, scale = c("equal", "free"),
-  legpos = "topright", ...)
+explorespec(
+  rspecdata,
+  by = NULL,
+  scale = c("equal", "free"),
+  legpos = "topright",
+  ...
+)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly of class \code{rspec}, which
-contains a column containing a wavelength range, named 'wl', and spectra data in
-remaining columns.}
+contains a column containing a wavelength range, named 'wl', and spectra
+data in remaining columns.}
 
 \item{by}{number of spectra to include in each graph (defaults to 1)}
 

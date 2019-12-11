@@ -4,14 +4,18 @@
 \alias{procspec}
 \title{Process spectra}
 \usage{
-procspec(rspecdata, opt = c("none", "smooth", "maximum", "minimum",
-  "bin", "sum", "center"), fixneg = c("none", "addmin", "zero"),
-  span = 0.25, bins = 20)
+procspec(
+  rspecdata,
+  opt = c("none", "smooth", "maximum", "minimum", "bin", "sum", "center"),
+  fixneg = c("none", "addmin", "zero"),
+  span = 0.25,
+  bins = 20
+)
 }
 \arguments{
 \item{rspecdata}{(required) a data frame, possibly of class \code{rspec}, which
-contains a column containing a wavelength range, named 'wl', and spectra data in
-remaining columns.}
+contains a column containing a wavelength range, named 'wl', and spectra
+data in remaining columns.}
 
 \item{opt}{what type of processing options to apply. User can select multiple
 options by providing a vector. Possibilities are:
@@ -20,7 +24,7 @@ options by providing a vector. Possibilities are:
 \item \code{"smooth"} applies LOESS smoothing to each spectrum using \code{\link[=loess.smooth]{loess.smooth()}}.
 Optimal smoothing parameter can be assessed by using \code{\link[=plotsmooth]{plotsmooth()}}.
 \item \code{"minimum"} subtracts the minimum from each individual spectra.
-\item \code{"maxmimum"} divides each spectrum by its maximum value.
+\item \code{"maximum"} divides each spectrum by its maximum value.
 \item \code{"sum"} divides each spectrum by summed values.
 \item \code{"bin"} bins each spectrum into the specified number of bins. \code{bins}
 argument must be set.

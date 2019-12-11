@@ -2,23 +2,27 @@
 #'
 #' Plots reflectance spectra in different arrangements.
 #'
-#' @param x (required) a data frame, possibly an object of class `rspec`,
-#' with a column with wavelength data, named 'wl', and the remaining column containing
-#' spectra to plot.
-#' @param select specification of which spectra to plot. Can be a numeric vector or
-#' factor (e.g., `sex=='male'`)
+#' @param x (required) a data frame, possibly an object of class `rspec`, with a
+#'   column with wavelength data, named 'wl', and the remaining column
+#'   containing spectra to plot.
+#' @param select specification of which spectra to plot. Can be a numeric vector
+#'   or factor (e.g., `sex=="male"`)
 #' @param type what type of plot should be drawn. Possibilities are:
-#' * `overlay` (default) for plotting multiple spectra in a single panel with
-#' a common y-axis.
-#' * `stack` for plotting multiple spectra in a vertical arrangement.
-#' * `heatmap` for plotting reflectance values by wavelength and a third variable
-#' (`varying`).
-#' @param varying a numeric vector giving values for y-axis in `type = heatmap`.
-#' @param n number of bins with which to interpolate colors and `varying` for the
-#' heatplot.
-#' @param labels.stack a vector of labels for the stacked spectra when using `type = stack`.
-#' Defaults to the numeric column ID's.
-#' @param ... additional arguments passed to plot (or image for `"heatmap"`).
+#'    * `overlay` (default) for plotting multiple spectra in a single panel with
+#'      a common y-axis.
+#'    * `stack` for plotting multiple spectra in a vertical arrangement.
+#'    * `heatmap` for plotting reflectance values by wavelength and a third
+#'      variable (`varying`).
+#' @param varying a numeric vector giving values for y-axis in
+#' `type = "heatmap"`.
+#' @param n number of bins with which to interpolate colors and `varying` for
+#'   the heatplot.
+#' @param labels.stack a vector of labels for the stacked spectra when using
+#'   `type = "stack"`. Defaults to the numeric column ID's.
+#' @param wl.guide logical determining whether visible light spectrum should be
+#'   added to the x-axis.
+#' @param ... additional arguments passed to [plot()] (or [image()] for
+#'   `"heatmap"`).
 #'
 #' @export
 #'
@@ -31,36 +35,30 @@
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
 #' @seealso [spec2rgb()], [image()], [plot()]
+#'
+#' @importFrom magick image_read
 
 # TODO: add argument for padding region between x in stack plot
 
 plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap"),
-                       varying = NULL, n = 100, labels.stack = NULL, ...) {
+                       varying = NULL, n = 100, labels.stack = NULL,
+                       wl.guide = TRUE, ...) {
   type <- match.arg(type)
 
   # make wavelength vector
-  wl_index <- which(names(x) == "wl")
-  if (length(wl_index) > 0) {
-    haswl <- TRUE
-    wl <- x[, wl_index]
+  wl <- isolate_wl(x, keep = "wl")
+
+  if (is.null(select)) {
+    x <- isolate_wl(x, keep = "spec")
   } else {
-    haswl <- FALSE
-    wl <- seq_len(nrow(x))
-    warning("No wavelengths provided; using arbitrary index values")
+    x <- isolate_wl(x[, select, drop = FALSE], keep = "spec")
   }
 
-  # subset based on indexing vector
-  if (is.logical(select)) {
-    select <- which(select == "TRUE")
+  # This line is needed for later because cols and lty are dropped depending on
+  # select and if it remains NULL, everything is dropped.
+  if (is.null(select)) {
+    select <- seq_along(x)
   }
-  if (is.null(select) & haswl == TRUE) {
-    select <- (seq_len(ncol(x)))[-wl_index]
-  }
-  if (is.null(select) & haswl == FALSE) {
-    select <- seq_len(ncol(x))
-  }
-
-  x <- as.data.frame(x[select]) # CE: removed comma before select
 
   arg <- list(...)
 
@@ -68,21 +66,16 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
   if (is.null(arg$xlab)) {
     arg$xlab <- "Wavelength (nm)"
   }
-  if (is.null(arg$xlim)) {
-    arg$xlim <- range(wl, na.rm = TRUE)
-  }
+  arg$x <- wl
 
   # heat plot
   if (type == "heatmap") {
-    if (is.null(arg$xlab)) {
-      arg$xlab <- "Wavelength (nm)"
-    }
     if (is.null(arg$ylab)) {
       arg$ylab <- "Index"
     }
     if (is.null(varying)) {
-      varying <- seq_len(ncol(x))
-      print("No varying vector supplied; using arbitrary values")
+      varying <- seq_along(x)
+      message("No varying vector supplied; using arbitrary values")
     }
     if (is.null(arg$ylim)) {
       arg$ylim <- range(varying, na.rm = TRUE)
@@ -93,32 +86,32 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
       jc <- colorRampPalette(arg$col)
       arg$col <- jc(n)
     }
-
     if (is.null(arg$lty)) {
       arg$lty <- 1
     }
 
     Index <- approx(varying, n = n)$y
 
-    dat <- vapply(seq_len(nrow(x)), function(z) {
+    dat <- apply(x, 1, function(z) {
       approx(
         x = varying,
-        y = x[z, ],
+        y = z,
         n = n
       )$y
-    }, numeric(length(Index)))
+    })
 
-    arg$x <- wl
     arg$y <- Index
     arg$z <- t(dat)
 
     do.call(image, arg)
+
+    invisible()
   }
 
   # coloring for overlay plot & others
   if (length(arg$col) < ncol(x)) {
     arg$col <- rep(arg$col, ncol(x))
-    arg$col <- arg$col[seq_len(ncol(x))]
+    arg$col <- arg$col[seq_along(x)]
   }
 
   if (any(names(arg$col) %in% names(x))) {
@@ -128,12 +121,13 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
   # line types for overlay plot & others
   if (length(arg$lty) < ncol(x)) {
     arg$lty <- rep(arg$lty, ncol(x))
-    arg$lty <- arg$lty[seq_len(ncol(x))]
+    arg$lty <- arg$lty[seq_along(x)]
   }
 
   if (any(names(arg$lty) %in% names(x))) {
     arg$col <- arg$lty[select - 1]
   }
+  arg$type <- "l"
 
 
   # overlay different spec curves
@@ -144,8 +138,6 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
     if (is.null(arg$ylab)) {
       arg$ylab <- "Reflectance (%)"
     }
-    arg$type <- "l"
-    arg$x <- wl
     arg$y <- x[, 1]
     col <- arg$col
     arg$col <- col[1]
@@ -167,12 +159,11 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
 
   # Stack curves along y-axis
   if (type == "stack") {
-    arg$type <- "l"
     if (is.null(arg$ylab)) {
       arg$ylab <- "Cumulative reflectance (arb. units)"
     }
 
-    x2 <- as.data.frame(x[, c(rev(seq_len(ncol(x))))])
+    x2 <- as.data.frame(x[, c(rev(seq_along(x)))])
     if (length(select) == 1) {
       y <- max(x2)
     } else {
@@ -181,7 +172,6 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
     ym <- cumsum(y)
     ymins <- c(0, ym[-length(ym)])
 
-    arg$x <- wl
     arg$y <- x2[, 1]
     if (is.null(arg$ylim)) {
       arg$ylim <- c(0, sum(y))
@@ -206,5 +196,16 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
     }
 
     axis(side = 4, at = yloc, labels = labels.stack, las = 1)
+  }
+
+  if (wl.guide) {
+    vislight <- image_read(system.file("linear_visible_spectrum.png", package = "pavo"))
+    rasterImage(
+      vislight,
+      380,
+      grconvertY(0, from = "npc", to = "user"),
+      750,
+      grconvertY(0.03, from = "npc", to = "user")
+    )
   }
 }

@@ -17,6 +17,7 @@
 #' `pavo` functions.
 #'
 #' @importFrom magick image_info
+#' @importFrom tools file_path_sans_ext
 #'
 #' @export
 #'
@@ -47,7 +48,7 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE,
 
   # If file extensions are in 'imgpath', it's a single image being directly specified
   if (grepl(paste(ext, collapse = "|"), imgpath, ignore.case = TRUE)) {
-    imgdat <- as.rimg(image_read(imgpath), name = sub(".*\\/", "", sub("[.][^.]+$", "", imgpath)))
+    imgdat <- as.rimg(image_read(imgpath), name = file_path_sans_ext(basename(imgpath)))
 
     # Warn of slowness if dimensions are large
     if (dim(imgdat)[1] * dim(imgdat)[2] > 1000000) {
@@ -79,8 +80,6 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE,
 
     message(length(files), " files found; importing images.")
 
-    imgnames <- gsub(extension, "", file_names)
-
     # Stop if max size estimated to exceed available memory
     imgsize <- image_info(image_read(files[1]))["filesize"]
     totalsize <- ((imgsize * 8) * length(file_names)) / (1024^3)
@@ -94,7 +93,7 @@ getimg <- function(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE,
     }
 
     # Get images
-    imgdat <- as.rimg(image_read(files), name = imgnames)
+    imgdat <- as.rimg(image_read(files), name = file_names)
 
     # Simplify if it's a single image   ###TODO###
     if (length(imgdat) == 1) imgdat <- imgdat[[1]]

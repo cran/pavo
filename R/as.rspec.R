@@ -4,23 +4,22 @@
 #' object
 #'
 #' @param object (required) a data frame or matrix containing spectra to
-#' process.
+#'   process.
 #' @param whichwl a numeric or character vector specifying which column contains
-#' wavelengths. If `NULL`` (default), function searches for column containing equally
-#' spaced numbers and sets it as wavelengths "wl". If no wavelengths are found or
-#' `whichwl` is not given, returns arbitrary index values.
+#'   wavelengths. If `NULL` (default), function searches for column containing
+#'   equally spaced numbers and sets it as wavelengths "wl". If no wavelengths
+#'   are found or `whichwl` is not given, returns arbitrary index values.
 #' @param interp whether to interpolate wavelengths in 1-nm bins (defaults to
-#' `TRUE``).
+#'   `TRUE`).
 #' @param lim vector specifying wavelength range to interpolate over (e.g.
-#' `c(300, 700)`).
-#' @param exceed.range logical. Should data be interpolated to the limits specified
-#' by `lim` if `lim` exceeds the range of the actual data? Useful, and relatively safe,
-#' when the data range falls slightly within `lim` (e.g. 300.1 - 699 nm), but will
-#' produce spurious results if `lim` far exceeds the range of input data.
-#' Defaults to `TRUE`.
+#'   `c(300, 700)`).
+#' @param exceed.range logical. Should data be interpolated to the limits
+#'   specified by `lim` if `lim` exceeds the range of the actual data? Useful,
+#'   and relatively safe, when the data range falls slightly within `lim` (e.g.
+#'   300.1 - 699 nm), but will produce spurious results if `lim` far exceeds the
+#'   range of input data. Defaults to `TRUE`.
 #'
-#' @return an object of class `rspec` for use in further `pavo`
-#' functions
+#' @return an object of class `rspec` for use in further `pavo` functions
 #'
 #' @export as.rspec is.rspec
 #'
@@ -43,7 +42,9 @@ as.rspec <- function(object, whichwl = NULL,
                      interp = TRUE, lim = NULL, exceed.range = TRUE) {
 
   # tibble dodge
-  if ("tbl_df" %in% attr(object, "class")) object <- data.frame(object)
+  if ("tbl_df" %in% attr(object, "class")) {
+    object <- data.frame(object)
+  }
 
   if (is.matrix(object) || is.data.frame(object)) {
     name <- colnames(object)
@@ -51,9 +52,9 @@ as.rspec <- function(object, whichwl = NULL,
     stop("object must be a data frame or matrix")
   }
 
-  if (length(object[is.na(object)]) > 0) {
+  if (anyNA(object)) {
     message(
-      "\nThe spectral data contain ", length(object[is.na(object)]),
+      "The spectral data contain ", sum(is.na(object)),
       " NA's(s), which should be reviewed closely."
     )
   }
@@ -69,11 +70,6 @@ as.rspec <- function(object, whichwl = NULL,
   # Case 3: wl | col1 | col2... (no whichwl, lim) --> use correlation find
   # Case 4:      col1 | col2... --> use arbitrary numbering
 
-  # try to automatically find wavelength column. for increasing wavelengths,
-  # expect a perfect correlation between lambda values and column indices
-  ind <- apply(object, 2, function(x) {
-    cor(x, seq_len(nrow(object)))
-  })
 
   if (!is.null(whichwl)) {
     if (is.numeric(whichwl)) {
@@ -84,24 +80,31 @@ as.rspec <- function(object, whichwl = NULL,
     wl <- object[, wl_index]
     object <- object[, -wl_index, drop = FALSE]
     name <- name[-wl_index]
-  } else if (any(ind > 0.999)) {
-    wl_index <- which(ind > 0.999)[1]
-    wl <- object[, wl_index]
-    object <- object[, -wl_index, drop = FALSE]
-    name <- name[-wl_index]
-    message("wavelengths found in column ", wl_index)
-  } else if (!is.null(lim)) {
-    wl <- seq(lim[1], lim[2], length.out = nrow(object))
-    warning(
-      "No wavelengths contained in dataset, using user-specified range. ",
-      "Check output carefully!"
-    )
   } else {
-    wl <- seq_len(nrow(object))
-    warning(
-      "No wavelengths found or whichwl not provided; ",
-      "using arbitrary index values"
-    )
+    # try to automatically find wavelength column. for increasing wavelengths,
+    # expect a near perfect correlation between lambda values and row indices
+    ind <- apply(object, 2, function(x) {
+      cor(x, seq_len(nrow(object)))
+    })
+    if (any(ind > 0.999)) {
+      wl_index <- which(ind > 0.999)[1]
+      wl <- object[, wl_index]
+      object <- object[, -wl_index, drop = FALSE]
+      name <- name[-wl_index]
+      message("wavelengths found in column ", wl_index)
+    } else if (!is.null(lim)) {
+      wl <- seq(lim[1], lim[2], length.out = nrow(object))
+      warning(
+        "No wavelengths contained in dataset, using user-specified range. ",
+        "Check output carefully!"
+      )
+    } else {
+      wl <- seq_len(nrow(object))
+      warning(
+        "No wavelengths found or whichwl not provided; ",
+        "using arbitrary index values."
+      )
+    }
   }
 
   l1.dat <- floor(wl[which.min(wl)]) # lower wavelength limit of given data
@@ -124,16 +127,9 @@ as.rspec <- function(object, whichwl = NULL,
     }
   }
 
-  # Negative value check
-  if (any(object < 0, na.rm = TRUE)) {
-    message(
-      "\nThe spectral data contain ", sum(object < 0, na.rm = TRUE),
-      " negative value(s), which may produce unexpected results if used in models. Consider using procspec() to correct them."
-    )
-  }
-
   # Interpolation & data-trimming
-  ifelse(exceed.range, rule <- 2, rule <- 1)
+  rule <- ifelse(exceed.range, 2, 1)
+
   if (interp) {
     object <- apply(object, 2, function(col) {
       approx(x = wl, y = col, xout = l1:l2, rule = rule)$y
@@ -141,6 +137,9 @@ as.rspec <- function(object, whichwl = NULL,
     wl <- seq(l1, l2)
   }
 
+  # We need to convert object as a df before putting back the wl, otherwise
+  # altrep INTSXP wl will be converted to REALSXP
+  object <- as.data.frame(object)
   res <- cbind(wl, object)
 
   colnames(res) <- c("wl", name)
@@ -165,15 +164,21 @@ as.rspec <- function(object, whichwl = NULL,
     }
   }
 
-  res <- as.data.frame(res)
+  # Negative value check
+  if (any(res < 0, na.rm = TRUE)) {
+    message(
+      "The spectral data contain ", sum(res < 0, na.rm = TRUE),
+      " negative value(s), which may produce unexpected results if used in models. Consider using procspec() to correct them."
+    )
+  }
+
   class(res) <- c("rspec", "data.frame")
 
   return(res)
 }
 
 #' @rdname as.rspec
-#' @return a logical value indicating whether the object is of class
-#' `rspec`
+#' @return a logical value indicating whether the object is of class `rspec`
 
 is.rspec <- function(object) {
   inherits(object, "rspec")

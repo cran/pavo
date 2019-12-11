@@ -4,15 +4,27 @@
 \alias{hexplot}
 \title{Plot a colour hexagon}
 \usage{
-hexplot(hexdata, achro = TRUE, labels = TRUE, sectors = c("none",
-  "fine", "coarse"), sec.col = "grey", out.lwd = 1, out.lty = 1,
-  out.lcol = "black", labels.cex = 1, achrosize = 0.8,
-  achrocol = "grey", margins = c(1, 1, 2, 2), square = TRUE, ...)
+hexplot(
+  hexdata,
+  achro = TRUE,
+  labels = TRUE,
+  sectors = c("none", "fine", "coarse"),
+  sec.col = "grey",
+  out.lwd = 1,
+  out.lty = 1,
+  out.lcol = "black",
+  labels.cex = 1,
+  achrosize = 0.8,
+  achrocol = "grey",
+  margins = c(1, 1, 2, 2),
+  square = TRUE,
+  ...
+)
 }
 \arguments{
-\item{hexdata}{(required) a data frame, possibly a result from the \code{\link[=colspace]{colspace()}}
-or \code{\link[=hexagon]{hexagon()}}
-function, containing values for the 'x' and 'y' coordinates as columns (labeled as such)}
+\item{hexdata}{(required) a data frame, possibly a result from the
+\code{\link[=colspace]{colspace()}} or \code{\link[=hexagon]{hexagon()}} function, containing values for the 'x' and 'y'
+coordinates as columns (labeled as such)}
 
 \item{achro}{should a point be plotted at the origin (defaults to \code{TRUE})?}
 
@@ -23,7 +35,8 @@ corresponding vertex?}
 \itemize{
 \item \code{"none"}: No sectors (default)
 \item \code{"fine"}: 36 10-degree sectors
-\item \code{"coarse"}: six bee-hue sectors (blue, blue-green, green, uv-green, uv, uv-blue).
+\item \code{"coarse"}: six bee-hue sectors (blue, blue-green, green, uv-green, uv,
+uv-blue).
 }}
 
 \item{sec.col}{line colour of hue sector dividers. Defaults to \code{"grey"}.}
@@ -36,9 +49,11 @@ corresponding vertex?}
 
 \item{labels.cex}{size of the arrow labels.}
 
-\item{achrosize}{size of the point at the origin when \code{achro = TRUE} (defaults to \code{0.8}).}
+\item{achrosize}{size of the point at the origin when \code{achro = TRUE}
+(defaults to \code{0.8}).}
 
-\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to \code{'grey'}).}
+\item{achrocol}{color of the point at the origin \code{achro = TRUE} (defaults to
+\code{'grey'}).}
 
 \item{margins}{margins for the plot.}
 

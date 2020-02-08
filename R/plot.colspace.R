@@ -31,7 +31,7 @@
 #' # Colour hexagon
 #' vis.flowers <- vismodel(flowers,
 #'   visual = "apis", qcatch = "Ei", relative = FALSE,
-#'   vonkries = TRUE, achro = "l", bkg = "green"
+#'   vonkries = TRUE, achromatic = "l", bkg = "green"
 #' )
 #' hex.flowers <- colspace(vis.flowers, space = "hexagon")
 #' plot(hex.flowers, sectors = "coarse")
@@ -58,7 +58,7 @@
 #' tcsvol(tcs.sicalis)
 #' }
 #'
-#' @seealso [plot()]
+#' @seealso [plot()], [points.colspace()]
 #'
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @author Thomas White \email{thomas.white026@@gmail.com}

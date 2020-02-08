@@ -6,12 +6,14 @@
 #' @inheritParams plot.colspace
 #' @param ... additional graphical options. See [par()].
 #'
-#' @return `points.colspace` adds points to a colorspace plot. When `space = 'tcs'`,
-#'  it creates 3D points in a tetrahedral color space plot using functions of the package `rgl`,
-#'  based on openGL capabilities.
+#' @return `points.colspace` adds points to a colourspace plot.
 #'
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @author Thomas White \email{thomas.white026@@gmail.com}
+#'
+#' @importFrom grDevices trans3d
+#'
+#' @seealso [plot.colspace()]
 #'
 #' @export
 #'
@@ -27,13 +29,6 @@ points.colspace <- function(x, ...) {
     arg$pch <- 19
   }
 
-  if (attr(x, "clrsp") != "tcs" & attr(x, "clrsp") != "CIELAB") {
-    arg$x <- x[, "x"]
-    arg$y <- x[, "y"]
-
-    do.call(points, arg)
-  }
-
   if (attr(x, "clrsp") == "tcs") {
     last_tetraplot <- get("last_plot.tetra", envir = .PlotTetraEnv)
 
@@ -45,9 +40,7 @@ points.colspace <- function(x, ...) {
 
     xy <- trans3d(x[, "x"], x[, "y"], x[, "z"], last_tetraplot)
     do.call(points, c(xy, arg))
-  }
-
-  if (attr(x, "clrsp") == "CIELAB") {
+  } else if (attr(x, "clrsp") == "CIELAB") {
     last_labplot <- get("last_plot.cielab", envir = .PlotCielabEnv)
 
     # arg$x <- x[ ,'a']
@@ -58,5 +51,10 @@ points.colspace <- function(x, ...) {
 
     xy <- trans3d(x[, "a"], x[, "b"], x[, "L"], last_labplot)
     do.call(points, c(xy, arg))
+  } else {
+    arg$x <- x[, "x"]
+    arg$y <- x[, "y"]
+
+    do.call(points, arg)
   }
 }

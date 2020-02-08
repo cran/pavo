@@ -94,7 +94,7 @@
 #' # Trichromat, colour-hexagon model (euclidean distances)
 #' vis.flowers <- vismodel(flowers,
 #'   visual = "apis", qcatch = "Ei",
-#'   relative = FALSE, vonkries = TRUE, achro = "l", bkg = "green"
+#'   relative = FALSE, vonkries = TRUE, achromatic = "l", bkg = "green"
 #' )
 #' hex.flowers <- colspace(vis.flowers, space = "hexagon")
 #' hexdist.flowers <- coldist(hex.flowers)
@@ -153,7 +153,7 @@ coldist <- function(modeldata,
 
   noise <- match.arg(noise)
 
-  usereceptornoisemodel <- !isTRUE(any(class(modeldata) %in% "colspace"))
+  usereceptornoisemodel <- !inherits(modeldata, "colspace")
 
   if (noise == "quantum") {
     if (!is.vismodel(modeldata) && !is.colspace(modeldata)) {
@@ -193,25 +193,27 @@ coldist <- function(modeldata,
     }
   }
 
-  # transformations in case object is neither from colspace or vismodel
+  # Transformations in case object is neither from colspace or vismodel. Changed
+  # warnings to messages, since there's no way to directly specify 'ncone' when using
+  # custom data you'd always get scary warnings.
   if (is.null(ncone)) {
     if (achromatic) {
       ncone <- ncol(modeldata) - 1
-      warning("number of cones not specified; assumed to be ", ncone,
-        " (last column ignored for chromatic contrast, used only for achromatic contrast)",
-        call. = FALSE
+      message(
+        "Number of cones assumed to be ", ncone,
+        " (last column ignored for chromatic contrast, used only for achromatic contrast)"
       )
     }
     else {
       # Don't count all-NA columns when guessing ncone
+      # FIXME: this only works if there is a single all-NA column. But we have
+      # no guarantee this will always be the case
       if (any(sapply(modeldata, function(x) all(is.na(x))))) {
         ncone <- ncol(modeldata) - 1
       } else {
         ncone <- ncol(modeldata)
       }
-      warning("number of cones not specified; assumed to be ", ncone,
-        call. = FALSE
-      )
+      message("Number of cones assumed to be ", ncone)
     }
   }
 
@@ -247,11 +249,11 @@ coldist <- function(modeldata,
     # Quantum catch models need Qi in original scale (not log transformed)
     # to calculate the noise. Save as qndat object.
     qndat <- switch(qcatch,
-      Qi = as.matrix(modeldata),
-      fi = as.matrix(exp(modeldata))
+      Qi = dat,
+      fi = exp(dat)
     )
 
-    dat2 <- dat[, 1:ncone, drop = FALSE]
+    dat2 <- dat[, seq_len(ncone), drop = FALSE]
 
     if (is.numeric(weber.ref) && weber.ref > length(n)) {
       stop("reference cone class for the empirical estimate of the Weber fraction (",
@@ -307,7 +309,7 @@ coldist <- function(modeldata,
 
     res[, "dS"] <- switch(noise,
       "neural" = newreceptornoise(dat2, n, weber, weber.ref, res),
-      "quantum" = newreceptornoise(dat2, n, weber, weber.ref, res, qndat[, 1:ncone])
+      "quantum" = newreceptornoise(dat2, n, weber, weber.ref, res, qndat[, seq_len(ncone)])
     )
     resref[, "dS"] <- switch(noise,
       "neural" = newreceptornoise(visref, n, weber, weber.ref, resref),
@@ -445,10 +447,13 @@ coldist <- function(modeldata,
   }
 
   # Set achro contrasts to NA if no lum values supplied
-  if (attr(modeldata, "visualsystem.achromatic") == "none" || is.null(attr(modeldata, "visualsystem.achromatic"))
-  || !(achromatic)) {
+  if (((is.vismodel(modeldata) || is.colspace(modeldata)) && attr(modeldata, "visualsystem.achromatic") == "none") || !(achromatic)) {
     res$dL <- NA
   }
+
+  # if (attr(modeldata, "visualsystem.achromatic") == "none" || !(achromatic)) {
+  #   res$dL <- NA
+  # }
 
   attr(res, "ncone") <- ncone
   attr(res, "isrnoise") <- usereceptornoisemodel

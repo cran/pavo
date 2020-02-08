@@ -1,7 +1,7 @@
 Package: pavo
 Title: Perceptual Analysis, Visualization and Organization of Spectral
         Colour Data
-Version: 2.3.0
+Version: 2.4.0
 Authors@R: 
     c(person(given = "Rafael",
              family = "Maia",
@@ -34,19 +34,19 @@ Authors@R:
 Description: A cohesive framework for parsing, analyzing and
     organizing colour from spectral data.
 License: GPL (>= 2)
-URL: http://rafaelmaia.net/pavo/, https://github.com/rmaia/pavo/
+URL: http://pavo.colrverse.com, https://github.com/rmaia/pavo/
 BugReports: https://github.com/rmaia/pavo/issues
 Depends: R (>= 3.5.0)
-Imports: cluster, geometry(>= 0.4.0), magick, pbmcapply, plot3D, sp,
-        viridisLite
+Imports: cluster, future.apply, geometry(>= 0.4.0), lightr(>= 1.0),
+        magick, plot3D, progressr, sp, viridisLite
 Suggests: digest, imager, knitr, mapproj, NbClust, rgl, rmarkdown,
-        testthat, xml2
+        testthat,
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-GB
 RoxygenNote: 7.0.2
 NeedsCompilation: no
-Packaged: 2019-12-11 07:12:43 UTC; rafaelmaia
+Packaged: 2020-02-08 06:39:24 UTC; rafaelmaia
 Author: Rafael Maia [aut, cre] (<https://orcid.org/0000-0002-7563-9795>),
   Thomas White [aut] (<https://orcid.org/0000-0002-3976-1734>),
   Hugo Gruson [aut] (<https://orcid.org/0000-0002-4094-1476>),
@@ -55,4 +55,4 @@ Author: Rafael Maia [aut, cre] (<https://orcid.org/0000-0002-7563-9795>),
   Pierre-Paul Bitton [aut] (<https://orcid.org/0000-0001-5984-2331>)
 Maintainer: Rafael Maia <rm72@zips.uakron.edu>
 Repository: CRAN
-Date/Publication: 2019-12-11 15:30:02 UTC
+Date/Publication: 2020-02-08 16:20:08 UTC

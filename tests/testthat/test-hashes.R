@@ -2,7 +2,7 @@ context("hashes")
 
 test_that("coldist", {
   skip_on_cran()
-  
+
   data(flowers)
   library(digest)
 
@@ -32,25 +32,30 @@ test_that("coldist", {
     digest::sha1(coldist(colspace(vismodel(flowers, visual = "segment")), achromatic = TRUE), digits = 4),
     "d65c018342664ae9c8dca35e715c57dde28de30a"
   )
+  expect_equal(
+    digest::sha1(coldist(as.matrix(vismodel(flowers, achro = "bt.dc")), qcatch = "Qi", achromatic = TRUE), digits = 4),
+    "c6d1989e98abd7772c00475696c6e6dafe0a2e46"
+  )
+
 })
 
 test_that("colspace", {
   skip_on_cran()
-  
+
   library(digest)
   data(flowers)
 
   expect_equal(
     digest::sha1(colspace(vismodel(flowers, visual = "canis", achromatic = "all")), digits = 4),
-    "443206b9f30dbf9fabb1025890e9c5953efb3b43"
+    "0e01892cc85af65956927dde880a432cb8ef58f3"
   ) # dispace
   expect_equal(
     digest::sha1(colspace(vismodel(flowers, visual = "apis", achromatic = "l")), digits = 4),
-    "1c8c2087dc1cb245a77b56c3e194002205cf4d20"
+    "68e113dd2b4ad1bfb80d236fa64f3b5c97e2b48d"
   ) # trispace
   expect_equal(
     digest::sha1(colspace(vismodel(flowers, visual = "bluetit", achromatic = "ch.dc")), digits = 4),
-    "3e32a9a99b2bd284b8cf2077ae4668f0bb83ca9a"
+    "57cb207e9637250020dabdd0d96570a63025dd36"
   ) # tcs
   expect_equal(
     digest::sha1(colspace(vismodel(flowers, visual = "musca", achro = "md.r1"), space = "categorical"), digits = 4),
@@ -81,17 +86,18 @@ test_that("colspace", {
     "f4e4cc8da4fdffddc80c51f2f830b88adba3779d"
   ) # cielch
 
-  expect_equal(
-    digest::sha1(summary(colspace(vismodel(flowers, visual = "cie10"), space = "cielch")), digits = 4),
-    "8d9c05ec7ae28b219c4c56edbce6a721bd68af82"
-  )
+  # sha1() has no method for the 'table' class
+  # expect_equal(
+  #   digest::sha1(summary(colspace(vismodel(flowers, visual = "cie10"), space = "cielch")), digits = 4),
+  #   "8d9c05ec7ae28b219c4c56edbce6a721bd68af82"
+  # )
   expect_equivalent(round(sum(summary(colspace(vismodel(flowers)))), 5), 4.08984)
   expect_equivalent(round(sum(summary(colspace(vismodel(flowers))), by = 3), 5), 7.08984)
 })
 
 test_that("processing & general", {
   skip_on_cran()
-  
+
   library(digest)
 
   # Sensdata
@@ -120,17 +126,27 @@ test_that("processing & general", {
   tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
   expect_equal(
     digest::sha1(subset(vis.sicalis, "C"), digits = 4),
-    "4d77fb3cbccb2520faa75c427345e0e630fc4938"
+    "d265007e21606280699956c9df106edbababaa76"
   )
   expect_equal(
     digest::sha1(subset(sicalis, "T", invert = TRUE), digits = 4),
     "332a97ed1c25045b70d871a8686e268d09cefd76"
   )
+
+  # Summary
+  expect_equal(
+    digest::sha1(summary(teal), digits = 4),
+    "59e740d97537e0b9892a914b489231f7ccbd8517"
+  )
+  expect_equal(
+    digest::sha1(summary(sicalis), digits = 4),
+    "a882bdb4bdcda1b95235f02d0783fb705e66b834"
+  )
 })
 
 test_that("images", {
   skip_on_cran()
-  
+
   library(digest)
   suppressWarnings(RNGversion("3.5.0")) # back compatibility for now
   set.seed(2231)
@@ -150,49 +166,64 @@ test_that("images", {
 
 test_that("vismodel", {
   skip_on_cran()
-  
+
   library(digest)
   data(flowers)
 
   # Output
   expect_equal(
     digest::sha1(vismodel(flowers, visual = "canis", achromatic = "all", illum = "bluesky"), digits = 4),
-    "7885f3c09e3fa529cfca3658e214b22fac81f9eb"
+    "d1d8229f54a64ba9d292284e784d196ee6a8021b"
   )
   expect_equal(
     digest::sha1(vismodel(flowers, visual = "apis", qcatch = "fi", achromatic = "ml", scale = 10000), digits = 4),
-    "cb9471e72e3261269799e6193d44c2067a36188d"
+    "fc77a98dd6335db3f5ed24bbda148aa39d0bc4f9"
   )
   expect_equal(
     digest::sha1(vismodel(flowers, visual = "bluetit", achromatic = "ch.dc", trans = "bluetit"), digits = 4),
-    "d50c261f4a31527fe3ba4281fef66eabb9b9261f"
+    "95275ae220707de802e181798f74f05280a22b93"
   )
   expect_equal(
     digest::sha1(vismodel(flowers, visual = "musca", achromatic = "md.r1", relative = FALSE), digits = 4),
-    "07c41c78516ef09dde394d6eec27cefe66c3bc77"
+    "9a1b514313bdfc4bb24c87b1098971e401c7dd96"
   )
   expect_equal(
     digest::sha1(vismodel(flowers, visual = "apis", relative = FALSE, qcatch = "Ei", bkg = "green", vonkries = TRUE, achromatic = "l"), digits = 4),
-    "7b348f76891decb04b06ad398cbef1ece1370a4f"
+    "a6bc51f272c930a4ac9e69a1851eca16f5a3a1a0"
   )
   expect_equal(
     digest::sha1(vismodel(flowers, visual = "cie10"), digits = 4),
-    "ac896df0004fc14da08394ab6ade8f3764e0498a"
+    "04f0a831e1cf7a50137a0f27df2e36d4c899ae41"
   )
 
   # Attributes
-  expect_equal(
-    digest::sha1(attributes(vismodel(flowers, visual = "canis", achromatic = "all", illum = "bluesky")), digits = 4),
-    "457f2380406720be0fb65d2c7d3efe4efcca5009"
-  )
-  expect_equal(
-    digest::sha1(attributes(vismodel(flowers, visual = "apis", qcatch = "fi", achromatic = "ml", scale = 10000)), digits = 4),
-    "1692dd3afc83d7524d8d971af695f68794c673f2"
-  )
-  expect_equal(
-    digest::sha1(attributes(vismodel(flowers, visual = "bluetit", achromatic = "ch.dc", trans = "bluetit")), digits = 4),
-    "81e59dc34d535e29bec068d7fcf7c828d9c3acef"
-  )
+  if (getRversion() < "4.0.0") {
+    expect_equal(
+      digest::sha1(attributes(vismodel(flowers, visual = "canis", achromatic = "all", illum = "bluesky")), digits = 4),
+      "b77b40f7833f88083b7834362b34e80254f1de14"
+    )
+    expect_equal(
+      digest::sha1(attributes(vismodel(flowers, visual = "apis", qcatch = "fi", achromatic = "ml", scale = 10000)), digits = 4),
+      "9a9b662b1dc4c81584d45843905c4daf43355c79"
+    )
+    expect_equal(
+      digest::sha1(attributes(vismodel(flowers, visual = "bluetit", achromatic = "ch.dc", trans = "bluetit")), digits = 4),
+      "11f0526bea5e21f5b9c8b910b58e0bbab016b027"
+    )
+  } else {
+    expect_equal(
+      digest::sha1(attributes(vismodel(flowers, visual = "canis", achromatic = "all", illum = "bluesky")), digits = 4),
+      "b984121a82c91aaad824580eab08563eeffb0587"
+    )
+    expect_equal(
+      digest::sha1(attributes(vismodel(flowers, visual = "apis", qcatch = "fi", achromatic = "ml", scale = 10000)), digits = 4),
+      "0fed595d308c8d09234b35b75bd6569f70de9fad"
+    )
+    expect_equal(
+      digest::sha1(attributes(vismodel(flowers, visual = "bluetit", achromatic = "ch.dc", trans = "bluetit")), digits = 4),
+      "760bfeafeea210f8629e126a49a80663f06e8885"
+    )
+  }
   # expect_equal(digest::sha1(attributes(vismodel(flowers, visual = 'musca', achro = 'md.r1', relative = FALSE)), digits = 4),  "3fcd2c3eb74ed4e6d2e505b2c207ca558f287d16")
   # expect_equal(digest::sha1(attributes(vismodel(flowers, visual = 'apis', relative = FALSE, qcatch = 'Ei', bkg = 'green', vonkries = TRUE, achromatic = 'l')), digits = 4),  "e1dc6128b9c4ce47a0664394f0e453e53ba6c9db")
   # expect_equal(digest::sha1(attributes(vismodel(flowers, visual = 'cie10')), digits = 4),  "38c06f479375903ba566d9fd7187f9efcf134761")

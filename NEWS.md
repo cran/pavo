@@ -1,3 +1,31 @@
+# pavo 2.4.0
+
+## NEW FEATURES AND SIGNIFICANT CHANGES
+
+* Fixed a bug introduced in version 2.3.0 that gave wrong values for S1UV and 
+S1V in `summary.rspec()`.
+* several `plot()` functions for colspace (`triplot()`, `tcsplot()`, 
+`tetraplot()`) gain a new `gamut` argument to plot the maximum gamut for a given
+visual system and illuminant. `summary.colspace()` also now returns the maximum
+colour volume for a given visual system and illuminant that you can use to
+compare to the realised volume by a given dataset. More information in PR #180.
+* parallel processing now relies on the `future` package, which offers windows 
+and high performance computing (HPC) environments support. The progress bar is
+produced by the `progressr` package and can be customised as well. As a 
+consequence, the `cores` argument in `getspec()`, `adjacent()` and `classify()`
+has been deprecated.
+
+## MINOR FEATURES AND BUG FIXES
+
+* fixed a plotting bug introduced in version 2.3.0 where it was required to run
+`projplot()` twice for the background grid to be displayed.
+* fixed a bug in `summary.colspace()` where `NULL` was returned instead of 
+`summary.data.frame()` for non-tcs colourspaces.
+* fix partial matching warnings in examples and in `bootcooldist()`
+* the package has a new website at `pavo.colrverse.com`
+* fixed a bug in `coldist()`that prevented the calculation of achromatic contrast
+when using custom quantum catch data 
+
 # pavo 2.3.0
 
 ## NEW FEATURES AND SIGNIFICANT CHANGES

@@ -13,14 +13,14 @@ A cohesive framework for parsing, analyzing and
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://rafaelmaia.net/pavo/}
+  \item \url{http://pavo.colrverse.com}
   \item \url{https://github.com/rmaia/pavo/}
   \item Report bugs at \url{https://github.com/rmaia/pavo/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Rafael Maia \email{rm72@zips.uakron.edu} (\href{https://orcid.org/0000-0002-7563-9795}{ORCID})
+\strong{Maintainer}: Rafael Maia \email{thomas.white026@gmail.com} (\href{https://orcid.org/0000-0002-7563-9795}{ORCID})
 
 Authors:
 \itemize{

@@ -42,7 +42,7 @@
 #' # Honeybee in the colour hexagon
 #' vis.flowers <- vismodel(flowers,
 #'   visual = "apis", qcatch = "Ei", relative = FALSE,
-#'   vonkries = TRUE, achro = "l", bkg = "green"
+#'   vonkries = TRUE, achromatic = "l", bkg = "green"
 #' )
 #' hex.flowers <- colspace(vis.flowers, space = "hexagon")
 #'
@@ -99,9 +99,10 @@ colspace <- function(vismodeldata,
     stop("Invalid colorspace selected")
   }
 
+  # Auto-define an appropriate space
   if (space2 == "auto") {
     if (all(c("X", "Y", "Z") %in% names(vismodeldata))) {
-      res <- cie(vismodeldata, "XYZ")
+      space2 <- "ciexyz"
     } else {
       if (is.null(attr(vismodeldata, "conenumb"))) {
         stop(
@@ -110,29 +111,30 @@ colspace <- function(vismodeldata,
           " argument"
         )
       }
-      res <-
+      space2 <-
         switch(as.character(attr(vismodeldata, "conenumb")),
-          "2" = dispace(vismodeldata),
-          "3" = trispace(vismodeldata),
-          "4" = tcspace(vismodeldata),
-          "seg" = segspace(vismodeldata)
+          "2" = "di",
+          "3" = "tri",
+          "4" = "tcs",
+          "seg" = "segment"
         )
     }
-  } else {
-    res <-
-      switch(space2,
-        "di" = dispace(vismodeldata),
-        "tri" = trispace(vismodeldata),
-        "hexagon" = hexagon(vismodeldata),
-        "tcs" = tcspace(vismodeldata),
-        "coc" = coc(vismodeldata),
-        "categorical" = categorical(vismodeldata),
-        "ciexyz" = cie(vismodeldata, "XYZ"),
-        "cielab" = cie(vismodeldata, "LAB"),
-        "cielch" = cie(vismodeldata, "LCh"),
-        "segment" = segspace(vismodeldata)
-      )
   }
+
+  # Run the model
+  res <-
+    switch(space2,
+      "di" = dispace(vismodeldata),
+      "tri" = trispace(vismodeldata),
+      "hexagon" = hexagon(vismodeldata),
+      "tcs" = tcspace(vismodeldata),
+      "coc" = coc(vismodeldata),
+      "categorical" = categorical(vismodeldata),
+      "ciexyz" = cie(vismodeldata, "XYZ"),
+      "cielab" = cie(vismodeldata, "LAB"),
+      "cielch" = cie(vismodeldata, "LCh"),
+      "segment" = segspace(vismodeldata)
+    )
 
   # Include lum for appropriate spaces
   if (!any(space2 %in% c("segment", "ciexyz", "cielab", "cielch"))) {
@@ -143,12 +145,12 @@ colspace <- function(vismodeldata,
   if (is.null(attr(res, "qcatch"))) {
     if (is.null(qcatch)) {
       qcatch <- "Qi"
-      warning('input is not a "vismodel" object and argument "qcatch" is undefined; assuming quantum catch are not transformed (i.e. qcatch="Qi")')
+      message('Input is not a "vismodel" object and argument "qcatch" is undefined; assuming quantum catch are not transformed (i.e. qcatch = "Qi")')
     }
     attr(res, "qcatch") <- qcatch
   }
 
-  # check relative if user-defined input
+  # Check relative if user-defined input
   if (is.null(attr(res, "relative"))) {
     attr(res, "relative") <- FALSE
     receptcols <- res[, colnames(res) %in% c("u", "s", "m", "l")]

@@ -21,6 +21,36 @@ test_that("as.rspec", {
   # With rule = 2, missing values outside of range are generated
   expect_equal(nrow(flowers3) + 1, nrow(as.rspec(flowers3, lim = c(300, 700), exceed.range = TRUE)))
   expect_warning(as.rspec(flowers3, lim = c(300, 700), exceed.range = TRUE), "beyond the range")
+
+  expect_error(as.rspec(c(300:700)), "must be a data frame or matrix")
+
+  colnames(flowers)[2] <- "wl"
+  expect_warning(as.rspec(flowers), "Multiple columns named 'wl'")
+
+  fakedat <- data.frame(wl = seq(200, 800, 0.5), refl1 = rnorm(1201), refl2 = rnorm(1201))
+  expect_equal(dim(as.rspec(fakedat, lim = c(300, 700), interp = FALSE)), c(801, 3))
+  expect_equal(dim(as.rspec(fakedat, lim = c(200, 800), interp = FALSE)), c(1201, 3))
+  expect_equal(dim(as.rspec(fakedat, lim = c(300, 700), interp = TRUE)), c(401, 3))
+  expect_equal(as.data.frame(as.rspec(fakedat, lim = c(300, 700))["wl"]), data.frame(wl = as.numeric(c(300:700))))
+
+  # Matrix and df input should have the same output
+  expect_equal(as.rspec(fakedat), as.rspec(as.matrix(fakedat)))
+
+  # Single column df should work and output a 2 columns rspec object
+  expect_equal(dim(suppressWarnings(as.rspec(fakedat[, 2, drop = FALSE]))), c(1201, 2))
+
+  expect_message(as.rspec(fakedat), "wavelengths found")
+
+  expect_warning(as.rspec(fakedat[, -1], lim = c(300, 700)), "user-specified range")
+  expect_warning(as.rspec(fakedat[, -1]), "arbitrary index")
+
+  expect_error(as.rspec(fakedat, lim = c(300.1, 700), interp = FALSE), "limits")
+  expect_error(as.rspec(fakedat, lim = c(300, 699.1), interp = FALSE), "limits")
+
+  fakedat[2:4, 2] <- NA
+  expect_message(as.rspec(fakedat, whichwl = 1), "negative")
+  expect_message(as.rspec(fakedat, whichwl = 1), "NA")
+
 })
 
 test_that("summary.rspec", {
@@ -50,4 +80,47 @@ test_that("summary.rspec", {
 
   # Warning about UV variables if full UV range is not included
   expect_warning(summary(sicalis, wlmin = 350), "UV-related variables may not be meaningful")
+})
+
+test_that("plot.rspec", {
+
+  data(teal)
+
+  expect_message(plot(teal, type = "heatmap"), "No varying vector supplied")
+
+})
+
+test_that("subset.rspec", {
+
+  data(sicalis)
+
+  sicalis_T <- subset(sicalis, "T")
+
+  expect_equal(dim(sicalis_T), c(401, 8))
+  expect_is(sicalis_T, "rspec")
+
+  expect_warning(subset(sicalis, "Z"), "Subset condition not found")
+
+})
+
+test_that("merge.rspec", {
+
+  data(sicalis)
+
+  sicalis_T <- subset(sicalis, "T")
+  sicalis_C <- subset(sicalis, "C")
+
+  sicalis_TC <- subset(sicalis, c("T", "C"))
+
+  sicalis_merged <- merge(sicalis_T, sicalis_C)
+
+  expect_is(sicalis_merged, "rspec")
+  expect_mapequal(sicalis_TC, sicalis_merged)
+
+  expect_error(merge(sicalis_T, as.data.frame(sicalis_C)),
+               "invalid rspec objects")
+
+  expect_error(merge(sicalis_T, sicalis_C[, -1]),
+               "Cannot find valid")
+
 })

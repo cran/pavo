@@ -57,7 +57,7 @@
 tcsplot <- function(tcsdata, size = 0.02, alpha = 1, col = "black",
                     vertexsize = 0.02, achro = TRUE, achrosize = 0.01, achrocol = "grey",
                     lwd = 1, lcol = "lightgrey", new = FALSE, hspin = FALSE,
-                    vspin = FALSE, floor = TRUE) {
+                    vspin = FALSE, floor = TRUE, gamut = FALSE) {
 
   # check if rgl is installed and loaded
   if (!requireNamespace("rgl", quietly = TRUE)) {
@@ -66,15 +66,9 @@ tcsplot <- function(tcsdata, size = 0.02, alpha = 1, col = "black",
     )
   }
 
-  if (!isNamespaceLoaded("rgl")) {
-    requireNamespace("rgl")
-  }
-
   if (new) {
     rgl::open3d(FOV = 1, mouseMode = c("zAxis", "xAxis", "zoom"))
   }
-
-  # can't figure out how to change the character type
 
   ttv <- ttvertex
 
@@ -92,26 +86,12 @@ tcsplot <- function(tcsdata, size = 0.02, alpha = 1, col = "black",
     col = c(cu, cs, cm, cl)
   )
 
-  rgl::segments3d(ttv[c("xu", "xs")], ttv[c("yu", "ys")], ttv[c("zu", "zs")],
-    color = lcol, lwd = lwd
-  )
-  rgl::segments3d(ttv[c("xu", "xm")], ttv[c("yu", "ym")], ttv[c("zu", "zm")],
-    color = lcol, lwd = lwd
-  )
-  rgl::segments3d(ttv[c("xu", "xl")], ttv[c("yu", "yl")], ttv[c("zu", "zl")],
-    color = lcol, lwd = lwd
-  )
-  rgl::segments3d(ttv[c("xs", "xm")], ttv[c("ys", "ym")], ttv[c("zs", "zm")],
-    color = lcol, lwd = lwd
-  )
-  rgl::segments3d(ttv[c("xs", "xl")], ttv[c("ys", "yl")], ttv[c("zs", "zl")],
-    color = lcol, lwd = lwd
-  )
-  rgl::segments3d(ttv[c("xl", "xm")], ttv[c("yl", "ym")], ttv[c("zl", "zm")],
-    color = lcol, lwd = lwd
-  )
+  rgl::lines3d(unlist(ttv[c("xu", "xs", "xm", "xl", "xs", "xl", "xu", "xm")]),
+               unlist(ttv[c("yu", "ys", "ym", "yl", "ys", "yl", "yu", "ym")]),
+               unlist(ttv[c("zu", "zs", "zm", "zl", "zs", "zl", "zu", "zm")]),
+               color = lcol, lwd = lwd)
 
-  if (achro == TRUE) {
+  if (achro) {
     rgl::spheres3d(0, 0, 0, col = achrocol, radius = achrosize, lit = FALSE)
   }
 
@@ -129,6 +109,15 @@ tcsplot <- function(tcsdata, size = 0.02, alpha = 1, col = "black",
     indices <- c(1, 2, 3, 4)
 
     rgl::wire3d(rgl::qmesh3d(vertices, indices), lit = FALSE)
+  }
+
+  if (gamut) {
+    maxgamut <- attr(tcsdata, "data.maxgamut")
+    colnames(maxgamut) <- c("x", "y", "z")
+    attr(maxgamut, "clrsp") <- "tcs"
+    tryCatch(tcsvol(maxgamut, grid = FALSE),
+             error = function(e) warning("Max gamut cannot be plotted.",
+                                         call. = FALSE))
   }
 
   if (hspin) {

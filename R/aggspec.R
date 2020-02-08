@@ -1,14 +1,17 @@
 #' Aggregate reflectance spectra
 #'
-#' Combines spectra (by taking the average, for example) according to
-#' an index or a vector of identities.
+#' Combines spectra (by taking the average, for example) according to an index
+#' or a vector of identities.
 #'
 #' @inheritParams aggplot
-#' @param FUN the function to be applied to the groups of spectra. (defaults to [mean()])
-#' @param trim logical. if `TRUE` (default), the function will try to identify and
-#' remove numbers at the end of the names of the columns in the new rspec object.
+#' @param FUN the function to be applied to the groups of spectra. (defaults to
+#'   [mean()])
+#' @param trim logical. if `TRUE` (default), the function will try to identify
+#'   and remove numbers at the end of the names of the columns in the new rspec
+#'   object.
 #'
-#' @return A data frame of class `rspec` containing the spectra after applying the aggregating function.
+#' @return A data frame of class `rspec` containing the spectra after applying
+#'   the aggregating function.
 #'
 #' @export
 #'
@@ -31,8 +34,6 @@
 
 aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
 
-  # Check: user may have removed 'wl' function already.
-  # (data.frame doesn't allow duplicate names anymore, so this should work)
   wl <- isolate_wl(rspecdata, keep = "wl")
   y <- isolate_wl(rspecdata, keep = "spec")
 
@@ -49,16 +50,16 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
     }
   }
 
-  # Check if the by argument has a 'wl' entry (e.g. if names were obtained through
-  # regex conditions on the original spec names) and remove it
+  # Check if the by argument has a 'wl' entry (e.g. if names were obtained
+  # through regex conditions on the original spec names) and remove it
 
-  if (length(which(by == "wl")) != 0) {
-    by <- by[-which(by == "wl")]
+  if ("wl" %in% by) {
+    by <- by[by != "wl"]
   }
 
   # Handle when 'by' is a list of factors
   if (is.list(by)) {
-    wl_id <- vapply(seq_along(by), function(x) which(by[[x]] == "wl"), numeric(1)) # extract wl columns
+    wl_id <- vapply(by, function(x) which(x == "wl"), numeric(1)) # extract wl columns
     # remove 'wl' column from each vector in list
     if (any(vapply(wl_id, length, numeric(1)) != 0)) {
       id <- which(vapply(wl_id, length, numeric(1)) != 0)
@@ -96,9 +97,10 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
 
   by <- factor(by) # is this necessary?
 
-  dat <- sapply(unique(by), function(z) {
+  # Convert to data.frame now as to retain ALTREP wl when using cbind() later
+  dat <- data.frame(sapply(unique(by), function(z) {
     apply(y[which(by == z)], 1, FUN)
-  })
+  }))
 
   colnames(dat) <- unique(by0)
 
@@ -106,14 +108,10 @@ aggspec <- function(rspecdata, by = NULL, FUN = mean, trim = TRUE) {
     colnames(dat) <- gsub("[._-][0-9]*$", "", colnames(dat))
   }
 
-  res <- data.frame(cbind(wl = wl, dat))
+  res <- cbind(wl = wl, dat)
 
   class(res) <- c("rspec", "data.frame")
 
   res
 
-  # This would return list of spectral data and data.frame with metadata:
-  # set <- strsplit(names(res), split='\\.')
-  # out <- as.data.frame(do.call("rbind", set))
-  # list(res, out)
 }

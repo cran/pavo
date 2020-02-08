@@ -11,10 +11,11 @@
 #'  the object belongs to.
 #' @param boot.n number of bootstrap replicates (defaults to 1000)
 #' @param alpha the confidence level for the confidence intervals (defaults to 0.95)
-#' @param cores number of cores to be used in parallel processing. If `1`, parallel
-#'  computing will not be used. Defaults to `getOption("mc.cores", 2L)`
 #' @param ... other arguments to be passed to [coldist()]. Must at minimum
 #' include `n` and `weber`. See [coldist()] for details.
+#' @inheritParams getspec
+#' 
+#' @inherit getspec details
 #'
 #' @return a matrix including the empirical mean and bootstrapped
 #'  confidence limits for dS (and dL if `achro = TRUE`).
@@ -22,13 +23,14 @@
 #' @examples
 #' \dontrun{
 #' data(sicalis)
-#' vm <- vismodel(sicalis, achro = "bt.dc")
+#' vm <- vismodel(sicalis, achromatic = "bt.dc")
 #' gr <- gsub("ind..", "", rownames(vm))
 #' bootcoldist(vm, by = gr, n = c(1, 2, 2, 4), weber = 0.1, weber.achro = 0.1, cores = 1)
 #' }
 #'
 #' @export
-#' @importFrom pbmcapply pbmclapply
+#' @importFrom future.apply future_lapply
+#' @importFrom progressr with_progress progressor
 #' @importFrom stats aggregate
 #'
 #' @references Maia, R., White, T. E., (2018) Comparing colors using visual models.
@@ -36,9 +38,15 @@
 
 
 bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
-                        cores = getOption("mc.cores", 2L), ...) {
+                        cores = NULL, ...) {
   if (!is.vismodel(vismodeldata) && !is.colspace(vismodeldata)) {
     stop('object must be a "vismodel" or "colspace" result', call. = FALSE)
+  }
+
+  if (!missing(cores)) {
+    warning("'cores' argument is deprecated. See ?future::plan for more info ",
+            "about how you can choose your parallelisation strategy.", 
+            call. = FALSE)
   }
 
   # geometric mean
@@ -60,6 +68,12 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
 
   arg0 <- list(...)
 
+  # 'achromatic' used to be called just 'achro' so let's work around it.
+  # TODO: add a warning about this so users update their scripts??
+  if (is.null(arg0$achromatic)) {
+    arg0$achromatic <- arg0$achro
+  }
+
   if (is.null(arg0$n)) {
     stop('argument "n" to be passed to "coldist" is missing', call. = FALSE)
   }
@@ -76,17 +90,17 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
     arg0$qcatch <- attr(vismodeldata, "qcatch")
   }
 
-  if (is.null(arg0$achro)) {
+  if (is.null(arg0$achromatic)) {
     if (is.null(attr(vismodeldata, "visualsystem.achromatic"))) {
-      stop('argument "achro" to be passed to "coldist" is missing', call. = FALSE)
+      stop('argument "achromatic" to be passed to "coldist" is missing', call. = FALSE)
     }
 
     if (attr(vismodeldata, "visualsystem.achromatic") == "none") {
-      arg0$achro <- FALSE
+      arg0$achromatic <- FALSE
     }
 
     if (attr(vismodeldata, "visualsystem.achromatic") != "none") {
-      arg0$achro <- TRUE
+      arg0$achromatic <- TRUE
     }
   }
 
@@ -190,24 +204,21 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
     attributes(bootgrouped[[i]])[names(attribs)] <- attribs
   }
 
-  # apply coldist to the replicated bootstraps
-  if (cores > 1 && .Platform$OS.type == "windows") {
-    cores <- 1
-    message('Parallel processing not available in Windows; "cores" set to 1\n')
-  }
-
   tmpbootcdfoo <- function(x) {
     tmparg <- arg0
     tmparg$modeldata <- x
     do.call(coldist, tmparg)
   }
-
-  bootcd <- pbmclapply(bootgrouped, function(z) {
-    tryCatch(tmpbootcdfoo(z),
-      error = function(e) NULL
-    )
-  }, mc.cores = cores)
-
+  
+  with_progress({
+    p <- progressor(along = bootgrouped)
+    bootcd <- future_lapply(bootgrouped, function(z) {
+      p()
+      tryCatch(tmpbootcdfoo(z),
+               error = function(e) NULL
+      )
+    })
+  })
 
   # get deltaS and name by group difference
   bootdS <- do.call(
@@ -218,7 +229,7 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
   )
 
   if (dim(bootdS)[1] < boot.n) {
-    stop('Bootstrap sampling encountered errors. Try using "cores = 1".')
+    stop('Bootstrap sampling encountered errors.')
   }
   # ...subtract them from the empirical
   # bootdS <- bootdS - empdS

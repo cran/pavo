@@ -59,12 +59,11 @@ vistab <- data.frame(phenotype = c("avg.uv", "avg.v", "bluetit", "star", "pfowl"
                                      "The triggerfish _Rhinecanthus aculeatus_ (trichromat)"))
 knitr::kable(vistab, caption = "Built-in visual phenotypes available in pavo")
 
-## ---- results='hide'-----------------------------------------------------
+## ------------------------------------------------------------------------
 vismod1 <- vismodel(sppspec,
   visual = "avg.uv", achromatic = "bt.dc",
   illum = "D65", relative = FALSE
 )
-vismod1
 
 ## ------------------------------------------------------------------------
 summary(vismod1)

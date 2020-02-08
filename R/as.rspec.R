@@ -42,7 +42,7 @@ as.rspec <- function(object, whichwl = NULL,
                      interp = TRUE, lim = NULL, exceed.range = TRUE) {
 
   # tibble dodge
-  if ("tbl_df" %in% attr(object, "class")) {
+  if (inherits(object, "tbl_df")) {
     object <- data.frame(object)
   }
 

@@ -38,7 +38,8 @@
 #'
 #' @export
 #'
-#' @importFrom graphics plot.default arrows
+#' @importFrom graphics plot.default par plot.default points arrows
+#' @importFrom grDevices trans3d
 #'
 #' @keywords internal
 #'
@@ -156,7 +157,7 @@ jndplot <- function(x, arrow = c("relative", "absolute", "none"), achro = FALSE,
     if (arrow.labels) {
       text(c("S", "L"),
         x = arrowarg$x1, y = 0, xpd = TRUE,
-        pos = c(2,4), cex = labels.cex, col = arrow.col
+        pos = c(2, 4), cex = labels.cex, col = arrow.col
       )
     }
 

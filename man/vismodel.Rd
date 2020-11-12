@@ -8,8 +8,8 @@ vismodel(
   rspecdata,
   visual = c("avg.uv", "avg.v", "bluetit", "ctenophorus", "star", "pfowl", "apis",
     "canis", "cie2", "cie10", "musca", "segment", "habronattus", "rhinecanthus"),
-  achromatic = c("none", "bt.dc", "ch.dc", "st.dc", "md.r1", "ra.dc", "cf.r", "ml", "l",
-    "all"),
+  achromatic = c("none", "bt.dc", "ch.dc", "st.dc", "md.r1", "ra.dc", "cf.r", "ml",
+    "l", "all"),
   illum = c("ideal", "bluesky", "D65", "forestshade"),
   trans = c("ideal", "bluetit", "blackbird"),
   qcatch = c("Qi", "fi", "Ei"),
@@ -104,9 +104,10 @@ Either a vector containing the spectral data, or one of the options:
 
 \item{scale}{a value by which the illuminant will be multiplied. Useful for when the
 illuminant is a relative value (i.e. transformed to a maximum of 1 or to a percentage),
-and does not correspond to quantum flux units (\eqn{\mu mol.s^{-1}.m^{-2}}). Useful values
-are, for example, 500 (for dim light) and 10000 (for bright illumination). Note that if
-\code{vonkries = TRUE} this transformation has no effect.}
+and does not correspond to quantum flux units
+(\ifelse{html}{\out{&mu;mol.s<sup>-1</sup>.m<sup>-2</sup>}}{\eqn{\mu mol.s^{-1}.m^{-2}}}).
+Useful values are, for example, 500 (for dim light) and 10000 (for bright
+illumination). Note that if \code{vonkries = TRUE} this transformation has no effect.}
 
 \item{relative}{should relative quantum catches be returned (i.e. is it a colour
 space model? Defaults to \code{TRUE}).}
@@ -119,6 +120,11 @@ stored and can be called using the \code{\link[=summary.vismodel]{summary.vismod
 \description{
 Calculates quantum catches at each photoreceptor. Both raw and relative values
 can be returned, for use in a suite of colourspace and non-colourspace models.
+}
+\note{
+Built-in \code{visual}, \code{achromatic}, \code{illum}, \code{bkg} and \code{trans} are only defined
+on the 300 to 700nm wavelength range. If you wish to work outside this range,
+you will need to provide your own data.
 }
 \examples{
 # Dichromat (dingo)

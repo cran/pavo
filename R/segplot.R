@@ -14,6 +14,8 @@
 #' plot(seg.flowers)
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
+#' @importFrom graphics axis par points polygon text
+#'
 #' @export
 #'
 #' @keywords internal

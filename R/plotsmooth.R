@@ -12,6 +12,9 @@
 #'
 #' @return Series of plot with curves processed with varying level of loess smoothing
 #'
+#' @importFrom graphics legend lines mtext par title
+#' @importFrom stats loess.smooth
+#'
 #' @export
 #'
 #' @seealso [procspec()]

@@ -80,6 +80,9 @@
 #'
 #' @export
 #'
+#' @importFrom stats dist setNames
+#' @importFrom utils combn
+#'
 #' @examples
 #' \dontrun{
 #' # Dichromat
@@ -141,13 +144,13 @@ coldist <- function(modeldata,
   # Prepare output
   pairsid <- t(combn(nrow(modeldata), 2))
 
+  # Prepare pairwise combinations of stimuli for output
   res <- as.data.frame(matrix(rownames(modeldata)[pairsid],
     ncol = 2, dimnames = list(NULL, c("patch1", "patch2"))
   ), stringsAsFactors = FALSE)
 
-  res[, "dS"] <- NA
-
-  if (achromatic) {
+  res[, "dS"] <- NA # Chromatic contrasts
+  if (achromatic) { # Achromatic contrasts
     res[, "dL"] <- NA
   }
 
@@ -253,6 +256,7 @@ coldist <- function(modeldata,
       fi = exp(dat)
     )
 
+    # Keep only cone-catch data
     dat2 <- dat[, seq_len(ncone), drop = FALSE]
 
     if (is.numeric(weber.ref) && weber.ref > length(n)) {
@@ -264,7 +268,10 @@ coldist <- function(modeldata,
       )
     }
 
-    if (weber.ref == "longest") weber.ref <- length(n)
+    # Set weber cone reference
+    if (weber.ref == "longest") {
+      weber.ref <- length(n)
+    }
 
     if (length(n) != ncone) {
       stop("vector of relative cone densities (", dQuote("n"),
@@ -274,7 +281,6 @@ coldist <- function(modeldata,
     }
 
     # CREATE REFERENCE OBJECTS FOR CARTESIAN TRANSFORMATION
-
     refsamp <- min(dim(dat2)[1], ncone)
 
     visref <- matrix(NA,
@@ -307,15 +313,17 @@ coldist <- function(modeldata,
       resref[, "dL"] <- NA
     }
 
+    ## Calculate dS
     res[, "dS"] <- switch(noise,
       "neural" = newreceptornoise(dat2, n, weber, weber.ref, res),
       "quantum" = newreceptornoise(dat2, n, weber, weber.ref, res, qndat[, seq_len(ncone)])
     )
     resref[, "dS"] <- switch(noise,
       "neural" = newreceptornoise(visref, n, weber, weber.ref, resref),
-      "quantum" = newreceptornoise(visref, n, weber, weber.ref, resref, qndat = exp(visref))
+      "quantum" = newreceptornoise(visref, n, weber, weber.ref, resref, exp(visref))
     )
 
+    ## Calculate dL
     if (achromatic) {
       note_dL <- " and noise-weighted luminance contrasts"
       visref <- cbind(visref, lum = log(1e-10))
@@ -439,7 +447,7 @@ coldist <- function(modeldata,
 
     subsamp <- unique(c(condition1, condition2))
     res <- res[subsamp, ]
-    row.names(res) <- 1:dim(res)[1]
+    row.names(res) <- NULL
   }
 
   if (exists("resref", inherits = FALSE)) {
@@ -465,19 +473,23 @@ coldist <- function(modeldata,
 # START RECEPTOR NOISE FUNCTIONS #
 ##################################
 
-newreceptornoise <- function(dat, n, weber, weber.ref, res, qndat = NULL) {
+newreceptornoise <- function(qcatch_raw, n, weber, weber.ref, res, qcatch_log = NULL) {
+
+  # Calculate relative receptor density
   reln <- n / sum(n)
+
+  # Back-calculate photoreceptor noise from channel-noise (weber fraction)
   if (length(weber) == length(n)) { # For when weber is known for all receptors
     v <- weber * sqrt(reln)
   } else {
     v <- weber * sqrt(reln[weber.ref])
   } # When weber is known for one receptor (typical)
 
-  if (is.null(qndat)) {
-    e <- setNames(v / sqrt(reln), colnames(dat))
+  if (is.null(qcatch_log)) {
+    e <- setNames(v / sqrt(reln), colnames(qcatch_raw))
   } else {
-    ept1 <- setNames(v^2 / reln, colnames(dat))
-    ept2 <- 2 / t(apply(res, 1, function(x) qndat[x[1], ] + qndat[x[2], ]))
+    ept1 <- setNames(v^2 / reln, colnames(qcatch_raw))
+    ept2 <- 2 / t(apply(res, 1, function(x) qcatch_log[x[1], ] + qcatch_log[x[2], ]))
     e <- sqrt(sweep(ept2, 2, ept1, "+"))
   }
 
@@ -486,9 +498,9 @@ newreceptornoise <- function(dat, n, weber, weber.ref, res, qndat = NULL) {
   ###############
 
   # all n-2 combinations (first part numerator)
-  n1combs <- combn(colnames(dat), dim(dat)[2] - 2)
+  n1combs <- combn(colnames(qcatch_raw), dim(qcatch_raw)[2] - 2)
 
-  if (is.null(qndat)) {
+  if (is.null(qcatch_log)) {
     # get those combinations of ei and prod(ei)^2
     num1 <- setNames(
       apply(n1combs, 2, function(x) prod(e[x])),
@@ -503,12 +515,12 @@ newreceptornoise <- function(dat, n, weber, weber.ref, res, qndat = NULL) {
   }
 
   # remaining 2 combinations (second part numerator)
-  n2combs <- apply(n1combs, 2, function(x) colnames(dat)[ !colnames(dat) %in% x ])
+  n2combs <- apply(n1combs, 2, function(x) colnames(qcatch_raw)[!colnames(qcatch_raw) %in% x])
 
   # f_d and f_e
   deltaqiqj <- lapply(1:dim(n1combs)[2], function(y) {
     t(apply(res, 1, function(x) {
-      dat[x[1], n2combs[, y]] - dat[x[2], n2combs[, y]]
+      qcatch_raw[x[1], n2combs[, y]] - qcatch_raw[x[2], n2combs[, y]]
     }))
   })
   names(deltaqiqj) <- apply(n2combs, 2, paste, collapse = "")
@@ -517,7 +529,7 @@ newreceptornoise <- function(dat, n, weber, weber.ref, res, qndat = NULL) {
   num2 <- do.call(cbind, lapply(deltaqiqj, function(x) x[, 1] - x[, 2]))
 
   # (e_abc)^2*(f_d-f_e)^2
-  if (is.null(qndat)) {
+  if (is.null(qcatch_log)) {
     etimesq <- num2 %*% diag(num1)
   } else {
     etimesq <- num2 * num1
@@ -531,9 +543,9 @@ newreceptornoise <- function(dat, n, weber, weber.ref, res, qndat = NULL) {
   ###############
 
   # all n-1 combinations
-  dcombs <- combn(colnames(dat), dim(dat)[2] - 1)
+  dcombs <- combn(colnames(qcatch_raw), dim(qcatch_raw)[2] - 1)
 
-  if (is.null(qndat)) {
+  if (is.null(qcatch_log)) {
     den <- setNames(
       apply(dcombs, 2, function(x) prod(e[x])),
       apply(dcombs, 2, paste, collapse = "")

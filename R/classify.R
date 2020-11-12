@@ -28,7 +28,7 @@
 #' @param ... additional graphical parameters when `interactive = TRUE`.
 #' Also see [graphics::par()].
 #' @inheritParams getspec
-#' 
+#'
 #' @inherit getspec details
 #'
 #' @return A matrix, or list of matrices, of class `rimg` containing the colour
@@ -39,7 +39,7 @@
 #'
 #' @importFrom stats kmeans
 #' @importFrom utils object.size
-#' @importFrom grDevices dev.new
+#' @importFrom grDevices dev.new dev.off
 #'
 #' @note Since the `kmeans` process draws on random numbers to find initial
 #' cluster centres when `interactive = FALSE`, use [set.seed()] if reproducible
@@ -54,16 +54,19 @@
 #'
 #' # Multiple images, with interactive classification and a reference image
 #' snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
-#' # snakes_class <- classify(snakes, refID = "snake_01", interactive = TRUE)
+#' \dontrun{
+#' snakes_class <- classify(snakes, refID = "snake_01", interactive = TRUE)
+#' }
+#'
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
 
 classify <- function(imgdat, method = c("kMeans", "kMedoids"), kcols = NULL, refID = NULL, interactive = FALSE,
                      plotnew = FALSE, col = "red", cores = NULL, ...) {
-
   if (!missing(cores)) {
     warning("'cores' argument is deprecated. See ?future::plan for more info ",
-            "about how you can choose your parallelisation strategy.",
-            call. = FALSE)
+      "about how you can choose your parallelisation strategy.",
+      call. = FALSE
+    )
   }
 
   ## ------------------------------ Checks ------------------------------ ##
@@ -248,7 +251,6 @@ classify <- function(imgdat, method = c("kMeans", "kMedoids"), kcols = NULL, ref
 #' @importFrom future.apply future_lapply
 #' @importFrom progressr with_progress progressor
 classifier <- function(imgdat_i2, n_cols_i2, method_i2) {
-  
   with_progress({
     p <- progressor(along = imgdat_i2)
     outdata <- future_lapply(seq_along(imgdat_i2), function(x) {

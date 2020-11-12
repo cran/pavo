@@ -18,11 +18,6 @@ vignette: >
 .caption {
   font-style: italic;
 }
-/* Center all figures. This is actually better than using knitr::opts_chunk
-because the code is only written once in the output */
-.figure {
-  text-align: center;
-}
 /* Auto-wrap long code line */
 code.sourceCode {
   white-space: pre-wrap;
@@ -37,11 +32,17 @@ options(
    warnPartialMatchAttr = TRUE
 )
 knitr::knit_hooks$set(fig = knitr::hook_pngquant)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.show = "hold"
+)
 ```
 
 [pavo_repo]: https://github.com/rmaia/pavo
 
-[data_location]: https://github.com/rmaia/pavo/blob/master/data_external/vignette
+[data_location]: https://github.com/rmaia/pavo/tree/master/data_external/vignette
 
 Let's again begin by loading the package.
 
@@ -768,7 +769,7 @@ JND.fms <- coldist(vm.fms, n = c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5))
 head(JND.fms)
 ```
 
-# Analyzing Spatial Data
+# Analysing Spatial Data
 
 `pavo` now allows for the combined analysis of spectral data and spatial data. Note that 'spatial' data of course include images, but may also draw on spatially-sampled _spectra_, as explored below. Thus while much of the below deals with image-based processing and analysis, images are not necessary for many spatial analyses and indeed may perform worse than spectrally-based analyses in some cases. Further, **image data should seldom be used without input from spectral measurements**. Even in the simple butterfly example below, users should first validate the presence and number of discrete colours in a patch via spectral measurement and visual modelling (i.e. the 'spectral' information), which is then augmented by image-based clustering of these _a priori_ identified patches to extract the 'spatial' information. Using uncalibrated images alone for inferences about colour pattern perception may well yield unreliable results, given the radical differences between human (camera) and non-human animal perception.
 

@@ -98,6 +98,8 @@
 #' @note Smoothing affects only B3, S2, S4, S6, S10, H2, and H5 calculation. All other
 #' variables can be reliably extracted using non-smoothed data.
 #'
+#' @importFrom stats quantile
+#'
 #' @export
 #'
 #' @examples

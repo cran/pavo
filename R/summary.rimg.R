@@ -15,13 +15,13 @@
 #'
 #' @export
 #'
-#' @importFrom graphics image
+#' @importFrom graphics image par
 #' @importFrom grDevices rgb
 #'
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
 #' papilio_class <- classify(papilio, kcols = 4)
 #' summary(papilio_class)
@@ -57,10 +57,11 @@ summary.rimg <- function(object, plot = FALSE, axes = TRUE, col = NULL, ...) {
             ID = attr(x, "imgname"),
             col_ID = seq(seq_len(nrow(attr(x, "classRGB")))),
             col_name = attr(x, "colnames"),
-            attr(x, "classRGB")
+            attr(x, "classRGB"),
+            stringsAsFactors = FALSE
           )
         })
-        do.call(rbind, out)
+        do.call(rbind, c(out, stringsAsFactors = FALSE))
       }
     } else {
       if (plot) {
@@ -70,7 +71,8 @@ summary.rimg <- function(object, plot = FALSE, axes = TRUE, col = NULL, ...) {
           img_ID = attr(object, "imgname"),
           col_ID = seq(seq_len(nrow(attr(object, "classRGB")))),
           col_name = attr(object, "colnames"),
-          attr(object, "classRGB")
+          attr(object, "classRGB"),
+          stringsAsFactors = FALSE
         )
       }
     }
@@ -82,15 +84,15 @@ summary.rimg <- function(object, plot = FALSE, axes = TRUE, col = NULL, ...) {
           plot(i, axes = axes, ...)
         }
       } else {
-        out <- lapply(object, function(x) data.frame(ID = attr(x, "imgname")))
+        out <- lapply(object, function(x) data.frame(ID = attr(x, "imgname"), stringsAsFactors = FALSE))
 
-        do.call(rbind, out)
+        do.call(rbind, c(out, stringsAsFactors = FALSE))
       }
     } else {
       if (plot) {
         plot(object, axes = axes, ...)
       } else {
-        data.frame(ID = attr(object, "imgname"))
+        data.frame(ID = attr(object, "imgname"), stringsAsFactors = FALSE)
       }
     }
   }

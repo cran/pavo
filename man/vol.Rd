@@ -4,12 +4,29 @@
 \alias{vol}
 \title{Plot a tetrahedral colour space}
 \usage{
-vol(tcsdata, alpha = 0.2, grid = TRUE, fill = TRUE, new = FALSE, ...)
+vol(
+  tcsdata,
+  type = c("convex", "alpha"),
+  avalue = "auto",
+  alpha = 0.2,
+  grid = TRUE,
+  fill = TRUE,
+  new = FALSE,
+  ...
+)
 }
 \arguments{
 \item{tcsdata}{(required) a data frame, possibly a result from the
 \code{\link[=colspace]{colspace()}} or \code{\link[=tcspace]{tcspace()}} function, containing values for the 'x', 'y'
 and 'z' coordinates as columns (labeled as such).}
+
+\item{type}{if "convex", the colour volume is plotted using a convex hull
+and if "alpha", it is plotted using alphashapes.}
+
+\item{avalue}{if \code{type = "alpha"}, which alpha parameter value should be used
+to compute the alphashape. \code{avalue = "auto"} (default) finds and use the
+\ifelse{html}{\out{&alpha;*}}{\eqn{$\alpha^*$}{alpha*}} value as defined in
+Gruson (2020).}
 
 \item{alpha}{transparency of volume (if \code{fill = TRUE}).}
 
@@ -23,10 +40,10 @@ and 'z' coordinates as columns (labeled as such).}
 \item{...}{additional graphical options. See \code{\link[=polygon]{polygon()}} and \code{\link[=tetraplot]{tetraplot()}}.}
 }
 \value{
-\code{\link[=vol]{vol()}} creates a 3D convex hull within a static tetrahedral plot.
+\code{\link[=vol]{vol()}} creates a 3D colour volume within a static tetrahedral plot.
 }
 \description{
-Produces a 3D convex hull in tetrahedral colour space when plotting a
+Produces a 3D colour volume in tetrahedral colour space when plotting a
 non-interactive tetrahedral plot.
 }
 \examples{
@@ -36,9 +53,30 @@ data(sicalis)
 vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
 tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 plot(tcs.sicalis)
-vol(tcs.sicalis)
 
+# Convex hull
+vol(tcs.sicalis, type = "convex")
+
+# Alpha-shape
+vol(tcs.sicalis, type = "alpha", avalue = 1)
+}
+\references{
+Stoddard, M. C., & Prum, R. O. (2008). Evolution of avian plumage color
+in a tetrahedral color space: A phylogenetic analysis of new world buntings. The
+American Naturalist, 171(6), 755-776.
+
+Stoddard, M. C., & Stevens, M. (2011). Avian vision and the evolution of
+egg color mimicry in the common cuckoo. Evolution, 65(7), 2004-2013.
+
+Maia, R., White, T. E., (2018) Comparing colors using visual models.
+Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
+
+Gruson H. 2020. Estimation of colour volumes as concave hypervolumes using
+\ifelse{html}{\out{&alpha;}}{\eqn{$\alpha$}{alpha}}-shapes. Methods in
+Ecology and Evolution, early view \doi{10.1111/2041-210X.13398}
 }
 \author{
 Rafael Maia \email{rm72@zips.uakron.edu}
+
+Hugo Gruson
 }

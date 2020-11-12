@@ -4,8 +4,7 @@ author: "Rafael Maia, Thomas White, Hugo Gruson, John Endler, Pierre-Paul Bitton
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
-bibliography: refs.bib
-csl: open-biology.csl
+bibliography: main.bib
 vignette: >
   %\VignetteIndexEntry{Spectral Shape Descriptors}
   %\VignetteEngine{knitr::rmarkdown}

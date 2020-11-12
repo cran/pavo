@@ -16,6 +16,8 @@
 #'
 #' @export
 #'
+#' @importFrom graphics par points text
+#'
 #' @keywords internal
 #'
 #' @inherit dispace references

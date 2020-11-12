@@ -29,6 +29,8 @@
 #' plot(tri.flowers)
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
+#' @importFrom graphics par points polygon
+#'
 #' @export
 #'
 #' @keywords internal
@@ -39,7 +41,6 @@
 triplot <- function(tridata, labels = TRUE, achro = TRUE, achrocol = "grey", achrosize = 0.8,
                     labels.cex = 1, out.lwd = 1, out.lcol = "black", out.lty = 1,
                     margins = c(1, 1, 2, 2), square = TRUE, gamut = FALSE, ...) {
-
   oPar <- par("mar", "pty")
   on.exit(par(oPar))
 
@@ -87,7 +88,8 @@ triplot <- function(tridata, labels = TRUE, achro = TRUE, achrocol = "grey", ach
       {
         convhulln(coords_mono)
         polygon(coords_mono[sort(c(max_gamut)), ],
-                col = "#55555555", border = NA)
+          col = "#55555555", border = NA
+        )
       },
       error = function(e) warning("Max gamut cannot be plotted.", call. = FALSE)
     )

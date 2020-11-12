@@ -37,6 +37,10 @@
 #' @seealso [spec2rgb()], [image()], [plot()]
 #'
 #' @importFrom magick image_read
+#' @importFrom graphics axis image lines
+#' @importFrom grDevices colorRampPalette
+#' @importFrom stats approx
+#' @importFrom utils tail
 
 # TODO: add argument for padding region between x in stack plot
 
@@ -104,7 +108,6 @@ plot.rspec <- function(x, select = NULL, type = c("overlay", "stack", "heatmap")
     arg$z <- t(dat)
 
     do.call(image, arg)
-
   } else {
 
     # coloring for overlay plot & others

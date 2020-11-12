@@ -1,9 +1,11 @@
 # `pavo`
 
+<!-- badges: start -->
 [![cran version](https://www.r-pkg.org/badges/version-ago/pavo)](https://cran.r-project.org/package=pavo/)
 [![cran downloads](https://cranlogs.r-pkg.org/badges/grand-total/pavo)](https://cran.r-project.org/package=pavo/)
-[![Build Status](https://travis-ci.org/rmaia/pavo.svg?branch=master)](https://travis-ci.org/rmaia/pavo/)
+[![R build status](https://github.com/rmaia/pavo/workflows/R-CMD-check/badge.svg)](https://github.com/rmaia/pavo/actions)
 [![cran checks](https://cranchecks.info/badges/worst/pavo)](https://cranchecks.info/pkgs/pavo)
+<!-- badges: end -->
 
 ## An `R` package for the spectral and spatial analysis of color patterns
 
@@ -27,10 +29,10 @@
 
 ## Citing pavo
 
-The manuscript describing the current iteration of the package has been published and are free to access:
+The manuscript describing the current iteration of the package has been published and is free to access:
 
 Maia R., Gruson H., Endler J.A., and White T.E. 2019 [pavo 2: New tools for the spectral 
-and spatial analysis of colour in R](https://doi.org/10.1111/2041-210X.13174). _Methods in Ecology and Evolution_, 10(7):1097‑107. 
+and spatial analysis of colour in R](https://doi.org/10.1111/2041-210X.13174). _Methods in Ecology and Evolution_, 10(7):1097‑1107. 
 
 
 ## Install

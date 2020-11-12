@@ -23,6 +23,8 @@
 #'
 #' @seealso [procspec()]
 #'
+#' @importFrom graphics abline par
+#'
 #' @export
 #'
 #' @examples
@@ -75,7 +77,7 @@ peakshape <- function(rspecdata, select = NULL, lim = NULL,
     function(x) which(rspecdata2[, x] == Bmax[x])
   ) # lambda_max index
 
-  dblpeaks <- vapply(Xi, length, numeric(1))
+  dblpeaks <- lengths(Xi)
   if (any(dblpeaks > 1)) {
     # Keep only first peak of each spectrum
     dblpeak_nms <- nms[dblpeaks > 1]
@@ -131,6 +133,7 @@ peakshape <- function(rspecdata, select = NULL, lim = NULL,
   data.frame(
     id = nms, B3 = as.numeric(Bmax), H1 = hue,
     FWHM = Xb - Xa, HWHM.l = hue - Xa, HWHM.r = Xb - hue,
-    incl.min = c("Yes", "No")[as.numeric(Bmin > Bmin_all) + 1]
+    incl.min = c("Yes", "No")[as.numeric(Bmin > Bmin_all) + 1],
+    stringsAsFactors = FALSE
   )
 }

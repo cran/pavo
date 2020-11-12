@@ -1,9 +1,16 @@
 #' Plot a tetrahedral colour space
 #'
-#' Produces a 3D convex hull in tetrahedral colour space when plotting a
+#' Produces a 3D colour volume in tetrahedral colour space when plotting a
 #' non-interactive tetrahedral plot.
 #'
-#' @inheritParams tcsplot
+#' @inheritParams voloverlap
+#' @param tcsdata (required) a data frame, possibly a result from the
+#'   [colspace()] or [tcspace()] function, containing values for the 'x', 'y'
+#'   and 'z' coordinates as columns (labeled as such).
+#' @param avalue if `type = "alpha"`, which alpha parameter value should be used
+#'   to compute the alphashape. `avalue = "auto"` (default) finds and use the
+#'   \ifelse{html}{\out{&alpha;*}}{\eqn{$\alpha^*$}{alpha*}} value as defined in
+#'    Gruson (2020).
 #' @param alpha transparency of volume (if `fill = TRUE`).
 #' @param grid logical. if `TRUE` (default), draws the polygon outline defined by the points.
 #' @param fill logical. if `TRUE` (default), fills the volume defined by the points.
@@ -11,9 +18,10 @@
 #' (defaults to `FALSE`)
 #' @param ... additional graphical options. See [polygon()] and [tetraplot()].
 #'
-#' @return [vol()] creates a 3D convex hull within a static tetrahedral plot.
+#' @return [vol()] creates a 3D colour volume within a static tetrahedral plot.
 #'
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
+#' @author Hugo Gruson
 #'
 #' @export
 #'
@@ -24,19 +32,43 @@
 #' vis.sicalis <- vismodel(sicalis, visual = "avg.uv")
 #' tcs.sicalis <- colspace(vis.sicalis, space = "tcs")
 #' plot(tcs.sicalis)
-#' vol(tcs.sicalis)
 #'
+#' # Convex hull
+#' vol(tcs.sicalis, type = "convex")
+#'
+#' # Alpha-shape
+#' vol(tcs.sicalis, type = "alpha", avalue = 1)
 #' @importFrom geometry convhulln
+#' @importFrom graphics par polygon
 #' @importFrom grDevices trans3d adjustcolor
 #'
+#' @inherit voloverlap references
+#'
 
-vol <- function(tcsdata, alpha = 0.2, grid = TRUE, fill = TRUE,
-                new = FALSE, ...) {
-  if (!is.null(attr(tcsdata, "clrsp")) && attr(tcsdata, "clrsp") != "tcs") stop("object is not in tetrahedral color space")
+vol <- function(tcsdata, type = c("convex", "alpha"), avalue = "auto",
+                alpha = 0.2, grid = TRUE, fill = TRUE, new = FALSE, ...) {
+  type <- match.arg(type)
 
-  coords <- tcsdata[, c("x", "y", "z")]
+  if (!is.null(attr(tcsdata, "clrsp")) && attr(tcsdata, "clrsp") != "tcs") {
+    stop("object is not in tetrahedral color space")
+  }
 
-  vol <- t(convhulln(coords, options = "FA")$hull)
+  if (type == "convex") {
+    coords <- tcsdata[, c("x", "y", "z")]
+    vol <- t(convhulln(coords, options = "FA")$hull)
+  } else {
+    if (avalue == "auto") {
+      avalue <- find_astar(as.matrix(tcsdata[, c("x", "y", "z")]))
+    }
+
+    ashape <- alphashape3d::ashape3d(as.matrix(tcsdata[, c("x", "y", "z")]),
+      alpha = avalue
+    )
+
+    tri <- ashape$triang
+    vol <- t(tri[tri[, ncol(tri)] %in% c(2, 3), c(1, 2, 3)])
+    coords <- ashape$x
+  }
 
   arg <- list(...)
 

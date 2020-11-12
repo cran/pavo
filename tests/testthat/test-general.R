@@ -1,46 +1,44 @@
-context("general")
-
 test_that("Class assignment", {
   data(flowers)
-
-  # Check rspec
-  # See test-S3rspec.R
-
-  # Check vismodel
-  vis.flowers <- vismodel(flowers, visual = "apis")
-  expect_is(vis.flowers, "vismodel")
 
   # Check a few colorspaces
   vis.cie <- vismodel(flowers, vonkries = TRUE, relative = FALSE, achro = "none", visual = "cie10")
   col.cie <- colspace(vis.cie, space = "cielab")
-  expect_is(col.cie, "colspace")
+  expect_s3_class(col.cie, "colspace")
 
   vis.tcs <- vismodel(flowers, visual = "bluetit")
   col.tcs <- colspace(vis.tcs, space = "tcs")
-  expect_is(col.cie, "colspace")
+  expect_s3_class(col.cie, "colspace")
 
   vis.hex <- vismodel(flowers, relative = FALSE, qcatch = "Ei", vonkries = TRUE, visual = "apis")
   col.hex <- colspace(vis.hex, space = "hex")
-  expect_is(col.hex, "colspace")
+  expect_s3_class(col.hex, "colspace")
 })
 
 test_that("sensdata", {
   expect_true(all(names(as.data.frame(vissyst)) %in% names(sensdata("all", "all"))))
+
+  # Check for negative values
+  expect_equal(min(sensdata(visual = "all", illum = "all", trans = "all", achromatic = "all", bkg = "all")), 0)
 })
 
 test_that("peakshape", {
   data(flowers)
 
-  expect_equivalent(round(colSums(peakshape(flowers, select = 1:5, lim = c(300, 700), plot = FALSE)[2:3])), c(216, 2617))
+  expect_equal(
+    round(colSums(peakshape(flowers, select = 1:5, lim = c(300, 700), plot = FALSE)[2:3])),
+    c(216, 2617),
+    ignore_attr = TRUE
+  )
 
-  test <- read.csv("known_output/FWHM_lims.csv")
+  test <- readRDS("known_output/FWHM_lims.rds")
   expect_equal(peakshape(test, plot = FALSE)[, 4], c(144, 52))
 
   expect_warning(peakshape(flowers[, -1], plot = FALSE), "wl column missing")
 
-  expect_equivalent(
+  expect_identical(
     nrow(peakshape(flowers, grepl("^Hibbertia", colnames(flowers)), plot = FALSE)),
-    6
+    6L
   )
 
   # Double peak

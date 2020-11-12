@@ -1,4 +1,4 @@
-## ----include = FALSE-----------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 # Do not use partial matching
 options(
    warnPartialMatchDollar = TRUE,
@@ -6,26 +6,32 @@ options(
    warnPartialMatchAttr = TRUE
 )
 knitr::knit_hooks$set(fig = knitr::hook_pngquant)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.show = "hold"
+)
 
-## ---- warning=FALSE, results='hide', message=FALSE-----------------------
+## ---- warning=FALSE, results='hide', message=FALSE----------------------------
 # Load the package, and set a global random-number seed for the reproducible generation of fake data later on.
 library(pavo)
 set.seed(1612217)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 specs <- readRDS(system.file("extdata/specsdata.rds", package = "pavo"))
 mspecs <- aggspec(specs, by = 3, FUN = mean)
 spp <- gsub('\\.[0-9].*$', '', names(mspecs))[-1]
 sppspec <- aggspec(mspecs, by = spp, FUN = mean)
 spec.sm <- procspec(sppspec, opt = "smooth", span = 0.2)
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 summary(spec.sm)
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 summary(spec.sm, subset = TRUE)
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 # Extract only brightness variables
 summary(spec.sm, subset = c('B1', 'B2', 'B3'))
 
@@ -36,11 +42,11 @@ peakshape(spec.sm, plot = TRUE)
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Plot from `peakshape`, setting the wavelength limits to 300 and 500 nm"----
 peakshape(spec.sm, select = 2, lim = c(300, 500), plot = TRUE)
 
-## ----echo=TRUE-----------------------------------------------------------
+## ----echo=TRUE----------------------------------------------------------------
 musca_sense <- sensdata(visual = "musca", achromatic = "md.r1")
 head(musca_sense)
 
-## ----echo = FALSE, results = 'asis'--------------------------------------
+## ----echo = FALSE, results = 'asis'-------------------------------------------
 vistab <- data.frame(phenotype = c("avg.uv", "avg.v", "bluetit", "star", "pfowl", "apis", "ctenophorus", "canis", "musca", "cie2",
                                    "cie10", "segment", "habronattus", "rhinecanthus"),
                      description = c("average ultraviolet-sensitive avian (tetrachromat)",
@@ -59,13 +65,13 @@ vistab <- data.frame(phenotype = c("avg.uv", "avg.v", "bluetit", "star", "pfowl"
                                      "The triggerfish _Rhinecanthus aculeatus_ (trichromat)"))
 knitr::kable(vistab, caption = "Built-in visual phenotypes available in pavo")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vismod1 <- vismodel(sppspec,
   visual = "avg.uv", achromatic = "bt.dc",
   illum = "D65", relative = FALSE
 )
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(vismod1)
 
 ## ---- fig=TRUE, include=TRUE, results = 'hide', fig.width=8.5, fig.height=5, fig.cap="Plots of species mean reflectance curves with corresponding relative usml cone stimulations (insets)."----
@@ -91,24 +97,24 @@ mtext("Reflectance (%)", side = 2, outer = TRUE, line = 1)
 idealizeddichromat <- sensmodel(c(350, 650))
 plot(idealizeddichromat, col = spec2rgb(idealizeddichromat), ylab = "Absorbance")
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 vismod.idi <- vismodel(sppspec, visual = idealizeddichromat, relative = FALSE)
 vismod.idi
 
-## ---- message = FALSE----------------------------------------------------
+## ---- message = FALSE---------------------------------------------------------
 coldist(vismod1,
   noise = "neural", achromatic = TRUE, n = c(1, 2, 2, 4),
   weber = 0.1, weber.achro = 0.1
 )
 coldist(vismod.idi, n = c(1, 2), weber = 0.1)
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 coldist(vismod1, subset = 'cardinal')
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 coldist(vismod1, subset = c('cardinal', 'jacana'))
 
-## ---- message=FALSE, warning=FALSE---------------------------------------
+## ---- message=FALSE, warning=FALSE--------------------------------------------
 
 # Load the data
 data(sicalis)
@@ -139,7 +145,7 @@ axis(1, at = 1:3, labels = rownames(sicdist))
 segments(1:3, sicdist[, 2], 1:3, sicdist[, 3], lwd = 2)  # Add CI's
 abline(h = 1, lty = 3, lwd = 2)  # Add a 'threshold' line at dS = 1
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 fakedata1 <- vapply(
   seq(100, 500, by = 20),
   function(x) rowSums(cbind(
@@ -170,7 +176,7 @@ fakedata2[, -1] <- fakedata2[, -1] / max(fakedata2[, -1]) * 100
 fakedata.c <- data.frame(wl = 300:700, fakedata1[, -1], fakedata2[, -1])
 fakedata.c <- as.rspec(fakedata.c)
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 # Visual model and colour distances
 fakedata.vm <- vismodel(fakedata.c, relative = FALSE, achromatic = 'all')
 fakedata.cd <- coldist(fakedata.vm,
@@ -185,12 +191,12 @@ head(fakedata.cc)
 ## ---- fig=TRUE, include=TRUE, fig.width=4, fig.height=4, fig.cap="Spectral data in a receptor noise-corrected colourspace"----
 plot(fakedata.cc, theta = 55, phi = 25, col = spec2rgb(fakedata.c))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 data(flowers)
 
 head(flowers[1:4])
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, visual = 'canis')
 
 di.flowers <- colspace(vis.flowers, space = 'di')
@@ -200,7 +206,7 @@ head(di.flowers)
 ## ---- fig=TRUE, include=TRUE, fig.width=4, fig.height=4, fig.cap="Flowers in a dichromatic colourspace, as modelled according to a canid visual system."----
 plot(di.flowers, col = spec2rgb(flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'fi', scale = 10000)
 
 tri.flowers <- colspace(vis.flowers, space = 'tri')
@@ -210,7 +216,7 @@ head(tri.flowers)
 ## ---- fig=TRUE, include=TRUE, fig.width=4, fig.height=4, fig.cap="Floral reflectance in a Maxwell triangle, considering a honeybee visual system."----
 plot(tri.flowers, pch = 21, bg = spec2rgb(flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, visual = "bluetit", qcatch = "fi", scale = 10000)
 
 tetra.flowers <- colspace(vis.flowers, space = "tcs")
@@ -230,10 +236,10 @@ axistetra(x = 0, y = 1.8)
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Projection plot from a tetrahedral colour space."----
 projplot(tetra.flowers, pch = 20, col = spec2rgb(flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 data(sicalis)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 par(mfrow = c(1, 2), pty = "s")
 tcs.sicalis.C <- subset(colspace(vismodel(sicalis)), "C")
 tcs.sicalis.T <- subset(colspace(vismodel(sicalis)), "T")
@@ -241,13 +247,13 @@ tcs.sicalis.B <- subset(colspace(vismodel(sicalis)), "B")
 voloverlap(tcs.sicalis.T, tcs.sicalis.B, plot = TRUE)
 voloverlap(tcs.sicalis.T, tcs.sicalis.C, plot = TRUE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(tetra.flowers)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, visual = 'apis', qcatch = 'Ei', relative = FALSE, vonkries = TRUE, achromatic = 'l', bkg = 'green')
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 hex.flowers <- colspace(vis.flowers, space = 'hexagon')
 
 head(hex.flowers)
@@ -255,7 +261,7 @@ head(hex.flowers)
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=5, fig.cap="Flowers as modelled in the hymenopteran colour hexagon of Chittka (1992), overlain with coarse bee-hue sectors."----
 plot(hex.flowers, sectors = 'coarse', pch = 21, bg = spec2rgb(flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, visual = "apis", qcatch = "Ei", relative = FALSE, vonkries = TRUE, bkg = "green")
 
 coc.flowers <- colspace(vis.flowers, space = "coc")
@@ -265,27 +271,27 @@ head(coc.flowers)
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=5, fig.cap="Flowers in the colour-opponent-coding space of Backhaus (1991), as modelling according to the honeybee."----
 plot(coc.flowers, pch = 21, bg = spec2rgb(flowers), yaxt = "n")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, visual = 'cie10', illum = 'D65', vonkries = TRUE, relative = FALSE, achromatic = 'none')
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ciexyz.flowers <- colspace(vis.flowers, space = 'ciexyz')
 head(ciexyz.flowers)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=5, fig.cap="Floral reflectance in the CIEXYZ human visual model. Note that this space is not perceptually calibrated, so we cannot make inferences about the similarity or differences of colours based on their relative location."----
 plot(ciexyz.flowers, pch = 21, bg = spec2rgb(flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 cielab.flowers <- colspace(vis.flowers, space = 'cielab')
 head(cielab.flowers)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=5, fig.cap="Floral reflectance spectra represented in the CIELab model of human colour sensation."----
 plot(cielab.flowers, pch = 21, bg = spec2rgb(flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 vis.flowers <- vismodel(flowers, qcatch = 'Qi', visual = 'musca', achromatic = 'none', relative = TRUE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 cat.flowers <- colspace(vis.flowers, space = 'categorical')
 
 head(cat.flowers)
@@ -330,10 +336,10 @@ seg.fdc <- colspace(seg.vis, space = "segment")
 # plot results
 plot(seg.fdc, col = spec2rgb(fakedata.c))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(coldist(tetra.flowers))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Model flower colours according to a honeybee
 vis.flowers <- vismodel(flowers, visual = "apis", qcatch = "Ei", relative = FALSE, vonkries = TRUE, achromatic = "l", bkg = "green")
 hex.flowers <- colspace(vis.flowers, space = "hexagon")
@@ -360,10 +366,10 @@ JND.fms <- coldist(vm.fms, n = c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5))
 
 head(JND.fms)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 butterflies <- getimg(system.file("testdata/images/", package = 'pavo'))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 butterflies_class <- classify(butterflies, kcols = c(4, 3))
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="The k-means classified images of our butterflies, along with their identified colour palettes"----
@@ -374,14 +380,14 @@ butterflies_class <- classify(butterflies, kcols = c(4, 3))
 summary(butterflies_class[[2]], plot = TRUE)
 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Automatic classification.
 butterflies_class <- classify(butterflies, kcols = c(4, 3))
 
 # Automatic classification using a reference image, identified by name.
 butterflies_class <- classify(butterflies, refID = 'h_melpomene', kcols = 3)
 
-## ---- eval = FALSE-------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 #  # Classification using interactively-specified centres for each image, with no
 #  # need to specify kcols (since it will be inferred from the numbers of colours selected)
 #  butterflies_class <- classify(butterflies, interactive = TRUE)
@@ -391,7 +397,7 @@ butterflies_class <- classify(butterflies, refID = 'h_melpomene', kcols = 3)
 #  # as above.
 #  butterflies_class <- classify(butterflies, refID = 1, interactive = TRUE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 
 # Load up our images
 butterflies <- getimg(system.file("testdata/images/", package = 'pavo'))
@@ -407,7 +413,7 @@ butterflies_adj <- adjacent(butterflies_class, xscale = 200, xpts = 200, bkgID =
 # Take a look
 head(butterflies_adj)
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 # Create a fake matrix of pairwise colour- and luminance distances between all
 # colour patten elements, as might be attained through visual modelling of spectral data.
 distances <- data.frame(c1 = c(1, 1, 2),
@@ -448,7 +454,7 @@ plot(lizard)
 plot(lizard)
 points(expand.grid(seq(0, dim(lizard)[1], 25), seq(0, dim(lizard)[1], 25)), pch = 16, col = 'red')
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 set.seed(12352)  # For reprodicubility
 
 # Generate some fake spectra that were grid-sampled across our scene
@@ -462,7 +468,7 @@ fakescene <- cbind(
 # Convert them to rspce objects
 fakescene <- as.rspec(data.frame(wl = 300:700, fakescene))
 
-## ---- fig=FALSE, message=FALSE-------------------------------------------
+## ---- fig=FALSE, message=FALSE------------------------------------------------
 # Visually model our spectra in a tetrahedral model of the blue tit, specifying
 # relative = FALSE so that we can estimate noise-calibrated distances.
 vis.fakescene <- vismodel(fakescene, visual = 'bluetit', relative = FALSE, scale = 10000)
@@ -485,7 +491,7 @@ library(NbClust)
 clust <- NbClust(jnd.fakescene, diss = jnd.mat, distance = NULL, method = 'centroid', index = 'hartigan')
 clust$Best.nc
 
-## ---- message=FALSE------------------------------------------------------
+## ---- message=FALSE-----------------------------------------------------------
 # Rearrange the data into a colour-classified image matrix, and take a look at it.
 # Note that is the same structure as the output of 'classify()'.
 mat.fakescene <- matrix(as.numeric(unlist(clust$Best.partition)), 10, 10)

@@ -6,6 +6,7 @@
 # SUMMARY VARIABLES #
 #####################
 
+#' @importFrom utils combn
 huedisp <- function(tcsres) {
   if (nrow(tcsres) == 1) {
     return(NA)
@@ -23,6 +24,7 @@ huedisp <- function(tcsres) {
 
 
 #' @importFrom geometry convhulln
+#' @importFrom stats dist var
 tcssum <- function(tcsres) {
   # centroid
   centroid <- colMeans(tcsres[c("u", "s", "m", "l")])
@@ -40,11 +42,29 @@ tcssum <- function(tcsres) {
     # circle of radius (3/4)
     tot.c.vol <- sqrt(3) / 8
 
+    # FIXME: there is a bug in alphashape3d which will sometimes fail on legit
+    # calls, such as
+    # summary(colspace(vismodel(flowers)), by = 4)
+    # so we wrap it in tryCatch() to prevent the error from trickling down in
+    # summary.colspace()
+    a.vol <- tryCatch(
+      {
+        astar <- find_astar(as.matrix(tcsres[, c("x", "y", "z")]))
+        ashape <- alphashape3d::ashape3d(as.matrix(tcsres[, c("x", "y", "z")]), astar)
+        alphashape3d::volume_ashape3d(ashape)
+      },
+      error = function(e) {
+        warning("There was an error in the computation of the alpha-shape volume", call. = FALSE)
+        return(NA_real_)
+      }
+    )
+
     # relative color volume
     rel.c.vol <- c.vol / tot.c.vol
   } else {
-    c.vol <- NA
-    rel.c.vol <- NA
+    c.vol <- NA_real_
+    rel.c.vol <- NA_real_
+    a.vol <- NA_real_
   }
 
   # hue disparity
@@ -61,13 +81,15 @@ tcssum <- function(tcsres) {
     c.vol, rel.c.vol,
     colspan.m, colspan.v,
     hdisp.m, hdisp.v,
-    mean.ra, max.ra
+    mean.ra, max.ra,
+    a.vol
   )
 
   names(res.c) <- c(
     "centroid.u", "centroid.s", "centroid.m", "centroid.l",
     "c.vol", "rel.c.vol", "colspan.m", "colspan.v", "huedisp.m", "huedisp.v",
-    "mean.ra", "max.ra"
+    "mean.ra", "max.ra",
+    "a.vol"
   )
 
   res.c

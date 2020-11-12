@@ -21,6 +21,8 @@
 #'
 #' @return an object of class `rspec` for use in further `pavo` functions
 #'
+#' @importFrom stats approx cor
+#'
 #' @export as.rspec is.rspec
 #'
 #' @examples
@@ -50,6 +52,10 @@ as.rspec <- function(object, whichwl = NULL,
     name <- colnames(object)
   } else {
     stop("object must be a data frame or matrix")
+  }
+
+  if (!all(vapply(seq_len(ncol(object)), function(j) is.numeric(object[, j]), logical(1)))) {
+    stop("all columns must contain numeric data", call. = FALSE)
   }
 
   if (anyNA(object)) {
@@ -135,6 +141,9 @@ as.rspec <- function(object, whichwl = NULL,
       approx(x = wl, y = col, xout = l1:l2, rule = rule)$y
     })
     wl <- seq(l1, l2)
+  } else {
+    object <- object[wl >= l1 & wl <= l2, ]
+    wl <- wl[wl >= l1 & wl <= l2]
   }
 
   # We need to convert object as a df before putting back the wl, otherwise
@@ -149,19 +158,6 @@ as.rspec <- function(object, whichwl = NULL,
   if (length(wl_index) > 1) {
     warning("Multiple columns named 'wl', check column names")
     colnames(res)[wl_index] <- c("wl", paste0("wl.", wl_index[-1] - 1))
-  }
-
-  # Trim data when not interpolating (todo: bit clumsy, weave this in above &
-  # perhaps default to nearest-wavelength if incorrect reference is provided)
-  if (!interp && !is.null(lim)) {
-    if (l1 %in% res$wl && l2 %in% res$wl) {
-      res <- res[which(res$wl == l1):which(res$wl == l2), ]
-    } else {
-      stop(
-        "Specified limits do not match a wavelength reference in the data. ",
-        "Check 'lim' argument."
-      )
-    }
   }
 
   # Negative value check

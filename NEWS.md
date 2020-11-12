@@ -1,3 +1,46 @@
+# pavo 2.5.0
+
+## NEW FEATURES AND SIGNIFICANT CHANGES
+
+* Add ability to compute colour volume by using alphashapes instead of convex 
+  hulls. The functions `vol()`, `tcsvol()` and `voloverlap()` gain a new 
+  argument `type = c("convex", "alpha")` to decide how you want to compute the
+  colour volume. Please refer to the vignette `vignette("pavo-5-alphashapes", 
+  package = "pavo")` for more information. As a result, the argument order
+  in these 3 function has changed. Check the documentation to update your
+  scripts accordingly. The function `summary.colspace()` also gains an 
+  additional column that returns that colour volume computed with an alpha-shape
+  of parameter alpha* in the case of `tcs` objects.
+
+## MINOR FEATURES AND BUG FIXES
+
+* `getimg()` now imports image files with uppercase extensions (e.g., JPG or 
+PNG), such as those produced by some camera brands or processing software.
+* Maximum quantum catches computation (`data.maxqcatches` attribute) now works
+for segment "visual model" as well. As a side effect, this removes a warning
+that occurred when users ran `vismodel(..., visual = "segment")`.
+* `sensmodel()` now accepts the argument `sensnames`, for specifying the names
+of the resulting sensitivity curves on-the-fly.
+* CIE models now accept data created outside of `vismodel()`, by allowing users to 
+specify the illuminant and viewer sensitivity function used when estimating XYZ values 
+(via `illum` and `visual` arguments in `colspace()`).
+* `bootcoldist()` is now laxer in its argument checks and accept objects that 
+are neither `vismodel` or `colspace` objects. This means you can now use this 
+function on quantum catches dataframe that you obtained outside of pavo, such
+as the MICA toolbox.
+* `summary.colspace()` now prints a more explicit error when the `by` argument
+value is not a multiple of the number of rows in the colspace object (i.e., the
+number of spectra)
+* Added a continuous measure of hue to the output of the categorical model of Troje (1993)
+* `teal` example dataset columns have been renamed to add an additional zero in
+front of single digit numbers, so that column names now sort in the correct
+order by default.
+* Some very small negative values in the built-in visual system data have 
+been corrected .
+* `as.rspec()` is now more lenient for wavelength trimming when `interp = FALSE`
+and now works even if the specified `lims` do not correspond to actual wl values
+from the input object.
+
 # pavo 2.4.0
 
 ## NEW FEATURES AND SIGNIFICANT CHANGES

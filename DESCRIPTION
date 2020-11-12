@@ -1,18 +1,18 @@
 Package: pavo
 Title: Perceptual Analysis, Visualization and Organization of Spectral
         Colour Data
-Version: 2.4.0
+Version: 2.5.0
 Authors@R: 
-    c(person(given = "Rafael",
-             family = "Maia",
-             role = c("aut", "cre"),
-             email = "rm72@zips.uakron.edu",
-             comment = c(ORCID = "0000-0002-7563-9795")),
-      person(given = "Thomas",
+    c(person(given = "Thomas",
              family = "White",
-             role = "aut",
+             role = c("aut", "cre"),
              email = "thomas.white026@gmail.com",
              comment = c(ORCID = "0000-0002-3976-1734")),
+     person(given = "Rafael",
+             family = "Maia",
+             role = "aut",
+             email = "rafa.maia@gmail.com",
+             comment = c(ORCID = "0000-0002-7563-9795")),
       person(given = "Hugo",
              family = "Gruson",
              role = "aut",
@@ -37,22 +37,23 @@ License: GPL (>= 2)
 URL: http://pavo.colrverse.com, https://github.com/rmaia/pavo/
 BugReports: https://github.com/rmaia/pavo/issues
 Depends: R (>= 3.5.0)
-Imports: cluster, future.apply, geometry(>= 0.4.0), lightr(>= 1.0),
-        magick, plot3D, progressr, sp, viridisLite
+Imports: alphashape3d, cluster, future.apply, geometry(>= 0.4.0),
+        lightr(>= 1.0), magick, plot3D, progressr, sp, viridisLite
 Suggests: digest, imager, knitr, mapproj, NbClust, rgl, rmarkdown,
-        testthat,
+        testthat(>= 2.99.0),
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-GB
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
+Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2020-02-08 06:39:24 UTC; rafaelmaia
-Author: Rafael Maia [aut, cre] (<https://orcid.org/0000-0002-7563-9795>),
-  Thomas White [aut] (<https://orcid.org/0000-0002-3976-1734>),
+Packaged: 2020-11-11 23:17:02 UTC; twhite
+Author: Thomas White [aut, cre] (<https://orcid.org/0000-0002-3976-1734>),
+  Rafael Maia [aut] (<https://orcid.org/0000-0002-7563-9795>),
   Hugo Gruson [aut] (<https://orcid.org/0000-0002-4094-1476>),
   John Endler [aut],
   Chad Eliason [aut],
   Pierre-Paul Bitton [aut] (<https://orcid.org/0000-0001-5984-2331>)
-Maintainer: Rafael Maia <rm72@zips.uakron.edu>
+Maintainer: Thomas White <thomas.white026@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-02-08 16:20:08 UTC
+Date/Publication: 2020-11-12 09:00:02 UTC

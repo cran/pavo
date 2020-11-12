@@ -15,6 +15,8 @@
 #' plot(cat.flowers)
 #' @author Thomas White \email{thomas.white026@@gmail.com}
 #'
+#' @importFrom graphics abline legend
+#'
 #' @export
 #'
 #' @keywords internal

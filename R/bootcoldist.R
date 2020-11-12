@@ -14,24 +14,24 @@
 #' @param ... other arguments to be passed to [coldist()]. Must at minimum
 #' include `n` and `weber`. See [coldist()] for details.
 #' @inheritParams getspec
-#' 
+#'
 #' @inherit getspec details
 #'
 #' @return a matrix including the empirical mean and bootstrapped
-#'  confidence limits for dS (and dL if `achro = TRUE`).
+#'  confidence limits for dS (and dL if `achromatic = TRUE`).
 #'
 #' @examples
 #' \dontrun{
 #' data(sicalis)
 #' vm <- vismodel(sicalis, achromatic = "bt.dc")
 #' gr <- gsub("ind..", "", rownames(vm))
-#' bootcoldist(vm, by = gr, n = c(1, 2, 2, 4), weber = 0.1, weber.achro = 0.1, cores = 1)
+#' bootcoldist(vm, by = gr, n = c(1, 2, 2, 4), weber = 0.1, weber.achro = 0.1)
 #' }
 #'
 #' @export
 #' @importFrom future.apply future_lapply
 #' @importFrom progressr with_progress progressor
-#' @importFrom stats aggregate
+#' @importFrom stats aggregate setNames
 #'
 #' @references Maia, R., White, T. E., (2018) Comparing colors using visual models.
 #'  Behavioral Ecology, ary017 \doi{10.1093/beheco/ary017}
@@ -39,14 +39,11 @@
 
 bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
                         cores = NULL, ...) {
-  if (!is.vismodel(vismodeldata) && !is.colspace(vismodeldata)) {
-    stop('object must be a "vismodel" or "colspace" result', call. = FALSE)
-  }
-
   if (!missing(cores)) {
     warning("'cores' argument is deprecated. See ?future::plan for more info ",
-            "about how you can choose your parallelisation strategy.", 
-            call. = FALSE)
+      "about how you can choose your parallelisation strategy.",
+      call. = FALSE
+    )
   }
 
   # geometric mean
@@ -97,14 +94,12 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
 
     if (attr(vismodeldata, "visualsystem.achromatic") == "none") {
       arg0$achromatic <- FALSE
-    }
-
-    if (attr(vismodeldata, "visualsystem.achromatic") != "none") {
+    } else {
       arg0$achromatic <- TRUE
     }
   }
 
-  if (arg0$achro) {
+  if (arg0$achromatic) {
     if (is.null(arg0$weber.achro)) {
       stop('argument "weber.achro" to be passed to "coldist" is missing', call. = FALSE)
     }
@@ -209,13 +204,13 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
     tmparg$modeldata <- x
     do.call(coldist, tmparg)
   }
-  
+
   with_progress({
     p <- progressor(along = bootgrouped)
     bootcd <- future_lapply(bootgrouped, function(z) {
       p()
-      tryCatch(tmpbootcdfoo(z),
-               error = function(e) NULL
+      tryCatch(suppressMessages(tmpbootcdfoo(z)),
+        error = function(e) NULL
       )
     })
   })
@@ -229,7 +224,7 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
   )
 
   if (dim(bootdS)[1] < boot.n) {
-    stop('Bootstrap sampling encountered errors.')
+    stop("Bootstrap sampling encountered errors.")
   }
   # ...subtract them from the empirical
   # bootdS <- bootdS - empdS
@@ -251,7 +246,7 @@ bootcoldist <- function(vismodeldata, by, boot.n = 1000, alpha = 0.95,
 
   res <- t(rbind(dS.mean, dsCI))
 
-  if (arg0$achro) {
+  if (arg0$achromatic) {
     empdL <- setNames(empcd$dL, paste(empcd$patch1, empcd$patch2, sep = "-"))
 
     bootdL <- do.call(

@@ -67,13 +67,21 @@
 #'  (defaults to `FALSE`).
 #' @param scale a value by which the illuminant will be multiplied. Useful for when the
 #'  illuminant is a relative value (i.e. transformed to a maximum of 1 or to a percentage),
-#'  and does not correspond to quantum flux units (\eqn{\mu mol.s^{-1}.m^{-2}}). Useful values
-#'  are, for example, 500 (for dim light) and 10000 (for bright illumination). Note that if
-#' `vonkries = TRUE` this transformation has no effect.
+#'  and does not correspond to quantum flux units
+#'  (\ifelse{html}{\out{&mu;mol.s<sup>-1</sup>.m<sup>-2</sup>}}{\eqn{\mu mol.s^{-1}.m^{-2}}}).
+#'  Useful values are, for example, 500 (for dim light) and 10000 (for bright
+#'  illumination). Note that if `vonkries = TRUE` this transformation has no effect.
 #'
 #' @return An object of class `vismodel` containing the photon catches for each of the
 #'  photoreceptors considered. Information on the parameters used in the calculation are also
 #'  stored and can be called using the [summary.vismodel()] function.
+#'
+#' @note
+#' Built-in `visual`, `achromatic`, `illum`, `bkg` and `trans` are only defined
+#' on the 300 to 700nm wavelength range. If you wish to work outside this range,
+#' you will need to provide your own data.
+#'
+#' @importFrom stats quantile
 #'
 #' @export
 #'
@@ -281,7 +289,7 @@ vismodel <- function(rspecdata,
     bkg <- rep(1, dim(rspecdata)[1])
   }
 
-  # Defining ocular transmission
+  # Defining ocular  <- mission
   trdat <- transmissiondata
 
   if (tr2 != "user-defined") {
@@ -364,7 +372,7 @@ vismodel <- function(rspecdata,
   Qi <- data.frame(
     crossprod(as.matrix(y), as.matrix(S * illum)) * B * K
   )
-  maxQi <- as.matrix(S * illum) * B * K
+  maxQi <- as.matrix(S * illum) * K
 
   names(Qi) <- names(S)
 

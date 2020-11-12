@@ -1,4 +1,4 @@
-## ----include = FALSE-----------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 # Do not use partial matching
 options(
    warnPartialMatchDollar = TRUE,
@@ -6,28 +6,34 @@ options(
    warnPartialMatchAttr = TRUE
 )
 knitr::knit_hooks$set(fig = knitr::hook_pngquant)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.show = "hold"
+)
 
-## ---- warning=FALSE, results='hide', message=FALSE-----------------------
+## ---- warning=FALSE, results='hide', message=FALSE----------------------------
 # Load the package, and set a global random-number seed for the reproducible generation of fake data later on.
 library(pavo)
 set.seed(1612217)
 
-## ---- echo=TRUE, eval=FALSE, results='hide', include=TRUE----------------
+## ---- echo=TRUE, eval=FALSE, results='hide', include=TRUE---------------------
 #  specs <- getspec("~/pavo/data_external/vignette", ext = "ttt", decimal = ",", subdir = TRUE, subdir.names = FALSE)
 #  # 213  files found; importing spectra
 #  # |================================================================================| 100%, ETA 00:00
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 specs <- readRDS(system.file("extdata/specsdata.rds", package = "pavo"))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 specs[1:10, 1:4]
 dim(specs) # the data set has 213 spectra, from 300 to 700 nm, plus a 'wl' column
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 is.rspec(specs)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Create some fake reflectance data with wavelength column arbitrarily titled
 # and not first in the data frame:
 fakedat <- data.frame(
@@ -45,25 +51,25 @@ is.rspec(fakedat.new)
 
 head(fakedat.new)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(as.rspec(fakedat, whichwl = 'wavelength'))
 
-## ---- fig.height=3, fig.width=4, fig=TRUE--------------------------------
+## ---- fig.height=3, fig.width=4, fig=TRUE-------------------------------------
 fakedat.new2 <- as.rspec(fakedat, lim = c(300, 500))
 
 plot(refl1 ~ wl, type = "l", data = fakedat.new2)
 
-## ---- fig.height=3, fig.width=4, fig = TRUE------------------------------
+## ---- fig.height=3, fig.width=4, fig = TRUE-----------------------------------
 fakedat.new2 <- as.rspec(fakedat, lim = c(300, 1000))
 
 plot(fakedat.new2[, 2] ~ fakedat.new2[, 1], type = "l")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 specs.tanager1 <- subset(specs, "tanager")
 
 head(specs.tanager1)[1:5]
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # extract first component of filenames containing species names
 spp <- do.call(rbind, strsplit(names(specs), "\\."))[, 1]
 
@@ -73,7 +79,7 @@ specs.tanager2 <- subset(specs, subset = spp == "tanager")
 # compare subsetting methods
 all.equal(specs.tanager1, specs.tanager2)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 specs.tanager <- subset(specs, "tanager")
 specs.parakeet <- subset(specs, "parakeet")
 specs.new <- merge(specs.tanager, specs.parakeet)
@@ -82,12 +88,12 @@ specs.new <- merge(specs.tanager, specs.parakeet)
 # 36 spectra plus the first (wl) column
 explorespec(specs[, 1:37], by = 3, lwd = 2)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 mspecs <- aggspec(specs, by = 3, FUN = mean)
 mspecs[1:5, 1:4]
 dim(mspecs) # data now has 71 spectra, one for each individual, and the 'wl' column
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # create a vector with species identity names
 spp <- gsub('\\.[0-9].*$', '', names(mspecs))[-1]
 table(spp)
@@ -96,7 +102,7 @@ table(spp)
 sppspec <- aggspec(mspecs, by = spp, FUN = mean)
 round(sppspec[1:5, ], 2)
 
-## ---- fig=TRUE, include=TRUE, fig.width=6, fig.height=4.5----------------
+## ---- fig=TRUE, include=TRUE, fig.width=6, fig.height=4.5---------------------
 plotsmooth(sppspec, minsmooth = 0.05, maxsmooth = 0.5, curves = 4, ask = FALSE)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Result for raw (grey line) and smoothed (red line) reflectance data for the parakeet"----
@@ -107,7 +113,7 @@ plot(sppspec[, 5] ~ sppspec[, 1],
 )
 lines(spec.sm[, 5] ~ sppspec[, 1], col = "red", lwd = 2)
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 # Run some different normalisations
 specs.max <- procspec(sppspec, opt = "max")
 specs.min <- procspec(sppspec, opt = "min")
@@ -129,7 +135,7 @@ abline(h = c(0, 1), lty = 2)
 mtext("Wavelength (nm)", side = 1, outer = TRUE, line = 1)
 mtext("Normalised reflectance (%)", side = 2, outer = TRUE, line = 1)
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 # PCA analysis
 spec.bin <- procspec(sppspec, opt = c("bin", "center"))
 head(spec.bin)
@@ -138,7 +144,7 @@ colnames(spec.bin) <- spec.bin[1, ]  # names variables as wavelength bins
 spec.bin <- spec.bin[-1, ]  # remove 'wl' column
 pca1 <- prcomp(spec.bin, scale. = TRUE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(pca1)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=7, fig.height=3, fig.cap="Plot of PC1 loading versus wavelength (left) and species mean spectra sorted vertically from lowest to highest PC1 value (right; values on right hand axis are column identities)."----
@@ -158,7 +164,7 @@ abline(h = 0, lty = 2)
 plot(sppspec, select = sel, labels.stack = names(sppspec)[sel], type = "s", col = colr)
 mtext("Wavelength (nm)", side = 1, outer = TRUE, line = 1)
 
-## ---- results='hide'-----------------------------------------------------
+## ---- results='hide'----------------------------------------------------------
 # Create a duplicate spectrum and add some negative values
 refl <- sppspec[, 7] - 20
 testspecs <- as.rspec(cbind(c(300:700), refl))
@@ -199,7 +205,7 @@ plot(teal.norm, type = "s", col = spec2rgb(teal))
 mtext("Wavelength (nm)", side = 1, outer = T, line = 1)
 mtext("Cumulative reflectance (A.U.)", side = 2, outer = T, line = 1)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 angles <- seq(15, 70, by = 5)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Heatmap plot for angle-resolved reflectance measurements of the green-winged teal."----
@@ -229,15 +235,15 @@ aggplot(mspecs, spp,
         FUN.error = function(x) sd(x) / sqrt(length(x)),
         lcol = 1, shadecol = "grey", alpha = 0.7)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 butterflies <- getimg(system.file("testdata/images/", package = 'pavo'))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 is.rimg(butterflies)
 str(butterflies[[1]])
 str(butterflies[[2]])
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 fakeimg <- array(c(
   matrix(c(1, 1, 0, 0), nrow = 12, ncol = 8),
   matrix(c(0, 0, 0, 0), nrow = 12, ncol = 8),
@@ -254,11 +260,11 @@ str(fake_rimg)
 plot(butterflies[[1]])
 
 
-## ---- eval = FALSE-------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 #  # Interactively specify the real-world scale of the image. Here 100 mm.
 #  butterflies <- procimg(butterflies, scaledist = 100)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # Interactively specify a smoothed polygon around the focal objects
 #  butterflies <- procimg(butterflies, outline = TRUE, iterations = 1)
 

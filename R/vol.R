@@ -37,7 +37,10 @@
 #' vol(tcs.sicalis, type = "convex")
 #'
 #' # Alpha-shape
+#' if (require("alphashape3d")) {
 #' vol(tcs.sicalis, type = "alpha", avalue = 1)
+#' }
+#'
 #' @importFrom geometry convhulln
 #' @importFrom graphics par polygon
 #' @importFrom grDevices trans3d adjustcolor
@@ -57,6 +60,14 @@ vol <- function(tcsdata, type = c("convex", "alpha"), avalue = "auto",
     coords <- tcsdata[, c("x", "y", "z")]
     vol <- t(convhulln(coords, options = "FA")$hull)
   } else {
+
+    if (!requireNamespace("alphashape3d", quietly = TRUE)) {
+      stop(
+        "Please install the alphashape3d package to be able to use ",
+        'type = "alpha"', call. = FALSE
+      )
+    }
+
     if (avalue == "auto") {
       avalue <- find_astar(as.matrix(tcsdata[, c("x", "y", "z")]))
     }

@@ -4,6 +4,7 @@ author: "Hugo Gruson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: main.bib
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{Colour volume estimation}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,7 +21,7 @@ knitr::opts_chunk$set(
 options(rgl.useNULL = TRUE)
 ```
 
-```{r include = FALSE}
+```{r include = FALSE, eval=require("rgl")}
 knitr::knit_hooks$set(webgl = rgl::hook_webgl)
 ```
 
@@ -40,13 +41,24 @@ You can plot the colour volume using $\alpha$-shape with the `vol()` function
 `type = "alpha"`. By default, this will use the $\alpha^*$ value defined in 
 @Gruson2020.
 
+```{r, include=FALSE}
+knitr::opts_knit$set(global.device = TRUE)
+```
+
 ```{r}
 library(pavo)
 data(flowers)
 vis_flowers <- vismodel(flowers, visual = "avg.uv")
 tcs_flowers <- colspace(vis_flowers)
 plot(tcs_flowers)
+```
+
+```{r, eval=require("alphashape3d")}
 vol(tcs_flowers, type = "alpha")
+```
+
+```{r, include=FALSE}
+knitr::opts_knit$set(global.device = FALSE)
 ```
 
 To get the colour volume value, you can use the `summary.colspace()` function. 
@@ -61,7 +73,7 @@ summary(tcs_flowers)
 Alternatively, you can set the $\alpha$ parameter to the value of your choice via the `avalue` 
 argument:
 
-```{r}
+```{r, eval=require("alphashape3d")}
 plot(tcs_flowers)
 vol(tcs_flowers, type = "alpha", avalue = 0.5)
 ```
@@ -85,17 +97,17 @@ High-level functions to build the $\alpha$-shape directly in `pavo` have not yet
 been implemented but you can use the `alphashape3d` package directly to compute
 the $\alpha$-shapes, its volume and display it in a 3D interactive plot.
 
-```{r}
+```{r, eval=require("alphashape3d")}
 library(alphashape3d)
 ashape_jnd <- ashape3d(as.matrix(xy_flowers), alpha = 10)
 volume_ashape3d(ashape_jnd)
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval=require("rgl")}
 rgl::bg3d("white") 
 ```
 
-```{r, webgl=TRUE}
+```{r, webshot::is_phantomjs_installed(), webgl=TRUE, eval=require("alphashape3d")}
 plot(ashape_jnd)
 ```
 
@@ -113,11 +125,11 @@ tcs.sicalis.C <- subset(colspace(vismodel(sicalis)), "C")
 tcs.sicalis.B <- subset(colspace(vismodel(sicalis)), "B")
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval=require("rgl")}
 rgl::bg3d()
 ```
 
-```{r, webgl=TRUE}
+```{r, eval = webshot::is_phantomjs_installed(), webgl=TRUE, eval=require("alphashape3d")}
 voloverlap(tcs.sicalis.C, tcs.sicalis.B, type = "alpha", plot = TRUE)
 ```
 

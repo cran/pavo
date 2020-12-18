@@ -1,7 +1,7 @@
 Package: pavo
 Title: Perceptual Analysis, Visualization and Organization of Spectral
         Colour Data
-Version: 2.6.0
+Version: 2.6.1
 Authors@R: 
     c(person(given = "Thomas",
              family = "White",
@@ -47,7 +47,7 @@ Language: en-GB
 RoxygenNote: 7.1.1
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2020-12-09 01:19:00 UTC; twhite
+Packaged: 2020-12-17 07:46:42 UTC; twhite
 Author: Thomas White [aut, cre] (<https://orcid.org/0000-0002-3976-1734>),
   Rafael Maia [aut] (<https://orcid.org/0000-0002-7563-9795>),
   Hugo Gruson [aut] (<https://orcid.org/0000-0002-4094-1476>),
@@ -56,4 +56,4 @@ Author: Thomas White [aut, cre] (<https://orcid.org/0000-0002-3976-1734>),
   Pierre-Paul Bitton [aut] (<https://orcid.org/0000-0001-5984-2331>)
 Maintainer: Thomas White <thomas.white026@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-12-09 10:20:06 UTC
+Date/Publication: 2020-12-18 22:20:02 UTC

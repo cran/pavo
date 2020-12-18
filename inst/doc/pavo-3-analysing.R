@@ -1,10 +1,4 @@
 ## ----include = FALSE----------------------------------------------------------
-# Do not use partial matching
-options(
-   warnPartialMatchDollar = TRUE,
-   warnPartialMatchArgs = TRUE,
-   warnPartialMatchAttr = TRUE
-)
 knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -35,8 +29,7 @@ summary(spec.sm, subset = TRUE)
 # Extract only brightness variables
 summary(spec.sm, subset = c('B1', 'B2', 'B3'))
 
-## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=5, fig.cap="Plots from `peakshape`"----
-par(mfrow = c(2, 3))
+## ---- fig=TRUE, include=TRUE, fig.cap="Plots from `peakshape`", fig.show="hold", out.width="30%"----
 peakshape(spec.sm, plot = TRUE)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Plot from `peakshape`, setting the wavelength limits to 300 and 500 nm"----
@@ -75,6 +68,7 @@ vismod1 <- vismodel(sppspec,
 summary(vismod1)
 
 ## ---- fig=TRUE, include=TRUE, results = 'hide', fig.width=8.5, fig.height=5, fig.cap="Plots of species mean reflectance curves with corresponding relative usml cone stimulations (insets)."----
+oldpar <- par(no.readonly = TRUE)
 par(mfrow = c(2, 6), oma = c(3, 3, 0, 0))
 layout(rbind(c(2, 1, 4 , 3, 6 , 5),
              c(1, 1, 3 , 3, 5 , 5), 
@@ -92,6 +86,7 @@ for (i in 1:6) {
 
 mtext("Wavelength (nm)", side = 1, outer = TRUE, line = 1)
 mtext("Reflectance (%)", side = 2, outer = TRUE, line = 1)
+par(oldpar)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Idealized dichromat photoreceptors created using `sensmodel`."----
 idealizeddichromat <- sensmodel(c(350, 650))
@@ -226,8 +221,7 @@ head(tetra.flowers)
 ## ---- fig=TRUE, include=TRUE, fig.height=5, fig.width=5, fig.cap="Flowers in a tetrahedral colourspace modelled using the visual phenotype of the blue tit. Point size is used to force perspective"----
 plot(tetra.flowers, pch = 21, bg = spec2rgb(flowers), perspective = TRUE, range = c(1, 2), cex = 0.5)
 
-## ---- fig=TRUE, include=TRUE, fig.height=4, fig.width=6, fig.cap="Flowers in a tetrahedral colourspace, with varied orientations and perspectives, modelled using the visual phenotype of the blue tit."----
-par(mfrow = c(1, 2), pty = "s")
+## ---- fig=TRUE, include=TRUE, fig.cap="Flowers in a tetrahedral colourspace, with varied orientations and perspectives, modelled using the visual phenotype of the blue tit.", fig.show="hold", out.width="45%"----
 plot(tetra.flowers, pch = 21, bg = spec2rgb(flowers))
 axistetra(x = 0, y = 1.8)
 plot(tetra.flowers, theta = 110, phi = 10, pch = 21, bg = spec2rgb(flowers))
@@ -239,8 +233,7 @@ projplot(tetra.flowers, pch = 20, col = spec2rgb(flowers))
 ## -----------------------------------------------------------------------------
 data(sicalis)
 
-## -----------------------------------------------------------------------------
-par(mfrow = c(1, 2), pty = "s")
+## ---- plot = TRUE, fig.show='hold', out.width='40%'---------------------------
 tcs.sicalis.C <- subset(colspace(vismodel(sicalis)), "C")
 tcs.sicalis.T <- subset(colspace(vismodel(sicalis)), "T")
 tcs.sicalis.B <- subset(colspace(vismodel(sicalis)), "B")
@@ -439,13 +432,12 @@ hsl_vals
 # include a list of images along with a list of distances and hsl values)
 adjacent(butterflies_class[[2]], xscale = 200, xpts = 200, bkgID = 1, coldists = distances, hsl = hsl_vals)
 
-## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="A cryptic lizard, along with a possible sampling grid for spectral measurement."----
+## ---- fig=TRUE, fig.cap="A cryptic lizard, along with a possible sampling grid for spectral measurement.", fig.show="hold", out.width="45%"----
 
 # Load up our image of a camouflaged lizard
 lizard <- getimg(system.file("testdata/images/vig/", package = 'pavo'))
 
 # Take a look at it
-par(mfrow = c(1, 2))
 plot(lizard)
 
 # And overlay a simple 'sampling grid' that might guide us as to where we should collect

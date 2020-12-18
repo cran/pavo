@@ -1,10 +1,5 @@
 ## ----include = FALSE----------------------------------------------------------
 # Do not use partial matching
-options(
-   warnPartialMatchDollar = TRUE,
-   warnPartialMatchArgs = TRUE,
-   warnPartialMatchAttr = TRUE
-)
 knitr::knit_hooks$set(fig = knitr::hook_pngquant)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -119,10 +114,8 @@ specs.max <- procspec(sppspec, opt = "max")
 specs.min <- procspec(sppspec, opt = "min")
 specs.str <- procspec(sppspec, opt = c("min", "max")) # multiple options
 
-## ---- fig=TRUE, include=TRUE, fig.width=7, fig.height=3, fig.cap="Results for min (left), max (centre), and both normalisations (right)"----
+## ---- fig=TRUE, include=TRUE, fig.cap="Results for min (left), max (centre), and both normalisations (right)", fig.show="hold", out.width="30%"----
 # Plot results
-par(mfrow = c(1, 3), mar = c(2, 2, 2, 2), oma = c(3, 3, 0, 0))
-
 plot(specs.min[, 5] ~ c(300:700), xlab = "", ylab = "", type = "l")
 abline(h = 0, lty = 2)
 
@@ -147,8 +140,7 @@ pca1 <- prcomp(spec.bin, scale. = TRUE)
 ## -----------------------------------------------------------------------------
 summary(pca1)
 
-## ---- fig=TRUE, include=TRUE, fig.width=7, fig.height=3, fig.cap="Plot of PC1 loading versus wavelength (left) and species mean spectra sorted vertically from lowest to highest PC1 value (right; values on right hand axis are column identities)."----
-
+## ---- fig=TRUE, include=TRUE, fig.cap="Plot of PC1 loading versus wavelength (left) and species mean spectra sorted vertically from lowest to highest PC1 value (right; values on right hand axis are column identities).", fig.show="hold", out.width="45%"----
 # Generate colours from spectra
 colr <- spec2rgb(sppspec)
 wls <- as.numeric(colnames(spec.bin))
@@ -158,7 +150,6 @@ sel <- rank(pca1$x[, 1])
 sel <- match(names(sort(sel)), names(sppspec))
 
 # Plot results
-par(mfrow = c(1, 2), mar = c(2, 4, 2, 5), oma = c(2, 0, 0, 0))
 plot(pca1$rotation[, 1] ~ wls, type = "l", ylab = "PC1 loading")
 abline(h = 0, lty = 2)
 plot(sppspec, select = sel, labels.stack = names(sppspec)[sel], type = "s", col = colr)
@@ -173,11 +164,8 @@ testspecs <- as.rspec(cbind(c(300:700), refl))
 testspecs.fix1 <- procspec(testspecs, fixneg = "addmin")
 testspecs.fix2 <- procspec(testspecs, fixneg = "zero")
 
-## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=3.5, fig.cap="Plots showing original reflectance curve including negative values (left) and two processed curves using `fixneg = addmin` (top right) and `fixneg = zero` (bottom right)."----
+## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=3.5, fig.cap="Plots showing original reflectance curve including negative values (left) and two processed curves using `fixneg = addmin` (center) and `fixneg = zero` (right).", fig.show="hold", out.width="30%"----
 # Plot it
-par(mar = c(2, 2, 2, 2), oma = c(3, 3, 0, 0))
-layout(cbind(c(1, 1), c(2, 3)), widths = c(2, 1, 1))
-
 plot(testspecs, select = 2, ylim = c(-10, 30))
 abline(h = 0, lty = 3)
 
@@ -191,13 +179,11 @@ mtext("Wavelength (nm)", side = 1, outer = TRUE, line = 1)
 mtext("Reflectance (%)", side = 2, outer = TRUE, line = 1)
 
 ## ---- fig=TRUE, include=TRUE, fig.width=5, fig.height=4, fig.cap="Overlay plot of the teal angle-dependent reflectance with colours of each curve being an approximation of the perceived colour."----
-par(mar = c(4, 4, 2, 2))
 data(teal)
 plot(teal, type = "o", col = spec2rgb(teal))
 
-## ---- fig=TRUE, include=TRUE, fig.width=4, fig.height=5.5, fig.cap="Stacked plot of the raw (left) and normalized (right) teal angle-dependent reflectance"----
+## ---- fig=TRUE, include=TRUE, fig.cap="Stacked plot of the raw (left) and normalized (right) teal angle-dependent reflectance", fig.show="hold", out.width="45%"----
 teal.norm <- procspec(teal, opt = c("min", "max"))
-par(mfrow = c(1, 2), mar = c(2, 2, 2, 2), oma = c(2, 2, 0, 0))
 
 plot(teal, type = "s", col = spec2rgb(teal))
 plot(teal.norm, type = "s", col = spec2rgb(teal))
@@ -220,9 +206,7 @@ plot(teal.sm,
   las = 1, useRaster = TRUE
 )
 
-## ---- fig=TRUE, include=TRUE, fig.width=6, fig.height=4, fig.cap="Example plots created using `aggplot`. Left: using median, standard deviation, and coloured lines. Right: using mean, standard error, and greyscale"----
-par(mfrow = c(1, 2), mar = c(4, 4, 2, 2), oma = c(2, 0, 0, 0))
-
+## ---- fig=TRUE, include=TRUE, fig.width=6, fig.height=4, fig.cap="Example plots created using `aggplot`. Left: using median, standard deviation, and coloured lines. Right: using mean, standard error, and greyscale", fig.show="hold", out.width="45%"----
 # Plot using median and standard deviation, default colours
 aggplot(mspecs, spp, 
         FUN.center = median, 

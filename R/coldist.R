@@ -81,12 +81,13 @@
 #' @export
 #'
 #' @importFrom stats dist setNames
+#' @importFrom farver compare_colour
 #' @importFrom utils combn
 #'
 #' @examples
 #' \donttest{
 #' # Dichromat
-#' data(flowers)
+#' data(flowers)  
 #' vis.flowers <- vismodel(flowers, visual = "canis", relative = FALSE)
 #' didist.flowers <- coldist(vis.flowers, n = c(1, 2))
 #'
@@ -113,6 +114,7 @@
 #' tetradist.sicalis.n <- coldist(vis.sicalis)
 #' }
 #'
+#' @author Thomas E. White \email{thomas.white026@@gmail.com}
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
 #' @references Vorobyev, M., Osorio, D., Bennett, A., Marshall, N., & Cuthill,
@@ -167,9 +169,7 @@ coldist <- function(modeldata,
   ncone <- attr(modeldata, "conenumb")
 
   if (isTRUE(attr(modeldata, "relative"))) {
-    warning("Quantum catch are relative, distances may not be meaningful",
-      call. = FALSE
-    )
+    message("Quantum catch are relative, distances may not be meaningful")
   }
 
   # Pre-processing for colspace objects
@@ -187,9 +187,8 @@ coldist <- function(modeldata,
     || is.null(attr(modeldata, "visualsystem.achromatic"))) {
       modeldata$lum <- 0
       if (achromatic) {
-        warning("achromatic = TRUE but visual model was calculated with achromatic = ",
-          dQuote("none"), "; achromatic contrast not calculated.",
-          call. = FALSE
+        message("achromatic = TRUE but visual model was calculated with achromatic = ",
+          dQuote("none"), "; achromatic contrast not calculated."
         )
       }
       achromatic <- FALSE
@@ -362,7 +361,7 @@ coldist <- function(modeldata,
       )
 
       if (dim(dat)[2] <= ncone) {
-        warning("achromatic is set to TRUE, but input data has the same number of columns for sensory data as number of cones in the visual system. There is no column in the data that represents an exclusively achromatic channel, last column of the sensory data is being used. Treat achromatic results with caution, and check if this is the desired behavior.", call. = FALSE)
+        warning("achromatic is set to TRUE, but input data has the same number of columns for sensory data as number of cones in the visual system. There is no column in the data that represents an exclusively achromatic channel, so the last column of the sensory data is being used. Treat achromatic results with caution, and check if this is the desired behavior.", call. = FALSE)
       }
     }
     message(note_dS, note_dL)
@@ -391,7 +390,7 @@ coldist <- function(modeldata,
       "categorical" = apply(pairsid, 1, function(x) dist(rbind(dat[x[1], c("x", "y")], dat[x[2], c("x", "y")]))),
       "segment" = apply(pairsid, 1, function(x) dist(rbind(dat[x[1], c("MS", "LM")], dat[x[2], c("MS", "LM")]))),
       "CIELAB" = ,
-      "CIELCh" = apply(pairsid, 1, function(x) dist(rbind(dat[x[1], c("L", "a", "b")], dat[x[2], c("L", "a", "b")]))),
+      "CIELCh" = apply(pairsid, 1, function(x) compare_colour(as.data.frame(dat)[x[1], c("L", "a", "b")], as.data.frame(dat)[x[2], c("L", "a", "b")], from_space = 'lab', method = 'cie2000')),
       "coc" = apply(pairsid, 1, function(x) dist(rbind(dat[x[1], c("x", "y")], dat[x[2], c("x", "y")]), method = "manhattan"))
     )
     if (achromatic) {
@@ -488,6 +487,16 @@ newreceptornoise <- function(qcatch_raw, n, weber, weber.ref, res, qcatch_log = 
   if (is.null(qcatch_log)) {
     e <- setNames(v / sqrt(reln), colnames(qcatch_raw))
   } else {
+    # Negative qcatch check
+    if (any(qcatch_log < 0)) {
+      stop(
+        length(qcatch_log[qcatch_log < 0]),
+        " negative quantum-catch value(s) returned following log-transformation, as required when noise = 'quantum',
+        so distances cannot be calculated. This typically results from very small raw quantum catches estimates (< 1).",
+        "Consider whether the illuminant is properly scaled, and/or the appropriate",
+        " form of noise is being calculated."
+      )
+    }
     ept1 <- setNames(v^2 / reln, colnames(qcatch_raw))
     ept2 <- 2 / t(apply(res, 1, function(x) qcatch_log[x[1], ] + qcatch_log[x[2], ]))
     e <- sqrt(sweep(ept2, 2, ept1, "+"))

@@ -4,13 +4,7 @@
 \alias{getimg}
 \title{Import image data}
 \usage{
-getimg(
-  imgpath = getwd(),
-  subdir = FALSE,
-  subdir.names = FALSE,
-  max.size = 1,
-  cores
-)
+getimg(imgpath = getwd(), subdir = FALSE, subdir.names = FALSE, max.size = 1)
 }
 \arguments{
 \item{imgpath}{(required) either the full file-path or URL to an image (including extension),
@@ -25,8 +19,6 @@ images? (defaults to \code{FALSE}).}
 
 \item{max.size}{maximum size of all images to be allowed in memory, in GB. Defaults to
 \code{1}.}
-
-\item{cores}{deprecated argument.}
 }
 \value{
 a image, or list of images, of class \code{rimg}, for use in further
@@ -37,7 +29,7 @@ Finds and imports PNG, JPEG, and/or BMP images.
 }
 \examples{
 # Single image
-papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
+papilio <- getimg(system.file("testdata/images/butterflies/papilio.png", package = "pavo"))
 
 # Multiple images
 snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))

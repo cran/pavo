@@ -1,8 +1,31 @@
+# pavo 2.7.0
+
+## NEW FEATURES AND SIGNIFICANT CHANGES
+
+* It is now possible to filter images according to the AcuityView 2.0 algorithm (Caves et al. 2018) in order to to model the visual acuity of animals, prior to analysis. The functionality is implemented in `procimg()`, with details and examples available in the function's help documentation and the vignette.
+* Added the argument `raw` to `bootcoldist()`. When `TRUE`, the full raw list of bootstrapped colour-distances are returned (equal in length to the number of replicates specified by `boot.n`), rather than the summary statistics which are returned by default.
+* Added the visual phenotype of the Vinegar fly _Drosophila melanogaster_ (Sharkey et al. 2020). See `?vismodel()` or `?sensdata()` for instructions on selecting it. 
+* `coldist()` now uses the package `farver` when calculating CIE2000 colour distances between points in the CIELab and CIELch spaces.
+
+## MINOR FEATURES AND BUG FIXES
+
+* Fixed a bug where procimg() would fail when using resize/rotate followed by further options, on single images. 
+* vignettes have been moved to https://book.colrverse.com/ and now use a book format
+* Fixed a bug in `plot.colspace(gamut = TRUE)` (as well as `triplot()`, `tcsplot()`, `tetraplot()`) where it would incorrectly display `"Max gamut cannot be plotted."` and fail to plot the max gamut each time.
+* Fixed a recent bug whereby the D65 illuminant was expressed in units of radiant flux, by default. It has instead been converted to photon flux (umol.s-1.m-2). 
+* Added an informative error message when raw quantum catch estimates are < 1, and an attempt is made to calculate colour distances in the receptor-noise model using `noise = 'quantum'`. Taking the root of negative values following log-transformation, as required when `noise = 'quantum'`, would previously produce an uninformative error, which has been rectified. 
+* The `margins` argument has been deprecated for cie, coc, hexagon, segment, projplot, di-, tri-, and tetra-chromatic plots. It was causing problems when later adding points to plots, and margin-handling is best left to the user anyway. The default plots may therefore look slightly different, but the margins can be adjusted to taste using the standard `par(mar = c())` pathway.
+* Fixed a bug where `bootcoldist()` would not run until supplied with receptor-noise model arguments (n, weber, weber.ref), even when not running the receptor-noise model.
+* Fixed a bug where `bootcoldist()` would sometimes fail when given data from colourspace models containing lots of negative coordinate values. This was particularly common for the hexagon model.
+* Improved safety and error handling in `adjacent()`.
+
 # pavo 2.6.1
 
 ## MINOR FEATURES AND BUG FIXES
 
 * Minor fix to a vignette to avoid installation issues. 
+* `options()` and `par()` are now always set locally, including in vignettes and
+examples, as to prevent spillover of these changes in the user session
 
 # pavo 2.6.0
 

@@ -112,7 +112,7 @@ noise-weighted Euclidean distances for \code{vismodel} objects.
 \examples{
 \donttest{
 # Dichromat
-data(flowers)
+data(flowers)  
 vis.flowers <- vismodel(flowers, visual = "canis", relative = FALSE)
 didist.flowers <- coldist(vis.flowers, n = c(1, 2))
 
@@ -166,5 +166,7 @@ achromatic vision: parameter choice and limitations for reliable model
 predictions. Behavioral Ecology, \doi{10.1093/beheco/arx133}
 }
 \author{
+Thomas E. White \email{thomas.white026@gmail.com}
+
 Rafael Maia \email{rm72@zips.uakron.edu}
 }

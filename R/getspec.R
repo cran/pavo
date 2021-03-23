@@ -22,8 +22,10 @@
 #' and import of spectral metadata.
 #'
 #' @examples
+#' # Import and inspect example spectral data with a range of set to 400-700nm.  
 #' rspecdata <- getspec(system.file("testdata", package = "lightr"), ext = "ttt", lim = c(400, 700))
 #' head(rspecdata)
+#' 
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #' @author Hugo Gruson \email{hugo.gruson+R@@normalesup.org}
 #'
@@ -33,13 +35,7 @@
 
 getspec <- function(where = getwd(), ext = "txt", lim = c(300, 700), decimal = ".",
                     sep = NULL, subdir = FALSE, subdir.names = FALSE,
-                    cores = NULL, ignore.case = TRUE) {
-  if (!missing(cores)) {
-    warning(
-      "'cores' argument is deprecated. See ?future::plan for more info ",
-      "about how you can choose your parallelisation strategy."
-    )
-  }
+                    ignore.case = TRUE) {
 
   lr_get_spec(
     where = where, ext = ext, lim = lim, decimal = decimal, sep = sep,

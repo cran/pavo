@@ -1,3 +1,5 @@
+local_edition(2)
+
 test_that("coldist", {
   skip_on_cran()
 
@@ -34,6 +36,42 @@ test_that("coldist", {
     digest::sha1(coldist(as.matrix(vismodel(flowers, achro = "bt.dc")), qcatch = "Qi", achromatic = TRUE), digits = 4),
     "c6d1989e98abd7772c00475696c6e6dafe0a2e46"
   )
+  expect_equal(
+    digest::sha1(coldist(colspace(vismodel(flowers, visual = "cie10", illum = "D65", vonkries = TRUE, relative = FALSE), 'cielab')), digits = 4),
+    "ab8d1c2eac211561f68759137baa2b5d3005b199"
+  )
+
+  # Bootcoldist output (means only, since CI's are bootstrapped)
+  ## RN model
+  # data(sicalis)
+  # vm <- vismodel(sicalis, achromatic = "bt.dc", relative = FALSE)
+  # gr <- gsub("ind..", "", rownames(vm))
+  # expect_equal(
+  # digest::sha1(bootcoldist(vm, by = gr, n = c(1, 2, 2, 4), weber = 0.1, weber.achro = 0.1)[, c(1, 4)]),
+  #              "5f29a9d9c57f922e439e419a4691445e7d67555d"
+  # )
+  #
+  # ## Tcs
+  # vm <- vismodel(sicalis, achromatic = "bt.dc")
+  # space <- colspace(vm)
+  # gr <- gsub("ind..", "", rownames(space))
+  # expect_equal(
+  # digest::sha1(bootcoldist(space, by = gr)[, c(1, 4)]),
+  #              "1abaef8c25cb8a91f79730be80207cea15e064d6"
+  # )
+  #
+  # ## Hexagon
+  # data(flowers)
+  # vis.flowers <- vismodel(flowers,
+  #                         visual = "apis", qcatch = "Ei", relative = FALSE,
+  #                         vonkries = TRUE, achromatic = "l", bkg = "green"
+  # )
+  # flowers.hex <- colspace(vis.flowers, space = "hexagon")
+  # pop_group <- c(rep('pop_1', nrow(flowers.hex)/2), rep('pop_2', nrow(flowers.hex)/2))
+  # expect_equal(
+  # digest::sha1(bootcoldist(flowers.hex, by = pop_group)[, c(1, 4)]),
+  #              "ef5ac59c77071718d398e2a6e08ff7daa5cbe92c"
+  # )
 })
 
 test_that("colspace", {
@@ -117,7 +155,7 @@ test_that("processing & general", {
   # Sensdata
   expect_known_hash(
     expect_silent(sensdata(illum = "all", bkg = "all", trans = "all")),
-    "27b20f98dc"
+    "b084b37ec7"
   )
 
   # Peakshape
@@ -166,7 +204,7 @@ test_that("images", {
   suppressWarnings(RNGversion("3.5.0")) # back compatibility for now
   set.seed(2231)
 
-  papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
+  papilio <- getimg(system.file("testdata/images/butterflies/papilio.png", package = "pavo"))
   snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
 
   expect_equal(

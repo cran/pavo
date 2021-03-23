@@ -29,8 +29,10 @@ test_that("Messages & warnings", {
   expect_message(coldist(as.matrix(vismodel(flowers, achro = "bt.dc")), qcatch = "Qi", achromatic = TRUE), "last column ignored for chromatic contrast")
   expect_message(coldist(as.matrix(vismodel(flowers)), qcatch = "Qi"), "Number of cones assumed to be 4")
 
-  expect_warning(coldist(vismodel(flowers)), "Quantum catch are relative")
-  expect_warning(coldist(vismodel(flowers), achromatic = TRUE), "achromatic contrast not calculated")
+  expect_message(coldist(vismodel(flowers)), "Quantum catch are relative")
+  expect_message(coldist(vismodel(flowers), achromatic = TRUE), "achromatic contrast not calculated")
+
+  expect_error(coldist(vismodel(flowers, relative = FALSE), noise = "quantum"), "negative quantum-catch")
 })
 
 test_that("Equivalent", {
@@ -57,6 +59,13 @@ test_that("Equivalent", {
     suppressWarnings(coldist(as.data.frame(vismodel(flowers)), qcatch = "Qi")),
     ignore_attr = TRUE
   )
+  
+  expect_equal(
+  coldist(colspace(vismodel(flowers, visual = "cie10", vonkries = TRUE, relative = FALSE), 'cielab')),
+  coldist(colspace(vismodel(flowers, visual = "cie10", vonkries = TRUE, relative = FALSE), 'cielch')),
+  ignore_attr = TRUE
+  )
+  
 })
 
 test_that("Options", {
@@ -99,9 +108,7 @@ test_that("Output", {
 })
 
 test_that("bootcoldist", {
-  # set.seed(11023)
   data(sicalis)
-
   vm <- vismodel(sicalis, visual = "apis", achromatic = "l")
   gr <- gsub("ind..", "", rownames(vm))
 
@@ -109,4 +116,10 @@ test_that("bootcoldist", {
     bootcoldist(vm, by = gr, n = c(1, 2, 3), weber = 0.1, weber.achro = 0.1)
   )
   expect_equal(dim(bcd), c(3, 6))
+  
+  # Raw size
+  raw <- bootcoldist(vm, by = gr, n = c(1, 2, 3), weber = 0.1, weber.achro = 0.1, boot.n = 30, raw = TRUE)
+  expect_equal(nrow(raw), 30)
+  raw2 <- bootcoldist(vm, by = gr, n = c(1, 2, 3), weber = 0.1, weber.achro = 0.1, boot.n = 437, raw = TRUE)
+  expect_equal(nrow(raw2), 437)
 })

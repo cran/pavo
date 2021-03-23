@@ -13,9 +13,9 @@
 #'   axis, from which the evenly-spaced sampling grid is constructed (if
 #'   required). Defaults to the smallest dimension of `classimg`, though this
 #'   should be carefully considered.
-#' @param xscale (required) an integer specifying the true length of the x-axis,
-#'   in preferred units. Not required, and ignored, only if image scales have
-#'   been set via [procimg()].
+#' @param xscale (required) an integer or list of integers equal in length to classimg()
+#'   specifying the true length of the x-axis, in preferred units. Not required,
+#'   and ignored, only if image scales have been set via [procimg()].
 #' @param exclude the portion of the scene to be excluded from the analysis, if
 #'   any.
 #'   - `'none'`: default
@@ -49,7 +49,6 @@
 #'   The first column, named 'patch', should contain numeric color category IDs,
 #'   with the remaining columns specifying one or more of 'hue' (angle, in
 #'   radians), 'sat', and/or 'lum'.
-#' @inheritParams getspec
 #'
 #' @inherit getspec details
 #'
@@ -108,13 +107,15 @@
 #' # Set a seed, for reproducibility
 #' set.seed(153)
 #'
-#' # Single image
-#' papilio <- getimg(system.file("testdata/images/papilio.png", package = "pavo"))
+#' # Run the adjacency analysis on a single image of a butterfly
+#' papilio <- getimg(system.file("testdata/images/butterflies/papilio.png", package = "pavo"))
 #' papilio_class <- classify(papilio, kcols = 4)
 #' papilio_adj <- adjacent(papilio_class, xscale = 100)
 #'
-#' # Single image, with (fake) color distances and hsl values
-#' # Fake color distances
+#' # Expand on the above, by including (fake) color distances and hsl values
+#' # of colour elements in the image
+#' 
+#' # Generate fake color distances
 #' distances <- data.frame(
 #'   c1 = c(1, 1, 1, 2, 2, 3),
 #'   c2 = c(2, 3, 4, 3, 4, 4),
@@ -122,7 +123,7 @@
 #'   dL = c(5.5, 6.6, 3.3, 2.2, 4.4, 6.6)
 #' )
 #'
-#' # Fake hue, saturation, luminance values
+#' # Generate some fake hue, saturation, luminance values
 #' hsl_vals <- data.frame(
 #'   patch = seq_len(4),
 #'   hue = c(1.5, 2.2, 1.0, 0.5),
@@ -130,15 +131,20 @@
 #'   sat = c(3.5, 1.1, 6.3, 1.3)
 #' )
 #'
-#' # Full analysis, including the white background's ID
+#' # Run the full analysis, including the white background's ID
 #' papilio_adj <- adjacent(papilio_class,
 #'   xscale = 100, bkgID = 1,
 #'   coldists = distances, hsl = hsl_vals
 #' )
 #'
-#' # Multiple images
+#' # Run an adjacency analysis on multiple images.
+#' # First load some images of coral snake colour patterns
 #' snakes <- getimg(system.file("testdata/images/snakes", package = "pavo"))
+#' 
+#' # Automatically colour-classify the coral snake patterns
 #' snakes_class <- classify(snakes, kcols = 3)
+#' 
+#' # Run the adjacency analysis, with varying real-world scales for each image
 #' snakes_adj <- adjacent(snakes_class, xpts = 120, xscale = c(50, 55))
 #' }
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
@@ -157,14 +163,7 @@
 
 adjacent <- function(classimg, xpts = NULL, xscale = NULL, bkgID = NULL,
                      polygon = NULL, exclude = c("none", "background", "object"),
-                     coldists = NULL, hsl = NULL, cores = NULL) {
-  if (!missing(cores)) {
-    warning("'cores' argument is deprecated. See ?future::plan for more info ",
-      "about how you can choose your parallelisation strategy.",
-      call. = FALSE
-    )
-  }
-
+                     coldists = NULL, hsl = NULL) {
   exclude2 <- match.arg(exclude)
 
   ## ------------------------------ Checks ------------------------------ ##
@@ -256,12 +255,15 @@ adjacent <- function(classimg, xpts = NULL, xscale = NULL, bkgID = NULL,
   ## Setting scales
   if (!is.na(attr(classimg[[1]], "px_scale"))) {
     xscale <- lapply(classimg, function(x) attr(x, "px_scale") * dim(x)[2])
-  } else if (is.null(xscale)) {
-    stop("Required argument xscale is missing, and one or more images are uncalibrated. Either specify xscale or use procimg() to set a scale for each image.")
-  } else if (length(xscale) <= 1) {
+    if (!is.null(xscale)) {
+      message("Argument xscale specified, but the image already contains a scale. Ignoring xscale in favour of the image's current scale")
+    }
+  } else if (length(xscale) <= 1 && is.numeric(xscale)) {
     xscale <- as.list(rep(xscale, length(classimg)))
-  } else if (length(xscale) == length(classimg)) {
+  } else if (length(xscale) == length(classimg) && is.numeric(unlist(xscale))) {
     xscale <- xscale
+  } else {
+    stop("Required argument xscale is missing or incorrectly specified, and one or more images are uncalibrated. Either specify xscale (an integer or integers) or use procimg() to set a scale for each image.")
   }
 
   ## Sampling density

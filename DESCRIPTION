@@ -1,7 +1,7 @@
 Package: pavo
 Title: Perceptual Analysis, Visualization and Organization of Spectral
         Colour Data
-Version: 2.7.1
+Version: 2.8.0
 Authors@R: 
     c(person(given = "Thomas",
              family = "White",
@@ -33,7 +33,7 @@ Authors@R:
              comment = c(ORCID = "0000-0001-5984-2331")))
 Description: A cohesive framework for the spectral and spatial analysis of 
     colour described in Maia, Eliason, Bitton, Doucet & Shawkey (2013) 
-    <doi:10.1111/2041-210X.12069> and Maia, Grsuon, Endler & White (2019)
+    <doi:10.1111/2041-210X.12069> and Maia, Gruson, Endler & White (2019)
     <doi:10.1111/2041-210X.13174>.
 License: GPL (>= 2)
 URL: http://pavo.colrverse.com, https://github.com/rmaia/pavo/
@@ -42,14 +42,15 @@ Depends: R (>= 3.5.0)
 Imports: cluster, future.apply, geometry(>= 0.4.0), lightr(>= 1.0),
         magick, farver, plot3D, progressr, sp, viridisLite
 Suggests: alphashape3d, digest, imager, knitr, mapproj, rgl, rmarkdown,
-        testthat(>= 2.99.0),
+        testthat(>= 2.99.0), vdiffr
 VignetteBuilder: knitr
+Config/Needs/website: pkgdown
 Encoding: UTF-8
 Language: en-GB
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2021-09-21 08:13:31 UTC; twhite
+Packaged: 2022-08-16 06:12:21 UTC; thomaswhite
 Author: Thomas White [aut, cre] (<https://orcid.org/0000-0002-3976-1734>),
   Rafael Maia [aut] (<https://orcid.org/0000-0002-7563-9795>),
   Hugo Gruson [aut] (<https://orcid.org/0000-0002-4094-1476>),
@@ -58,4 +59,4 @@ Author: Thomas White [aut, cre] (<https://orcid.org/0000-0002-3976-1734>),
   Pierre-Paul Bitton [aut] (<https://orcid.org/0000-0001-5984-2331>)
 Maintainer: Thomas White <thomas.white026@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-09-21 13:10:21 UTC
+Date/Publication: 2022-08-16 13:00:20 UTC

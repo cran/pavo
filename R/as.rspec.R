@@ -10,7 +10,9 @@
 #'   equally spaced numbers and sets it as wavelengths "wl". If no wavelengths
 #'   are found or `whichwl` is not given, returns arbitrary index values.
 #' @param interp whether to interpolate wavelengths in 1-nm bins (defaults to
-#'   `TRUE`).
+#'   `TRUE`). It is rarely recommended to turn off this option, as
+#'   uninterpolated spectra are incompatible with some downstream analyses,
+#'   including notably colour vision models.
 #' @param lim vector specifying wavelength range to interpolate over (e.g.
 #'   `c(300, 700)`).
 #' @param exceed.range logical. Should data be interpolated to the limits
@@ -45,7 +47,7 @@ as.rspec <- function(object, whichwl = NULL,
 
   # tibble dodge
   if (inherits(object, "tbl_df")) {
-    object <- data.frame(object)
+    object <- data.frame(object, check.names = FALSE)
   }
 
   if (is.matrix(object) || is.data.frame(object)) {

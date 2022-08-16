@@ -29,8 +29,7 @@
 #' - `huedisp.v` the variance in hue disparity.
 #' - `mean.ra` mean saturation.
 #' - `max.ra` maximum saturation achieved by the group of points.
-#' - `a.vol` colour volume computed with
-#'    \ifelse{html}{\out{&alpha;}}{\eqn{$\alpha$}{alpha}}-shapes.
+#' - `a.vol` colour volume computed with \eqn{\alpha}{alpha}-shapes.
 #'
 #' @export
 #'
@@ -57,9 +56,9 @@
 #' @references Endler, J. A., & Mielke, P. (2005). Comparing entire colour patterns
 #'  as birds see them. Biological Journal Of The Linnean Society, 86(4), 405-431.
 #' @references
-#' Gruson H. 2020. Estimation of colour volumes as concave hypervolumes using
-#'  \ifelse{html}{\out{&alpha;}}{\eqn{$\alpha$}{alpha}}-shapes. Methods in
-#'  Ecology and Evolution, early view \doi{10.1111/2041-210X.13398}
+#' Gruson H. (2020). Estimation of colour volumes as concave hypervolumes using
+#' \eqn{\alpha}{alpha}-shapes. Methods in Ecology and Evolution, 11(8), 955-963
+#' \doi{10.1111/2041-210X.13398}
 
 summary.colspace <- function(object, by = NULL, ...) {
   chkDots(...)

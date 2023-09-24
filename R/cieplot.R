@@ -21,7 +21,6 @@
 #'   to `FALSE`)
 #' @param ciebg should the colour background be plotted for CIEXYZ plot?
 #'   (defaults to `TRUE`)
-#' @param margin Deprecated. Please use the standard [par()] method for custom margins.
 #' @inheritParams triplot
 #'
 #' @examples
@@ -31,10 +30,10 @@
 #' # CIEXYZ
 #' # Estimate quantum catches, using the cie10-degree viewer matching function
 #' vis.flowers <- vismodel(flowers, visual = "cie10", illum = "D65", vonkries = TRUE, relative = FALSE)
-#' 
+#'
 #' # Run the ciexyz model
 #' xyz.flowers <- colspace(vis.flowers, space = "ciexyz")
-#' 
+#'
 #' # Visualise the floral spectra in a ciexyz chromaticity diagram
 #' plot(xyz.flowers)
 #'
@@ -42,10 +41,10 @@
 #' # Using the quantum catches above, instead model the spectra in the CIELab
 #' # space
 #' lab.flowers <- colspace(vis.flowers, space = "cielab")
-#' 
+#'
 #' # And plot in Lab space
 #' plot(lab.flowers)
-#' 
+#'
 #' @author Thomas E. White \email{thomas.white026@@gmail.com}
 #' @author Rafael Maia \email{rm72@@zips.uakron.edu}
 #'
@@ -63,13 +62,7 @@
 
 cieplot <- function(ciedata, mono = TRUE, out.lwd = NULL, out.lcol = "black",
                     out.lty = 1, theta = 45, phi = 10, r = 1e6, zoom = 1, box = FALSE,
-                    ciebg = TRUE, margin = NULL, ...) {
-  if (!missing("margin")) {
-    message(
-      "The 'margin' argument is deprecated, and will be ignored. ",
-      "See ?par() for guidance on setting margins in the standard manner."
-    )
-  }
+                    ciebg = TRUE, ...) {
 
   arg <- list(...)
 
@@ -137,7 +130,7 @@ cieplot <- function(ciedata, mono = TRUE, out.lwd = NULL, out.lcol = "black",
       rasterImage(bg, min(monox), min(monoy), max(monox), max(monoy))
     }
 
-    if (mono == TRUE) {
+    if (mono) {
       polygon(monoy ~ monox, border = out.lcol, lty = out.lty, lwd = out.lwd)
     }
 
@@ -152,7 +145,7 @@ cieplot <- function(ciedata, mono = TRUE, out.lwd = NULL, out.lcol = "black",
   }
 
   # CIELAB or CIELch
-  if (attr(ciedata, "clrsp") == "CIELAB" | attr(ciedata, "clrsp") == "CIELCh") {
+  if (attr(ciedata, "clrsp") %in% c("CIELAB", "CIELCh")) {
 
     # Set defaults
     arg <- list(...)

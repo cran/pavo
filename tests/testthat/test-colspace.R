@@ -1,4 +1,4 @@
-test_that("Receptor orders/names", {
+test_that("Receptor orders & names", {
   data(flowers)
 
   # dichromat
@@ -44,6 +44,15 @@ test_that("Receptor orders/names", {
   )
 })
 
+test_that("colcat()", {
+
+  # https://github.com/rmaia/pavo/issues/244
+  # colcat() works even for points close to the origin
+  test <- data.frame(u = 0, s = 0, m = 0, l = 0)
+  expect_no_error(colspace(test, space = "categorical"))
+
+})
+
 test_that("Relative quantum catches", {
   data(flowers)
 
@@ -58,7 +67,7 @@ test_that("Relative quantum catches", {
   expect_warning(colspace(di_vis_norel), "not relative")
   expect_warning(colspace(di_vis_noreldf), "not relative")
 
-  expect_equal(
+  expect_identical(
     suppressWarnings(colspace(di_vis)),
     suppressWarnings(colspace(di_vis_norel))
   )
@@ -74,13 +83,13 @@ test_that("Relative quantum catches", {
   expect_warning(colspace(tri_vis_norel), "not relative")
   expect_warning(colspace(tri_vis_noreldf), "not relative")
 
-  expect_equal(
+  expect_identical(
     suppressWarnings(colspace(tri_vis)),
     suppressWarnings(colspace(tri_vis_norel))
   )
 })
 
-test_that("Errors/messages", {
+test_that("Errors & messages", {
   data(flowers)
 
   # Categorical
@@ -179,7 +188,7 @@ test_that("CIE", {
     Z = c(0.5, 0.6),
     lum = c(NA, NA)
   )
-  expect_equal(
+  expect_identical(
     colspace(fakedat, space = "cielab", visual = sensdata(visual = "cie10"), illum = sensdata(illum = "D65")),
     colspace(fakedat, space = "cielab", visual = "cie10", illum = "D65")
   )
@@ -187,7 +196,7 @@ test_that("CIE", {
   # Should ignore custom options when data are class vismodel()
   expect_warning(vm_d65 <- colspace(vismodel(flowers, "cie10"), space = "cielab", visual = "cie10", illum = "D65"))
   expect_warning(vm_bluesky <- colspace(vismodel(flowers, "cie10"), space = "cielab", visual = "cie2", illum = "bluesky"))
-  expect_equal(
+  expect_identical(
     vm_d65,
     vm_bluesky
   )

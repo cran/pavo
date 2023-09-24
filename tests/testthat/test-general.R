@@ -19,7 +19,7 @@ test_that("sensdata", {
   expect_true(all(names(as.data.frame(vissyst)) %in% names(sensdata("all", "all"))))
 
   # Check for negative values
-  expect_equal(min(sensdata(visual = "all", illum = "all", trans = "all", achromatic = "all", bkg = "all")), 0)
+  expect_identical(min(sensdata(visual = "all", illum = "all", trans = "all", achromatic = "all", bkg = "all")), 0)
 })
 
 test_that("peakshape", {
@@ -31,13 +31,13 @@ test_that("peakshape", {
     ignore_attr = TRUE
   )
 
-  test <- readRDS("known_output/FWHM_lims.rds")
-  expect_equal(peakshape(test, plot = FALSE)[, 4], c(144, 52))
+  test <- readRDS(file.path("known_output", "FWHM_lims.rds"))
+  expect_identical(peakshape(test, plot = FALSE)[, 4], c(144L, 52L))
 
   expect_warning(peakshape(flowers[, -1], plot = FALSE), "wl column missing")
 
   expect_identical(
-    nrow(peakshape(flowers, grepl("^Hibbertia", colnames(flowers)), plot = FALSE)),
+    nrow(peakshape(flowers, startsWith(colnames(flowers), "Hibbertia"), plot = FALSE)),
     6L
   )
 
@@ -54,4 +54,28 @@ test_that("peakshape", {
     peakshape(flowers, lim = c(300, 400), plot = FALSE),
     "incorporate all minima in spectral curves"
   )
+})
+
+test_that("simulate", {
+  # Ideal reflectance
+  spec_50 <- simulate_spec(ylim = c(0, 50))
+  expect_identical(summary(spec_50)$B2, 50) # recover brightness
+  expect_identical(summary(spec_50)$B3, 50) # recover brightness
+
+  # Sigmoidal
+  spec_sig1 <- simulate_spec(wl_inflect = 550) # low-high
+  expect_identical(summary(spec_sig1)$H3, 550) # recover hue
+  expect_identical(summary(spec_sig1)$S6, 100) # recover sat
+  expect_identical(summary(spec_sig1)$B3, 100) # recover brightness
+
+  spec_sig2 <- simulate_spec(wl_inflect = 550, ylim = c(100, 0)) # high-low
+  expect_identical(summary(spec_sig2)$H3, 550) # recover hue
+  expect_identical(summary(spec_sig2)$S6, 100) # recover sat
+  expect_identical(summary(spec_sig2)$B3, 100) # recover brightness
+
+  # Gaussian
+  spec_gauss1 <- simulate_spec(wl_peak = 400)
+  expect_identical(summary(spec_gauss1)$H1, 400) # recover hue
+  expect_identical(summary(spec_gauss1)$S6, 100) # recover sat
+  expect_identical(summary(spec_gauss1)$B3, 100) # recover brightness
 })

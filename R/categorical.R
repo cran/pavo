@@ -46,11 +46,7 @@ categorical <- function(vismodeldata) {
     if (!attr(dat, "relative")) {
       warning("Quantum catch are not relative, which may produce unexpected results", call. = FALSE)
     }
-  }
-
-  # if not, check if it has more (or less) than 4 columns
-
-  else {
+  } else {  # if not, check if it has more (or less) than 4 columns
     if (ncol(dat) < 4) {
       stop("Input data is not a ", dQuote("vismodel"),
         " object and has fewer than four columns",
@@ -106,20 +102,22 @@ categorical <- function(vismodeldata) {
   x <- R7p - R8p
   y <- R7y - R8y
 
-  # Colour category calculator (surely a better way?)
+  # Colour category calculator
   colcat <- function(object) {
-    if (object$x > 0 && object$y > 0) {
-      return("p+y+")
+    if (object$x == 0 && object$y == 0) {
+      return(NA_character_)
     }
-    if (object$x < 0 && object$y > 0) {
-      return("p-y+")
+    if (object$x == 0) {
+      return(ifelse(object$y > 0, "y+", "y-"))
     }
-    if (object$x < 0 && object$y < 0) {
-      return("p-y-")
+    if (object$y == 0) {
+      return(ifelse(object$x > 0, "p+", "p-"))
     }
-    if (object$x > 0 && object$y < 0) {
-      return("p+y-")
-    }
+
+    paste0(
+      ifelse(object$x > 0, "p+", "p-"),
+      ifelse(object$y > 0, "y+", "y-")
+    )
   }
 
   res <- data.frame(R7p, R7y, R8p, R8y, x, y, row.names = rownames(dat))
